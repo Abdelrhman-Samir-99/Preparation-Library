@@ -1,4 +1,7 @@
 ## High Level Design
++ [Scaling]()
+  + Horizontal Scaling
+  + Vertical Scaling
 + [Load Balancer]()
   + Consistent Hashing
   + Round Robin 
@@ -16,3 +19,6 @@
     + [SQL]()
   + Non-Relational Databases
   + Transactions
+  + Master – Slave Databases
+  + Partitioning
+  + Sharding
