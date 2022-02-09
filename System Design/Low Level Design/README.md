@@ -1,4 +1,5 @@
 ## Low Level Design (LLD)
++ [Object Oriented Design]()
 + [Design Principles]()
   + SOLID
   + DRY
