@@ -20,7 +20,7 @@ For interviews, there may be any type of problem-solving including (Algorithms a
 + I believe you should mainly focus on (Linked List – Hash Table – Trie – Heap) since they are so popular in interviews. <br>
 + I will discuss other Data Structures which may be useful later including (Segment Tree – Caches (LRU – LFU) – Disjoint and Union set – etc.)
 ### [Algorithms](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms)
-+ I believe that the most popular ones are (Dynamic Programming – Quick Select – Greedy – DFS – BFS). <br>
++ I believe that the most popular ones are (Dynamic Programming – Quick Select – Greedy – Graph Traversal). <br>
 + I will discuss more algorithms including (Strongly Connected Components – Minimum Spanning Tree – Rabin Karp – KMP – Hashing – etc.)
 
 ## Programming Language
