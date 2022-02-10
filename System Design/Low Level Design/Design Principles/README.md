@@ -3,10 +3,10 @@ These principles should help you to write **clean and extendable** code
 
 + **SOLID**
   + **Videos**
-    + [Tim Corey (Highly Recomended)](https://www.youtube.com/playlist?list=PLAaFb7UfyShCoS246UzZJNEiXuD8bg02e)
+    + [Tim Corey (Highly Recommended)](https://www.youtube.com/playlist?list=PLAaFb7UfyShCoS246UzZJNEiXuD8bg02e)
 + **Don't Repeat Yourself (DRY)**
   + **Videos**
-    + [Tim Corey (Highly Recomended)](https://www.youtube.com/watch?v=dhnsegiPXoo&t=7s)
+    + [Tim Corey (Highly Recommended)](https://www.youtube.com/watch?v=dhnsegiPXoo&t=7s)
   
 + **You Aren't Gonna Need It (YAGNI)**
   + **Videos**
