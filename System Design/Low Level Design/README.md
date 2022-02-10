@@ -7,7 +7,9 @@
   + Keep It Stupid Simple (KISS)
   + Favor composition over inheritance
   + Program to interfaces not implementations
-+ Design Patterns
+  + Encapsulate what may vary
+  + Depend on abstraction. Do not depend on concrete classes.
++ Design Patterns **(Highly recommend reading a book)**
   + [Creational Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Creational/README.md)
   + [Structural Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Structural/README.md)
   + [Behavioral Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Behavioral/README.md)
