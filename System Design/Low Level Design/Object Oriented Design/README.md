@@ -1,11 +1,11 @@
 ## Object-Oriented Design
 Do not forget to follow the [design principles](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Design%20Principles) in your design.
 ### Videos
-+ #### YouTube
++ **YouTube**
   + [Parking Lot](https://www.youtube.com/watch?v=tVRyb4HaHgw&ab_channel=ThinkSoftware)
   + Chess Game
   + Elevator
-+ #### LinkedIn Learning
++ **LinkedIn Learning**
   + [Programming Foundations: Object-Oriented Design](https://www.linkedin.com/learning/programming-foundations-object-oriented-design-3) 
 ### Articles
 + [Grokking the Object-Oriented Design Interview](https://akshay-iyangar.github.io/system-design/)
