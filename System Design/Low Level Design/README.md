@@ -1,6 +1,6 @@
 ## Low Level Design (LLD)
-+ [Object Oriented Design](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Object%20Oriented%20Design)
-+ [Design Principles](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Design%20Principles)
++ [Object Oriented Design](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Object%20Oriented%20Design/README.md)
++ [Design Principles](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Principles/README.md)
   + SOLID
   + Don't Repeat Yourselft (DRY)
   + You Aren't Gonna Need It (YAGNI)
