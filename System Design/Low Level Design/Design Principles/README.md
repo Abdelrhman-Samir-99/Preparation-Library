@@ -4,7 +4,7 @@ These principles should help you to write **clean and extendable** code
 + **SOLID**
   + **Videos**
     + [Tim Corey (Highly Recomended)](https://www.youtube.com/playlist?list=PLAaFb7UfyShCoS246UzZJNEiXuD8bg02e)
-+ **Don't Repeat your self (DRY)**
++ **Don't Repeat Yourself (DRY)**
   + **Videos**
     + [Tim Corey (Highly Recomended)](https://www.youtube.com/watch?v=dhnsegiPXoo&t=7s)
   
