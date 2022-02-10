@@ -15,3 +15,5 @@ These principles should help you to write **clean and extendable** code
 + **Keep It Stupid Simple (KISS)**
   + **Articles**
     + [Definition](https://workat.tech/machine-coding/tutorial/software-design-principles-dry-yagni-eytrxfhz1fla)
++ **Books**
+  + [Head First Design Patterns](https://longbiao.spatial-crowdsensing.com/courses/scad/files/head-first-design-patterns-compressed.pdf)
