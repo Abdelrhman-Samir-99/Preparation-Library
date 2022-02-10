@@ -8,10 +8,10 @@
   + Favor composition over inheritance
   + Program to interfaces not implementations
 + Design Patterns
-  + [Creational Patterns]()
-  + [Structural Patterns]()
-  + [Behavioral Patterns]()
-  + [Architectural Patterns]()
+  + [Creational Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Creational/README.md)
+  + [Structural Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Structural/README.md)
+  + [Behavioral Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Behavioral/README.md)
+  + [Architectural Patterns](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Patterns/Architectural/README.md)
 + [Diagrams](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Diagrams)
   + Entity Relation Diagram (ERD)
   + Class Diagram
