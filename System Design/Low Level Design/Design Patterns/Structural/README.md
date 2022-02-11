@@ -21,7 +21,10 @@
   + [Guru](https://refactoring.guru/design-patterns/composite)
 ## Decorator
 + **Videos**
-  + [Christopher Okhravi](https://www.youtube.com/watch?v=GCraGHx6gso&t=2166s)
+  + **LinkedIn Learning**
+    + [Eric Freeman & Elisabeth Robson](https://www.linkedin.com/learning/programming-foundations-design-patterns-2)
+  + **YouTube**
+    + [Christopher Okhravi](https://www.youtube.com/watch?v=GCraGHx6gso&t=2166s)
 + **Articles**
   + [Guru](https://refactoring.guru/design-patterns/decorator)
 ## Facade
