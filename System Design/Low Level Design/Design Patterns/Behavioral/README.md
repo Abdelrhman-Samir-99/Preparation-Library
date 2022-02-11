@@ -1,5 +1,5 @@
 # Behavioral Patterns
-Behavioral design patterns are concerned with algorithms and the assignment of new responsibilities for objects.
+Behavioral design patterns are concerned with algorithms and the assignment of responsibilities between objects.
 ## LinkedIn Learning
 + Bethan Palmer **(Recommended to start with)**
     + [Part 1](https://www.linkedin.com/learning/java-design-patterns-behavioral-part-1)
