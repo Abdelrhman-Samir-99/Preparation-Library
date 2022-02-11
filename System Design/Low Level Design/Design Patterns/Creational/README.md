@@ -18,7 +18,10 @@ Be aware about the potintial problems in this pattern (Creating multiple instanc
 
 + Factory **Method**
   + **Videos**
-    + [Christopher Okhravi](https://www.youtube.com/watch?v=hUE_j6q0LTQ)
+    + **LinkedIn Learning**
+      + [Eric Freeman & Elisabeth Robson](https://www.linkedin.com/learning/programming-foundations-design-patterns-2)
+    + **YouTube**
+      + [Christopher Okhravi](https://www.youtube.com/watch?v=hUE_j6q0LTQ)
   + **Articles**
     + [Guru](https://refactoring.guru/design-patterns/factory-method)
 ## Builder
