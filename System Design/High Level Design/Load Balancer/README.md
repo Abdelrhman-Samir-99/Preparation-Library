@@ -1,24 +1,14 @@
-## High Level Design
-+ [Scaling]()
-  + Horizontal Scaling
-  + Vertical Scaling
-+ [Load Balancer]()
-  + Consistent Hashing
-  + Round Robin 
-+ [Message Queue]()
-  + RabbitMQ
-+ [Caches]()
-  + Redis
-+ [DataBases]() 
-  + Relational Databases
-    + Normalization vs denormalization
-    + Joins
-      + Complexity
-      + Join tables
-    + ACID
-    + [SQL]()
-  + Non-Relational Databases
-  + Transactions
-  + Master – Slave Databases
-  + Partitioning
-  + Sharding
+# Load Balancer
+Load balancing refers to efficiently distributing incoming network traffic across a group of backend servers, also known as a server farm or server pool.
+
+## Definition
++ **Videos**
+  + [Gaurav Sen](https://www.youtube.com/watch?v=K0Ta65OqQkY)
+  + [IBM Technology](https://www.youtube.com/watch?v=sCR3SAVdyCc&t=330s) **(Recommended)**
+## Consistent Hashing
++ **Videos**
+  + [Gaurav Sen](https://www.youtube.com/watch?v=zaRkONvyGr8&t=86s) 
++ **Articles**
+## Round Robin
++ **Videos**
+  + [jscapeus](https://www.youtube.com/watch?v=iqOTT7_7qXY)
