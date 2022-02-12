@@ -18,7 +18,7 @@
   + Entity Relation Diagram (ERD)
   + Class Diagram
   + Use Case Diagram
-+ [User stories]()
++ User stories
 + **Books**
   + [Head First Design Patterns](https://longbiao.spatial-crowdsensing.com/courses/scad/files/head-first-design-patterns-compressed.pdf)
   + [Head First Object-Oriented Analysis & Design](http://index-of.es/Programming/O%27Reilly%20Desining%20Series/O%27Reilly%20Head%20First%20Object-Oriented%20Design%20and%20Analysis.pdf)
