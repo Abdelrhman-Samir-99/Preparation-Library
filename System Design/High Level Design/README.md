@@ -11,15 +11,17 @@
   + Server-Side
     + Redis
     + In-Memory Caching
-  + Client-Sdie
-+ [DataBases](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/DataBases/README.md) 
+  + Client-Side
++ [Databases](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/DataBases/README.md) 
   + Relational Databases
-    + Normalization vs denormalization
+    + Normalization vs Denormalization
     + Joins
       + Complexity
       + Join tables
     + ACID
-    + [SQL]()
+    + [SQL](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/DataBases/Relational/README.md)
+    + Logical query processing
+    + Query optimization (indexers)
   + Non-Relational Databases
   + Transactions
   + Master – Slave Databases
