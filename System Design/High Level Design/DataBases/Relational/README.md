@@ -6,3 +6,5 @@
 + **Youtube**
   + [Jamie King](https://www.youtube.com/playlist?list=PL31B586F8DE1ACCEB) **(Highly Recommended)**
   + [El-Desouky](https://www.youtube.com/playlist?list=PL1DUmTEdeA6J6oDLTveTt4Z7E5qEfFluE) **(Arabic)**
+### Articles
++ [W3Schools](https://www.w3schools.com/sql/default.asp)
