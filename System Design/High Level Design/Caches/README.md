@@ -4,7 +4,7 @@ Software or hardware component aimed at storing data so that future requests for
 ## Server-Side
 ### Redis
 + **Videos**
-  + [Introduction](https://youtu.be/8A_iNFRP0F4)
+  + [Introduction + Cache Worker](https://youtu.be/8A_iNFRP0F4)
   + [Time Corey](https://www.youtube.com/watch?v=UrQWii_kfIE&t=3600s) **(Highly Recommended)**
 ### In-Memory Caching
 + **Videos**
