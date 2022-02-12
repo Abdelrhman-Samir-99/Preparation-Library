@@ -8,7 +8,10 @@
 + [Message Queue](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/Message%20Queue/README.md)
   + RabbitMQ
 + [Caches](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/Caches/README.md)
-  + Redis
+  + Server-Side
+    + Redis
+    + In-Memory Caching
+  + Client-Sdie
 + [DataBases](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/DataBases/README.md) 
   + Relational Databases
     + Normalization vs denormalization
