@@ -1,7 +1,5 @@
 # Data Structure
 
-
-
 ## List Based Data Structure
 <div align = "center">
 
@@ -21,10 +19,10 @@
 
 |  Key  | Sparse Table | Segment Tree | Heap | Trie | Balanced BST | BST | DSU |
 |:-----:|:------------:|:------------:|:----:|:----:|:------------:|:---:|:----:|
-| Build | O(N log<sub>2</sub> N) | O(N) | O(N) | O(N) | O(N log<sub>2</sub> N) | **O(N<sup>2</sup>)**| O(N) |
-| Append  |O(N log<sub>2</sub> N)| O(log<sub>2</sub> N)|O(log<sub>2</sub> N)| O(M)|O(log<sub>2</sub> N)| O(N) | O(log<sub>2</sub> N)|
-| Erase |O(N log<sub>2</sub> N)| O(log<sub>2</sub> N)|O(log<sub>2</sub> N)| O(M)|O(log<sub>2</sub> N)| O(N)| **??**
-| Find |O(1)|O(log<sub>2</sub> N)|O(N)|O(M)|O(log<sub>2</sub> N)| O(N)| O(log<sub>2</sub> N)
-| Memory |O(N log<sub>2</sub> N)|O(N)|O(N)|O(N)|O(N)| O(N)| O(N)
-| Notes |<ul> <li> Range Queries </li> <li> Immutable data </li> <li> Overlap friendly operations, or we will cascade the search </li> </ul>| <ul> <li> Range Queries </li> <li> Can do range update with propagation </li> </ul>| <ul> <li> Build in linear time </li> <li> Single misplaced node </li> </ul> | <ul> <li> **M** is the length of the word </li> <li>The space complexity I believe is **Alphabet size * N** </li> </ul> | <ul> <li> AVL tree</li> </ul> | |
+| Build | O(N log<sub>2</sub>&nbsp;N) | O(N) | O(N) | O(N) | O(N log<sub>2</sub>&nbsp;N) | **O(N<sup>2</sup>)**| O(N) |
+| Append  |O(N log<sub>2</sub>&nbsp;N)| O(log<sub>2</sub>&nbsp;N)|O(log<sub>2</sub>&nbsp;N)| O(M)|O(log<sub>2</sub>&nbsp;N)| O(N) | O(log<sub>2</sub>&nbsp;N)|
+| Erase |O(N log<sub>2</sub>&nbsp;N)| O(log<sub>2</sub>&nbsp;N)|O(log<sub>2</sub>&nbsp;N)| O(M)|O(log<sub>2</sub>&nbsp;N)| O(N)| **??**
+| Find |O(1)|O(log<sub>2</sub>&nbsp;N)|O(N)|O(M)|O(log<sub>2</sub>&nbsp;N)| O(N)| O(log<sub>2</sub>&nbsp;N)
+| Memory |O(N log<sub>2</sub>&nbsp;N)|O(N)|O(N)|O(N)|O(N)| O(N)| O(N)
+| Notes |<ul> <li> Range&nbsp;Queries </li> <li> Immutable&nbsp;data </li> <li> Overlap&nbsp;friendly operations, or we will cascade the search </li> </ul>| <ul> <li> Range&nbsp;Queries </li> <li> Can do range update with propagation </li> </ul>| <ul> <li> Build in linear time </li> <li> Single misplaced node </li> </ul> | <ul> <li> **M** is the length of the word </li> <li>The space complexity I&nbsp;believe is **Alphabet size * N** </li> </ul> | <ul> <li> AVL&nbsp;tree</li> </ul> | |
 </div>
