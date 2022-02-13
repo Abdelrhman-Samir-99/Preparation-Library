@@ -1,8 +1,8 @@
 # Algorithms
 
 ## Graphs
-### Graph Traversal
-<!-- Graph Based DS -->
+### Traversal
+<!-- Graph Traversal -->
 <div align = "center">
   <table>
     <thead>
@@ -16,14 +16,14 @@
       </tr>
     </thead>
     <tbody>
-    <!-- Time Comlexity --> 
+    <!-- Time Complexity --> 
       <tr>
         <td align = "center">Time Complexity</td>    
-        <td align = "center">O(N)</td>
-        <td align = "center">O(N)</td>
-        <td align = "center">O(N)</td>
-        <td align = "center">O(N)</td>
-        <td align = "center">O(N)</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E|&nbsp;+&nbsp;|V|)</td>
       </tr>
       <!-- Space Complexity--> 
       <tr>
@@ -55,6 +55,68 @@
           <p> •&nbsp; Constant space if we don't&nbsp;consider stack size </p>
           <p> •&nbsp; Visit all the children before the root </p>
           <p> •&nbsp; (Left - Right - Root) </p>
+        </td>
+        <td align = "left"> <strong> Didn't study yet </strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+### Shortest Path on weighted graphs
+<!-- Graph Shortest Path -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">Dijkstra</th>
+        <th align= "center">Floyd-Warshall</th>
+        <th align= "center">Bellman-Ford</th>
+        <th align= "center">Dynamic Programming (DAG)</th>
+        <th align= "center">Bidirectional</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Time Complexity --> 
+      <tr>
+        <td align = "center">Time Complexity</td>    
+        <td align = "center">O(|V| + |E|&nbsp;log<sub>2</sub>&nbsp;|V|)</td>
+        <td align = "center"><strong>O(N<sup>3</sup>)</strong></td>
+        <td align = "center">O(|E| * |V|) =&nbsp;O(|V|<sup>3</sup>)</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Space Complexity--> 
+      <tr>
+        <td align = "center">Space Complexity</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center"><strong>O(N<sup>2</sup>)</strong></td>
+        <td align = "center">O(|V|)</td>
+        <td align = "center">O(|V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center">Notes</td>
+        <td align = "left">
+          <p> •&nbsp; Doesn't work on negative weights </p>
+          <p> •&nbsp; Single source shortest path </p>
+          <p> •&nbsp; Another implementation using adjacency matrix </p>
+        </td>
+        <td align = "left">
+          <p> •&nbsp; Multi source shortest path </p>
+          <p> •&nbsp; Works with negative weights </p>
+        </td>
+        <td align = "leftr">
+          <p> •&nbsp; Multi source shortest path </p>
+          <p> •&nbsp; Works with negative weights </p>
+          <p> •&nbsp; May end early </p>
+        </td>
+        <td align = "left">
+          <p> •&nbsp; Single source shortest path </p>
+          <p> •&nbsp; Works with negative weights </p>
+          <p> •&nbsp; Must be DAG </p>
         </td>
         <td align = "left"> <strong> Didn't study yet </strong></td>
       </tr>
