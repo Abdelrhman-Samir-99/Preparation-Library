@@ -37,11 +37,11 @@
     <!-- Build --> 
       <tr>
         <td align = "center">Build</td>    
-        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N&nbsp;log<sub>2</sub>&nbsp;N)</td>
         <td align = "center">O(N)</td>
         <td align = "center">O(N)</td>
         <td align = "center">O(N&nbsp*&nbspAlphabet&nbspSize)</td>
-        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N&nbsp;log<sub>2</sub>&nbsp;N)</td>
         <td align = "center"><strong>O(N<sup>2</sup>)</strong></td>
         <td align = "center">O(N)</td>
       </tr>
