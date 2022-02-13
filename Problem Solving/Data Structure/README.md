@@ -12,7 +12,7 @@
 | Erase |O(N)|O(N)|O(N)|O(N)|O(N)
 | Find |O(N)|O(N)|O(N)|O(N)|O(N)
 | Memory |O(N)|O(N)|O(N)|O(N)|O(N)
-| Notes |<ul> <li> The Asymptotic time complexity is Θ(1)</li> <li>Be aware about memory handling/problems</li></ul>| ||||
+| Notes |<ul> <li> The Asymptotic time complexity is Θ(1)</li> <li>Be aware about memory handling/problems</li> <li> Building may take <strong>O(N<sup>2</sup>)</strong> </li></ul>| ||||
 </div>
 
 
