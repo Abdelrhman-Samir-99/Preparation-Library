@@ -1,8 +1,10 @@
 # Data Structure
 
 ## List Based Data Structure
-<div align = "center">
+<!-- List Based DS -->
 
+<div align = "center">
+  
 |  Key  | Hash Table | Singly Linked List | Doubly Linked List | Stack | Queue
 |:-----:|:----------:|:------------------:|:------------------:|:-----:|:-----:|
 | Append  |O(N)| O(1)|O(1)|O(1)|O(1)
@@ -15,14 +17,113 @@
 
 
 ## Graph Based Data Structure 
-<div align = "center">
 
-|  Key  | Sparse Table | Segment Tree | Heap | Trie | Balanced BST | BST | DSU |
-|:-----:|:------------:|:------------:|:----:|:----:|:------------:|:---:|:----:|
-| Build | O(N log<sub>2</sub>&nbsp;N) | O(N) | O(N) | O(N) | O(N log<sub>2</sub>&nbsp;N) | **O(N<sup>2</sup>)**| O(N) |
-| Append  |O(N log<sub>2</sub>&nbsp;N)| O(log<sub>2</sub>&nbsp;N)|O(log<sub>2</sub>&nbsp;N)| O(M)|O(log<sub>2</sub>&nbsp;N)| O(N) | O(log<sub>2</sub>&nbsp;N)|
-| Erase |O(N log<sub>2</sub>&nbsp;N)| O(log<sub>2</sub>&nbsp;N)|O(log<sub>2</sub>&nbsp;N)| O(M)|O(log<sub>2</sub>&nbsp;N)| O(N)| **??**
-| Find |O(1)|O(log<sub>2</sub>&nbsp;N)|O(N)|O(M)|O(log<sub>2</sub>&nbsp;N)| O(N)| O(log<sub>2</sub>&nbsp;N)
-| Memory |O(N log<sub>2</sub>&nbsp;N)|O(N)|O(N)|O(N)|O(N)| O(N)| O(N)
-| Notes |<ul> <li> Range&nbsp;Queries </li> <li> Immutable&nbsp;data </li> <li> Overlap&nbsp;friendly operations, or we will cascade the search </li> </ul>| <ul> <li> Range&nbsp;Queries </li> <li> Can do range update with propagation </li> </ul>| <ul> <li> Build in linear time </li> <li> Single misplaced node </li> </ul> | <ul> <li> **M** is the length of the word </li> <li>The space complexity I&nbsp;believe is **Alphabet size * N** </li> </ul> | <ul> <li> AVL&nbsp;tree</li> </ul> | |
+<!-- Graph Based DS -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">Sparse Table</th>
+        <th align= "center">Segment Tree</th>
+        <th align= "center">Heap</th>
+        <th align= "center">Trie</th>
+        <th align= "center">Balanced BST</th>
+        <th align= "center">BST</th>
+        <th align= "center">DSU</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Build --> 
+      <tr>
+        <td align = "center">Build</td>    
+        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N&nbsp*&nbspAlphabet&nbspSize)</td>
+        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center"><strong>O(N<sup>2</sup>)</strong></td>
+        <td align = "center">O(N)</td>
+      </tr>
+      <!-- Append --> 
+      <tr>
+        <td align = "center">Append</td>    
+        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(M)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(1)</td> <!-- DO NOT FORGET TO NOTE THAT -->
+      </tr>
+      <!-- Erase -->
+      <tr>
+        <td align = "center">Erase</td>    
+        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(M)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center"><strong> ?? </strong></td> <!-- DO NOT FORGET TO NOTE THAT -->
+      </tr>
+      <!-- Find -->
+      <tr>
+        <td align = "center">Find</td>    
+        <td align = "center">O(1)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(M)</td>
+        <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(log&nbsp;N)</td>
+      </tr>
+      <!-- Memory -->
+      <tr>
+        <td align = "center">Memory</td>    
+        <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N&nbsp*&nbspAlphabet&nbspSize)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N)</td>
+        <td align = "center">O(N)</td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center"> Notes </td>
+        <td align = "left"> 
+          <ul> 
+            <li> Range&nbsp;Queries </li> 
+            <li> Immutable&nbsp;data </li> 
+            <li> Overlap&nbsp;friendly operations, or we will cascade the search </li> 
+          </ul> 
+        </td>
+        <td align = "left"> 
+          <ul>
+            <li> Range&nbsp;Queries </li> 
+            <li> Can do range update with propagation </li> 
+          </ul>
+        </td>
+        <td align = "left"> 
+          <ul> 
+            <li> Build in linear time </li> 
+            <li> Single misplaced node </li> 
+          </ul> 
+        </td>
+        <td align = "left"> 
+          <ul style = "marggin:0px;"> 
+            <li> <strong>M</strong> is the length of the word </li>  
+          </ul> 
+        </td>
+        <td align = "left"> 
+          <ul> 
+            <li> AVL&nbsp;tree</li> 
+          </ul>
+        </td>
+        <td align = "left"> </td>
+        <td align = "left"> </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
