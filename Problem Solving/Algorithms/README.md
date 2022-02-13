@@ -123,3 +123,154 @@
     </tbody>
   </table>
 </div>
+
+
+### Minimum Spanning Tree (MST)
+<!-- Spanning Tree -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">Kruskal</th>
+        <th align= "center">Prim</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Time Complexity --> 
+      <tr>
+        <td align = "center">Time Complexity</td>    
+        <td align = "center">O(|E|&nbsp;log<sub>2</sub>&nbsp;|V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Space Complexity--> 
+      <tr>
+        <td align = "center">Space Complexity</td>
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center">Notes</td>
+        <td align = "left">
+          <p> •&nbsp; Sorting edges + DSU </p>
+        </td>
+        <td align = "left">
+          Didn't study yet
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+### Strongly Connected Components (SCC)
+<!-- Strongly Connected Components -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">Tarjan</th>
+        <th align= "center">Kosaraju's</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Time Complexity --> 
+      <tr>
+        <td align = "center">Time Complexity</td>    
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Space Complexity--> 
+      <tr>
+        <td align = "center">Space Complexity</td>
+        <td align = "center">O(|V|)</td>
+        <td align = "center"></td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center">Notes</td>
+        <td align = "left">
+          <p> •&nbsp; Stack + timers </p>
+        </td>
+        <td align = "left">
+          <strong> Didn't study yet </strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Topological Sorting
+<!-- Topological Sorting -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">DFS</th>
+        <th align= "center">BFS (Khan's Algorithm)</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Time Complexity --> 
+      <tr>
+        <td align = "center">Time Complexity</td>    
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E| + |V|)</td>
+      </tr>
+      <!-- Space Complexity--> 
+      <tr>
+        <td align = "center">Space Complexity</td>
+        <td align = "center">O(H)</td>
+        <td align = "center">O(W)</td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center">Notes</td>
+        <td align = "left">
+        </td>
+        <td align = "left">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Bipartite Test
+<!-- Bipartite Test -->
+<div align = "center">
+  <table>
+    <thead>
+      <tr>
+        <th align= "center">Key</th>
+        <th align= "center">DFS</th>
+        <th align= "center">BFS</th>
+      </tr>
+    </thead>
+    <tbody>
+    <!-- Time Complexity --> 
+      <tr>
+        <td align = "center">Time Complexity</td>    
+        <td align = "center">O(|E| + |V|)</td>
+        <td align = "center">O(|E| + |V|)</td>
+      </tr>
+      <!-- Space Complexity--> 
+      <tr>
+        <td align = "center">Space Complexity</td>
+        <td align = "center">O(H)</td>
+        <td align = "center">O(W)</td>
+      </tr>
+      <!-- Notes -->
+      <tr>
+        <td align = "center">Notes</td>
+        <td align = "left">
+          <p></p>
+        </td>
+        <td align = "left">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
