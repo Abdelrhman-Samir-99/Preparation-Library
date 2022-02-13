@@ -125,7 +125,7 @@
 </div>
 
 
-### Minimum Spanning Tree (MST)
+<h3 align = "center"> Minimum Spanning Tree (MST) </h3>
 <!-- Spanning Tree -->
 <div align = "center">
   <table>
@@ -164,7 +164,7 @@
 </div>
 
 
-### Strongly Connected Components (SCC)
+<h3 align = "center"> Strongly Connected Components (SCC) </h3>
 <!-- Strongly Connected Components -->
 <div align = "center">
   <table>
@@ -202,7 +202,7 @@
   </table>
 </div>
 
-### Topological Sorting
+<h3 align = "center"> Topological Sorting </h3>
 <!-- Topological Sorting -->
 <div align = "center">
   <table>
@@ -238,7 +238,7 @@
   </table>
 </div>
 
-### Bipartite Test
+<h3 align = "center"> Bipartite Test </h3>
 <!-- Bipartite Test -->
 <div align = "center">
   <table>
