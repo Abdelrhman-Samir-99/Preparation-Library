@@ -93,23 +93,23 @@
       <tr>
         <td align = "center"> Notes </td>
         <td align = "left"> 
-           <p> • Range&nbsp;Queries </p> 
-           <p> • Immutable&nbsp;data </p> 
-           <p> • Overlap&nbsp;friendly operations, or we will cascade the search </p>  
+           <p> •&nbsp;Range&nbsp;Queries </p> 
+           <p> •&nbsp;Immutable&nbsp;data </p> 
+           <p> •&nbsp;Overlap&nbsp;friendly operations, or we will cascade the search </p>  
         </td>
         <td align = "left"> 
-           <p> • Range&nbsp;Queries </p> 
-           <p> • Can do range update with propagation </p> 
+           <p> •&nbsp;Range&nbsp;Queries </p> 
+           <p> •&nbsp;Can do range update with propagation </p> 
         </td>
         <td align = "left"> 
-           <p> • Build in linear&nbsp;time </p> 
-           <p> • Single misplaced&nbsp;node </p> 
+           <p> •&nbsp;Build in linear&nbsp;time </p> 
+           <p> •&nbsp;Single misplaced&nbsp;node </p> 
         </td>
         <td align = "left"> 
-           <p> • <strong>M</strong> is the length of the word </p>  
+           <p> •&nbsp;<strong>M</strong> is the length of the word </p>  
         </td>
         <td align = "left"> 
-           <p> • AVL&nbsp;tree</p> 
+           <p> •&nbsp;AVL&nbsp;tree</p> 
         </td>
         <td align = "left"> </td>
         <td align = "left"> </td>
