@@ -201,7 +201,7 @@ A graph is a data structure that is used to represent data and the relation betw
   </table>
 </div>
 
-<h3> Topological Sorting </h2>
+<h2> Topological Sorting </h2>
 <!-- Topological Sorting -->
 <div align = "center">
   <table>
