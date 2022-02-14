@@ -1,6 +1,6 @@
 ## Algorithms
 
-+ [Graphs](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph)
++ [**Graphs**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph)
   + [Traversal](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#traversal)
     + DFS (In-Order)
     + BFS
@@ -24,3 +24,18 @@
   + [Bipartite testing](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#-bipartite-test-)
     + DFS
     + BFS
++ **Searching**
+  + Binary Search
+  + Complete Search
++ **Sorting**
+  + Merge Sort
+  + Quick Sort
+  + Count Sort
++ **Querying**
+  + MO's Algorithm
++ **String Processing**
+  + Hashing
+    + Rolling Hash
+  + Knuth Morris Pratt (KMP)
+  + Z-Function
+  + Suffix Array
