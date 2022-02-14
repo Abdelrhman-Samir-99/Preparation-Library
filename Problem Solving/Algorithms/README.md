@@ -39,3 +39,7 @@
   + Knuth Morris Pratt (KMP)
   + Z-Function
   + Suffix Array
++ **Dynamic Programming**
+  + Palindrome Substrings
+  + Coins (all versions)
+  + ...
