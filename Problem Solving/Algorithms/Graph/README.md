@@ -81,7 +81,7 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Time Complexity</td>    
         <td align = "center">O(|V| + |E|&nbsp;log<sub>2</sub>&nbsp;|V|)</td>
-        <td align = "center"><strong>O(N<sup>3</sup>)</strong></td>
+        <td align = "center"><strong>O(|V|<sup>3</sup>)</strong></td>
         <td align = "center">O(|E| * |V|) =&nbsp;O(|V|<sup>3</sup>)</td>
         <td align = "center">O(|E| + |V|)</td>
         <td align = "center"></td>
@@ -90,7 +90,7 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Space Complexity</td>
         <td align = "center">O(|E| + |V|)</td>
-        <td align = "center"><strong>O(N<sup>2</sup>)</strong></td>
+        <td align = "center"><strong>O(|V|<sup>2</sup>)</strong></td>
         <td align = "center">O(|V|)</td>
         <td align = "center">O(|V|)</td>
         <td align = "center"></td>
