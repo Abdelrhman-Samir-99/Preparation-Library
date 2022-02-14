@@ -223,8 +223,8 @@
       <!-- Space Complexity--> 
       <tr>
         <td align = "center">Space Complexity</td>
-        <td align = "center">O(H)</td>
-        <td align = "center">O(W)</td>
+        <td align = "center">O(|V|)</td>
+        <td align = "center">O(|V|)</td>
       </tr>
       <!-- Notes -->
       <tr>
@@ -259,8 +259,8 @@
       <!-- Space Complexity--> 
       <tr>
         <td align = "center">Space Complexity</td>
-        <td align = "center">O(H)</td>
-        <td align = "center">O(W)</td>
+        <td align = "center">O(|V|)</td>
+        <td align = "center">O(|V|)</td>
       </tr>
       <!-- Notes -->
       <tr>
