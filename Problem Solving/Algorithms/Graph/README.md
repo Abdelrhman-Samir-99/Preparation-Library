@@ -1,7 +1,6 @@
-# Algorithms
-
-## Graphs
-### Traversal
+# Graph
+A graph is a data structure that is used to represent data and the relation between it.
+## Traversal
 <!-- Graph Traversal -->
 <div align = "center">
   <table>
@@ -63,7 +62,7 @@
 </div>
 
 
-### Shortest Path on weighted graphs
+## Shortest Path on weighted graphs
 <!-- Graph Shortest Path -->
 <div align = "center">
   <table>
@@ -125,7 +124,7 @@
 </div>
 
 
-<h3 align = "center"> Minimum Spanning Tree (MST) </h3>
+<h2> Minimum Spanning Tree (MST) </h2>
 <!-- Spanning Tree -->
 <div align = "center">
   <table>
@@ -164,7 +163,7 @@
 </div>
 
 
-<h3 align = "center"> Strongly Connected Components (SCC) </h3>
+<h2> Strongly Connected Components (SCC) </h2>
 <!-- Strongly Connected Components -->
 <div align = "center">
   <table>
@@ -202,7 +201,7 @@
   </table>
 </div>
 
-<h3 align = "center"> Topological Sorting </h3>
+<h3> Topological Sorting </h2>
 <!-- Topological Sorting -->
 <div align = "center">
   <table>
@@ -238,7 +237,7 @@
   </table>
 </div>
 
-<h3 align = "center"> Bipartite Test </h3>
+<h2> Bipartite Test </h2>
 <!-- Bipartite Test -->
 <div align = "center">
   <table>
