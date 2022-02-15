@@ -1,29 +1,30 @@
 ## Algorithms
 
-+ [**Graphs**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph)
-  + [Traversal](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#traversal)
++ **Graphs**
+  + [Traversal](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Traversal/README.md)
     + DFS (In-Order)
     + BFS
     + Pre-Order
     + Post-Order
-  + [Shortest path](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#shortest-path-on-weighted-graphs)
+  + [Shortest path](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Shortest%20Path/README.md)
     + Dijkstra
     + Floyd Warshall
     + Bellman-Ford
     + Dynamic programming on a DAG
     + Bidirectional
-  + [Minimum Spanning Tree](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#-minimum-spanning-tree-mst-)
+  + [Minimum Spanning Tree](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Minimum%20Spanning%20Tree/README.md)
     + Kruskal
     + Prim
-  + [Strongly Connected Component](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#-strongly-connected-components-scc-)
+  + [Strongly Connected Component](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Strongly%20Connected%20Component/README.md)
     + Tarjan
-    + Kosaraju's
-  + [Topological Sorting](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#-topological-sorting-)
+    + Kosaraju
+  + [Topological Sorting](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Topological%20Sorting/README.md)
     + DFS
-    + BFS (Khan's)
-  + [Bipartite testing](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/Problem%20Solving/Algorithms/Graph#-bipartite-test-)
+    + BFS (Kahn)
+  + [Bipartite testing](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Bipartite%20Testing/README.md)
     + DFS
     + BFS
+  + [Cheat Sheet](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Cheat%20Sheet/README.md) **(Recommended to check)**
 + **Searching**
   + Binary Search
   + Complete Search
