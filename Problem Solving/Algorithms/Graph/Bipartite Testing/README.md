@@ -1,20 +1,21 @@
-## Topological Sorting
+# NOT FINISHED
+## Bipartite Testing
 ### DFS
 + **Vidoes**
-  + [Algorithms with Attitude](https://www.youtube.com/watch?v=xqLY-ZLJig8)
-  + [Tushar](https://www.youtube.com/watch?v=ddTC4Zovtbc)
-  + [WilliamFiset](https://www.youtube.com/watch?v=eL-KzMXSXXI)
-  + [Mostafa Saad](https://www.youtube.com/watch?v=9DP0X2xlPCo) **(Arabic)**
+  + [Algorithms with Attitude]()
+  + [Tushar]()
+  + [WilliamFiset]()
+  + [Mostafa Saad]() **(Arabic)**
 + **Articles**
-  + [CP-Algorithms](https://cp-algorithms.com/graph/topological-sort.html)
+  + [CP-Algorithms]()
 + **Problems**
-  + [LeetCode](https://leetcode.com/list/9631itbe)
+  + [LeetCode](https://leetcode.com/list/963b7s7h)
  
-### BFS (Kahn's Algorithm)
+### BFS
 + **Vidoes**
-  + [Algorithms with Attitude](https://www.youtube.com/watch?v=agHGA0pVMe8&t=514s)
-  + [WilliamFiset](https://www.youtube.com/watch?v=cIBFEhD77b4)
+  + [Algorithms with Attitude]()
+  + [WilliamFiset]()
 + **Articles**
-  + [Geeks4Geeks](https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/)
+  + [Geeks4Geeks]()
 + **Problems**
-  + [LeetCode](https://leetcode.com/list/9631itbe)
+  + [LeetCode](https://leetcode.com/list/963b7s7h)
