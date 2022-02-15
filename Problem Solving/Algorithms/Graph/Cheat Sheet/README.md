@@ -171,7 +171,7 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <th align= "center">Key</th>
         <th align= "center">Tarjan</th>
-        <th align= "center">Kosaraju's</th>
+        <th align= "center">Kosaraju</th>
       </tr>
     </thead>
     <tbody>
@@ -209,7 +209,7 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <th align= "center">Key</th>
         <th align= "center">DFS</th>
-        <th align= "center">BFS (Khan's Algorithm)</th>
+        <th align= "center">BFS (Kahn's Algorithm)</th>
       </tr>
     </thead>
     <tbody>
@@ -229,8 +229,10 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Notes</td>
         <td align = "left">
+          <p> •&nbsp;Must be a DAG </p>
         </td>
         <td align = "left">
+          <p> •&nbsp;Must be a DAG </p>
         </td>
       </tr>
     </tbody>
