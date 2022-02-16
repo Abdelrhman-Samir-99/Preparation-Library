@@ -24,7 +24,7 @@
   + [Bipartite testing](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Bipartite%20Testing/README.md)
     + DFS
     + BFS
-  + [Lowest Common Ancestor]()
+  + Lowest Common Ancestor
     + Brute Force
     + Binary Lifting
     + Using RMQ
@@ -38,14 +38,15 @@
   + Count Sort
   + Heap Sort
 + [**Querying**]()
-  + MO's Algorithm
+  + MO's Algorithm (Square Root Decomposition)
 + [**String Processing**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/String%20Processing/README.md)
   + Hashing
-    + Rolling Hash
+    + Rolling Hash (Rabin Karp)
   + Knuth Morris Pratt (KMP)
   + Z-Function
   + Suffix Array
-+ [**Dynamic Programming**]()
-  + Palindrome Substrings
-  + Coins (all versions)
-  + ...
++ [**Dynamic Programming**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Dynamic%20Programming/README.md)
+  + What is dynamic programming
+  + Common problems
+    + Number of palindrome substrings
+    + ...
