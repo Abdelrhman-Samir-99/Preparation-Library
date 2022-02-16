@@ -7,7 +7,7 @@
   
 |  Key  | Hash Table | Singly Linked List | Doubly Linked List | Stack | Queue
 |:-----:|:----------:|:------------------:|:------------------:|:-----:|:-----:|
-| Append  |O(N)| O(1)|O(1)|O(1)|O(1)
+| Push  |O(N)| O(1)|O(1)|O(1)|O(1)
 | Pop | O(N) | O(1) | O(1) | O(1) | O(1)
 | Erase |O(N)|O(N)|O(N)|O(N)|O(N)
 | Find |O(N)|O(N)|O(N)|O(N)|O(N)
@@ -47,7 +47,7 @@
       </tr>
       <!-- Append --> 
       <tr>
-        <td align = "center">Append</td>    
+        <td align = "center">Push</td>    
         <td align = "center">O(N log<sub>2</sub>&nbsp;N)</td>
         <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
         <td align = "center">O(log<sub>2</sub>&nbsp;N)</td>
