@@ -43,7 +43,7 @@
     <thead>
       <tr>
         <th align= "center">Key</th>
-        <th align= "center">Rolling Hash (Rabin Karp)</th>
+        <th align= "center">Rolling Hash&nbsp;(&nbsp;Rabin&nbsp;Karp&nbsp;)</th>
         <th align= "center">KMP</th>
         <th align= "center">Z-Function</th>
         <th align= "center">Suffix Array</th>
