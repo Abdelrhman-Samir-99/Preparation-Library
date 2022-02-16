@@ -39,7 +39,7 @@
   + Heap Sort
 + [**Querying**]()
   + MO's Algorithm
-+ [**String Processing**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/edit/main/Problem Solving/Algorithms/String Processing/README.md)
++ [**String Processing**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/String%20Processing/README.md)
   + Hashing
     + Rolling Hash
   + Knuth Morris Pratt (KMP)
