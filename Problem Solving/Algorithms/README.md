@@ -32,19 +32,20 @@
 + **Searching**
   + Binary Search
   + Complete Search
-+ **Sorting**
++ [**Sorting**]()
   + Merge Sort
   + Quick Sort
   + Count Sort
-+ **Querying**
+  + Heap Sort
++ [**Querying**]()
   + MO's Algorithm
-+ **String Processing**
++ [**String Processing**]()
   + Hashing
     + Rolling Hash
   + Knuth Morris Pratt (KMP)
   + Z-Function
   + Suffix Array
-+ **Dynamic Programming**
++ [**Dynamic Programming**]()
   + Palindrome Substrings
   + Coins (all versions)
   + ...
