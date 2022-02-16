@@ -37,23 +37,23 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Notes</td>
         <td align = "left">
-          <p> •&nbsp; Constant space if we don't&nbsp;consider stack size </p>
-          <p> •&nbsp; (Left - Root - Right) </p>
-          <p> •&nbsp; Depth First </p>
+          <p> •&nbsp;Constant space if we don't&nbsp;consider stack size </p>
+          <p> •&nbsp;(Left - Root - Right) </p>
+          <p> •&nbsp;Depth First </p>
         </td>
         <td align = "left">
-          <p> •&nbsp; Used to serialize a Binary Tree </p>
-          <p> •&nbsp; Layer By&nbsp;Layer </p>
+          <p> •&nbsp;Used to serialize a Binary Tree </p>
+          <p> •&nbsp;Layer By&nbsp;Layer </p>
          </td>
         <td align = "leftr">
-          <p> •&nbsp; Constant space if we don't&nbsp;consider stack size </p>
-          <p> •&nbsp; Used to serialize a Binary Tree </p>
-          <p> •&nbsp; (Root - Left - Right) </p>
+          <p> •&nbsp;Constant space if we don't&nbsp;consider stack size </p>
+          <p> •&nbsp;Used to serialize a Binary Tree </p>
+          <p> •&nbsp;(Root - Left - Right) </p>
         </td>
         <td align = "left">
-          <p> •&nbsp; Constant space if we don't&nbsp;consider stack size </p>
-          <p> •&nbsp; Visit all the children before the root </p>
-          <p> •&nbsp; (Left - Right - Root) </p>
+          <p> •&nbsp;Constant space if we don't&nbsp;consider stack size </p>
+          <p> •&nbsp;Visit all the children before the root </p>
+          <p> •&nbsp;(Left - Right - Root) </p>
         </td>
         <td align = "left"> <strong> Didn't study yet </strong></td>
       </tr>
@@ -99,23 +99,23 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Notes</td>
         <td align = "left">
-          <p> •&nbsp; Doesn't work on negative weights </p>
-          <p> •&nbsp; Single source shortest path </p>
-          <p> •&nbsp; Another implementation using adjacency matrix </p>
+          <p> •&nbsp;Doesn't work on negative weights </p>
+          <p> •&nbsp;Single source shortest path </p>
+          <p> •&nbsp;Another implementation using adjacency matrix </p>
         </td>
         <td align = "left">
-          <p> •&nbsp; Multi source shortest path </p>
-          <p> •&nbsp; Works with negative weights </p>
+          <p> •&nbsp;Multi source shortest path </p>
+          <p> •&nbsp;Works with negative weights </p>
         </td>
         <td align = "leftr">
-          <p> •&nbsp; Multi source shortest path </p>
-          <p> •&nbsp; Works with negative weights </p>
-          <p> •&nbsp; May end early </p>
+          <p> •&nbsp;Multi source shortest path </p>
+          <p> •&nbsp;Works with negative weights </p>
+          <p> •&nbsp;May end early </p>
         </td>
         <td align = "left">
-          <p> •&nbsp; Single source shortest path </p>
-          <p> •&nbsp; Works with negative weights </p>
-          <p> •&nbsp; Must be DAG </p>
+          <p> •&nbsp;Single source shortest path </p>
+          <p> •&nbsp;Works with negative weights </p>
+          <p> •&nbsp;Must be DAG </p>
         </td>
         <td align = "left"> <strong> Didn't study yet </strong></td>
       </tr>
@@ -191,7 +191,7 @@ A graph is a data structure that is used to represent data and the relation betw
       <tr>
         <td align = "center">Notes</td>
         <td align = "left">
-          <p> •&nbsp; Stack + timers </p>
+          <p> •&nbsp;Stack + timers </p>
         </td>
         <td align = "left">
           <strong> Didn't study yet </strong>
