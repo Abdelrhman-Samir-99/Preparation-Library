@@ -1,5 +1,5 @@
 ## String Processing
-### Rolling Hash - Rabin-Karp
+### Rolling Hash - (Rabin Karp)
 + **Videos**
   + [Mostafa Saad](https://www.youtube.com/watch?v=Z26JzYn7G6U&t=634s) **(Arabic)**
   + [Stable Sort](https://www.youtube.com/watch?v=BfUejqd07yo)
@@ -43,7 +43,7 @@
     <thead>
       <tr>
         <th align= "center">Key</th>
-        <th align= "center">Rolling Hash</th>
+        <th align= "center">Rolling Hash (Rabin Karp)</th>
         <th align= "center">KMP</th>
         <th align= "center">Z-Function</th>
         <th align= "center">Suffix Array</th>
