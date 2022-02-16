@@ -29,10 +29,10 @@
     + Binary Lifting
     + Using RMQ
   + [Cheat Sheet](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Cheat%20Sheet/README.md) **(Recommended to check)**
-+ [**Searching**]()
++ [**Searching**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Searching/README.md)
   + Binary Search
   + Complete Search
-+ [**Sorting**]()
++ [**Sorting**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Sorting/README.md)
   + Merge Sort
   + Quick Sort
   + Count Sort
