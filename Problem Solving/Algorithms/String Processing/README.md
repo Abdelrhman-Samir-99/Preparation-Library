@@ -31,6 +31,7 @@
 ### Suffix Array
 + **Videos**
   + [Mostafa Saad](https://www.youtube.com/watch?v=maBr777ZRhw&t=1309s) **(Arabic)**
+  + [WilliamFiset](https://www.youtube.com/playlist?list=PLDV1Zeh2NRsCQ_Educ7GCNs3mvzpXhHW5) **(Playlist)**
 + **Articles**
   + [CP-Algorithms](https://cp-algorithms.com/string/suffix-array.html)
 + **Problems**
