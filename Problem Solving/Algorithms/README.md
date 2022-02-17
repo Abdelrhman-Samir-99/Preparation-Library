@@ -37,7 +37,7 @@
   + Quick Sort
   + Count Sort
   + Heap Sort
-+ [**Querying**]()
++ [**Querying**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Querying/README.md)
   + MO's Algorithm (Square Root Decomposition)
 + [**String Processing**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/String%20Processing/README.md)
   + Hashing
@@ -45,8 +45,24 @@
   + Knuth Morris Pratt (KMP)
   + Z-Function
   + Suffix Array
-+ [**Dynamic Programming**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Dynamic%20Programming/README.md)
-  + What is dynamic programming
++ Sliding Window
   + Common problems
+    + Longest Substring Without Repeating Characters
+    + Trapping Rain Water
+    + Two Sum
++ **Greedy**
+  + Dynamic Programming VS Greedy  
+  + Common problems
+    + Quick Select
+    + Merge Intervals
+    + Set Matrix Zeroes
++ **Dynamic Programming**
+  + [What is dynamic programming](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Dynamic%20Programming/README.md)
+  + Common problems
+    + Best Time to Buy and Sell Stock
     + Number of palindrome substrings
-    + ...
+    + Longest Increasing Subsequence
+    + Longest Common Substring
+    + Edit Distance
+    + 0/1 Knapsack
+    + etc...
