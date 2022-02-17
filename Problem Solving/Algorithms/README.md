@@ -45,7 +45,7 @@
   + Knuth Morris Pratt (KMP)
   + Z-Function
   + Suffix Array
-+ Sliding Window
++ **Sliding Window**
   + Common problems
     + Longest Substring Without Repeating Characters
     + Trapping Rain Water
