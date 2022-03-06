@@ -1,4 +1,5 @@
 ## High Level Design
++ [High Level Design Videos](https://www.youtube.com/c/SystemDesignInterview/videos) **(Highly Recommended)**
 + [Scaling](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/High%20Level%20Design/Scaling/README.md)
   + Horizontal Scaling
   + Vertical Scaling
@@ -18,12 +19,12 @@
     + Joins
       + Complexity
       + Join tables
-    + ACID
     + [SQL](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/DataBases/Relational/README.md)
     + Logical query processing
     + Query optimization (indexers)
   + Non-Relational Databases
-  + Transactions
+  + Transactions 
+    + ACID
   + Master – Slave Databases
   + Partitioning
   + Sharding
