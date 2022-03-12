@@ -1,4 +1,4 @@
-## LinkedList#
+## LinkedList
 ### **Singly LinkedList**
 + **Vidoes**
   + [HackerRank](https://www.youtube.com/watch?v=njTh_OwMljA&ab_channel=HackerRank)
