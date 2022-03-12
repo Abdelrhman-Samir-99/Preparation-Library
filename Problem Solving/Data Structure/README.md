@@ -29,4 +29,4 @@
    + [**Segment Tree**]() **(Rare)**
    + [**Sparse Table**]() **(Not Necessary)**
 
-+ [**CheatSheet**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Data%20Structure/Everything/README.md)
++ [**CheatSheet**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Data%20Structure/CheatSheet/README.md)
