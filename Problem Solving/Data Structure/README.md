@@ -18,7 +18,9 @@
      + Collusion Techniques
         + Open Addressing
         + Chainning
-
+  + Caches
+    + Least Recently Used (LRU)
+    + Least Frequently Used (LFU)
 + **Graph Based**
    + [**Binary Search Tree (BST)**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Data%20Structure/Graph%20Based/Binary%20Search%20Tree%20(BST)/README.md)
       + Balanced BST.
