@@ -1,32 +1,15 @@
-## Data Structure
+## Binary Search Tree (BST)
 
-+ **List Based**
-  + [**LinkedList**]()
-     + Singly LinkedList
-     + Doubly LinkedList
-     + Circular LinkedList
+### Unbalanced BST
++ **Vidoes**
+  + [WilliamFiset](https://www.youtube.com/watch?v=xIejolxzZS8)
+  + [Geeks4Geeks](https://www.youtube.com/watch?v=Dk57JonwKNk&t=614s)
++ **Articles**
+  + []()
 
-  + [**Stack**]()
-     + Array vs LinkedList Implementation
-     + Monotonic Stack
-
-  + [**Queue**]()
-     + Array vs LinkedList Implementation
-     + Monotonic Queue
-
-  + [**Hash Table**]()
-     + Collusion Techniques
-        + Open Addressing
-        + Chainning
-
-+ **Graph Based**
-   + [**Heap**]()
-   + [**Trie**]()
-   + [**Binary Search Tree (BST)**]()
-      + Balanced BST.
-      + Unbalanced BST.
-   + [**Disjoint and Union set (DSU)**]() **(Rare)**
-   + [**Segment Tree**]() **(Rare)**
-   + [**Sparse Table**]() **(Not Necessary)**
-
-+ [**CheatSheet**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Data%20Structure/CheatSheet/README.md)
+### Balanced BST
++ **Vidoes**
+  + [ WilliamFiset](https://www.youtube.com/watch?v=T9gct6Dx-jo)
+  + [Geeks4Geeks](https://www.youtube.com/watch?v=_xA8UvfOGgU)
++ **Articles**
+  + []()
