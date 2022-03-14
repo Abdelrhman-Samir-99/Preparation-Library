@@ -1,15 +1,7 @@
-## Binary Search Tree (BST)
+## Disjoint and Union set
 
-### Unbalanced BST
 + **Vidoes**
-  + [WilliamFiset](https://www.youtube.com/watch?v=xIejolxzZS8)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=Dk57JonwKNk&t=614s)
+  + [WilliamFiset](https://www.youtube.com/playlist?list=PLDV1Zeh2NRsBI1C-mR6ZhHTyfoEJWlxvq)
+  + [Mostafa Saad](https://www.youtube.com/watch?v=HQ5ANfzSDn0&t=623s) **(Arabic)**
 + **Articles**
-  + []()
-
-### Balanced BST
-+ **Vidoes**
-  + [ WilliamFiset](https://www.youtube.com/watch?v=T9gct6Dx-jo)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=_xA8UvfOGgU)
-+ **Articles**
-  + []()
+  + [CP-Algorithms](https://cp-algorithms.com/data_structures/disjoint_set_union.html)
