@@ -1,15 +1,15 @@
-## Binary Search Tree (BST)
+## Trie
 
-### Unbalanced BST
+### Dynamic memory allocation
 + **Vidoes**
-  + [WilliamFiset](https://www.youtube.com/watch?v=xIejolxzZS8)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=Dk57JonwKNk&t=614s)
+  + [Tushar Roy](https://www.youtube.com/watch?v=AXjmTQ8LEoI&t=949s)
+  + [HackerRank](https://www.youtube.com/watch?v=zIjfhVPRZCg)
+  + [Mostafa Saad](https://www.youtube.com/watch?v=IGaJWl0jPY4) **(Arabic)**
 + **Articles**
   + []()
 
-### Balanced BST
+### Static memory allocation
 + **Vidoes**
-  + [ WilliamFiset](https://www.youtube.com/watch?v=T9gct6Dx-jo)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=_xA8UvfOGgU)
+  + [](https://www.youtube.com/watch?v=T9gct6Dx-jo)
 + **Articles**
   + []()
