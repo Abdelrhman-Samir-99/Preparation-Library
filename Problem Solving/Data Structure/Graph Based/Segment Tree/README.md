@@ -1,15 +1,13 @@
 ## Binary Search Tree (BST)
 
-### Unbalanced BST
+### Building and augmentation
 + **Vidoes**
-  + [WilliamFiset](https://www.youtube.com/watch?v=xIejolxzZS8)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=Dk57JonwKNk&t=614s)
+  + [](https://www.youtube.com/watch?v=xIejolxzZS8)
 + **Articles**
   + []()
 
-### Balanced BST
+### Propagation
 + **Vidoes**
-  + [ WilliamFiset](https://www.youtube.com/watch?v=T9gct6Dx-jo)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=_xA8UvfOGgU)
+  + [](https://www.youtube.com/watch?v=xIejolxzZS8)
 + **Articles**
   + []()
