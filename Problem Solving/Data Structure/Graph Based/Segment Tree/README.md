@@ -12,6 +12,6 @@
 ### Propagation
 + **Vidoes**
   + CodeForces
- + **Articles**
++ **Articles**
   + [CP-Algorithms](https://cp-algorithms.com/data_structures/segment_tree.html)
   + [GeeksForGeeks](https://www.geeksforgeeks.org/lazy-propagation-in-segment-tree/)
