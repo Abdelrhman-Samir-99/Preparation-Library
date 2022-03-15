@@ -18,7 +18,7 @@
      + Collusion Techniques
         + Open Addressing
         + Chainning
-  + Caches
+  + **Caches**
     + Least Recently Used (LRU)
     + Least Frequently Used (LFU)
 + **Graph Based**
