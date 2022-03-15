@@ -1,15 +1,8 @@
-## Binary Search Tree (BST)
+## Sparse Table
 
-### Unbalanced BST
 + **Vidoes**
-  + [WilliamFiset](https://www.youtube.com/watch?v=xIejolxzZS8)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=Dk57JonwKNk&t=614s)
+  + [WilliamFiset](https://www.youtube.com/watch?v=uUatD9AudXo&t=1199s)
+  + [Errichto](https://www.youtube.com/watch?v=0jWeUdxrGm4)
 + **Articles**
-  + []()
+  + [CP-Algorithms](https://cp-algorithms.com/data_structures/sparse-table.html)
 
-### Balanced BST
-+ **Vidoes**
-  + [ WilliamFiset](https://www.youtube.com/watch?v=T9gct6Dx-jo)
-  + [Geeks4Geeks](https://www.youtube.com/watch?v=_xA8UvfOGgU)
-+ **Articles**
-  + []()
