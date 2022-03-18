@@ -1,5 +1,4 @@
 ## Low Level Design (LLD)
-+ [Object Oriented Design](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Object%20Oriented%20Design/README.md)
 + [Design Principles](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/Low%20Level%20Design/Design%20Principles/README.md)
   + SOLID
   + Don't Repeat Yourselft (DRY)
@@ -19,6 +18,7 @@
   + Class Diagram
   + Use Case Diagram
 + User stories
++ [Object Oriented Design](https://github.com/Abdelrhman-Samir-99/Preparation-Library/tree/main/System%20Design/Low%20Level%20Design/Object%20Oriented%20Design/README.md)
 + **Books**
   + [Head First Design Patterns](https://longbiao.spatial-crowdsensing.com/courses/scad/files/head-first-design-patterns-compressed.pdf)
   + [Head First Object-Oriented Analysis & Design](http://index-of.es/Programming/O%27Reilly%20Desining%20Series/O%27Reilly%20Head%20First%20Object-Oriented%20Design%20and%20Analysis.pdf)
