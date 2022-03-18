@@ -17,4 +17,4 @@
 
 ### [Ruby](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/Ruby/Ruby.md)
 + Basic syntax
-+ Object Oriented Porgramming
++ Classes and Modules
