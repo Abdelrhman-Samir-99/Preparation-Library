@@ -25,17 +25,17 @@ For interviews, there may be any type of problem-solving including (Algorithms a
 
 ## Programming Language
 This just is made to provide resources I used to learn a particular programming language or a framework.
-### [Programming Language]()
+### [Programming Language](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/README.md)
 + C++
 + C#
 + Java
 + Ruby
-### [Frameworks]()
+### [Frameworks](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Frameworks/README.md)
 + Ruby on Rails
 + Spring/ SpringBoot
 
 ## Operating System
 ## Computer Network
-## [Behavioral]()
+## Behavioral
 The behavioral part is far more important than you think. Some companies like Amazon may have their own leadership principles which reflect their culture. And to pass the interview, you must show that you can fit into the companies culture. <br>
 I will share my preparation for each company, starting with Amazon.
