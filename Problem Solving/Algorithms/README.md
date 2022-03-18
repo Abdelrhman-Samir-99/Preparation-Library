@@ -6,7 +6,7 @@
     + BFS
     + Pre-Order
     + Post-Order
-    + Morris
+    + Morris **(Nice to know)**
   + [Shortest path](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Graph/Shortest%20Path/README.md)
     + Dijkstra
     + Floyd Warshall
@@ -43,16 +43,17 @@
     + Quick Select
     + Merge Intervals
     + Set Matrix Zeroes
+    + etc.
 + **Dynamic Programming**
   + [My Notes](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/Dynamic%20Programming/README.md)
   + [Common problems]()
-    + Best Time to Buy and Sell Stock
-    + Number of palindrome substrings
-    + Longest Increasing Subsequence
+    + 0/1 Knapsack
     + Longest Common Substring
     + Edit Distance
-    + 0/1 Knapsack
-    + etc...
+    + Longest Increasing Subsequence
+    + Number of palindrome substrings
+    + Best Time to Buy and Sell Stock
+    + etc.
 + [**String Processing**](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Problem%20Solving/Algorithms/String%20Processing/README.md) **(Rare)**
   + Hashing
     + Rolling Hash (Rabin Karp)
