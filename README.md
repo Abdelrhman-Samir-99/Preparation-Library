@@ -23,9 +23,9 @@ For interviews, there may be any type of problem-solving including (Algorithms a
 + I believe that the most popular ones are (Dynamic Programming – Quick Select – Greedy – Graph Traversal). <br>
 + I will discuss more algorithms including (Strongly Connected Components – Minimum Spanning Tree – Rabin Karp – KMP – Hashing – etc.)
 
-## Programming Language
-This just is made to provide resources I used to learn a particular programming language or a framework.
-### [Programming Language](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/README.md)
+## Programming Languages and Frameworks
+This section is just to provide resources I used to learn a particular programming language or a framework.
+### [Programming Languages](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/README.md)
 + C++
 + C#
 + Java
@@ -34,8 +34,6 @@ This just is made to provide resources I used to learn a particular programming 
 + Ruby on Rails
 + Spring/ SpringBoot
 
-## Operating System
-## Computer Network
 ## Behavioral
 The behavioral part is far more important than you think. Some companies like Amazon may have their own leadership principles which reflect their culture. And to pass the interview, you must show that you can fit into the companies culture. <br>
 I will share my preparation for each company, starting with Amazon.
