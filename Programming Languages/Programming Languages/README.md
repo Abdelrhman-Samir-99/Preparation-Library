@@ -2,6 +2,7 @@
 ### [C++](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/C%2B%2B/C%2B%2B.md)
 + Basic syntax
 + Object Oriented Porgramming
++ Pointers
 + Threading and Locks
 
 ### [Java](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/Programming%20Languages/Programming%20Languages/Java/Java.md)
