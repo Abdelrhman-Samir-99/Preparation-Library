@@ -1,0 +1,77 @@
+[
+  {
+    "id": 1,
+    "question": "What is SQS and what problem does it solve?",
+    "answer": "SQS (Simple Queue Service) acts as a **message queue** between services, decoupling them so they don't communicate directly. Service A pushes messages to the queue, Service B consumes them at its own pace."
+  },
+  {
+    "id": 2,
+    "question": "What is visibility timeout and why is it important?",
+    "answer": "When a consumer pulls a message, it becomes **hidden** for the visibility timeout period. If the consumer fails to delete it in time, the message reappears and can be redelivered.\n\nYou can extend it using `ChangeMessageVisibility` while processing."
+  },
+  {
+    "id": 3,
+    "question": "What's the difference between standard and FIFO queues?",
+    "answer": "**FIFO** guarantees message ordering and exactly-once processing.\n\n**Standard** queues don't guarantee order and allow duplicate processing. Standard queues have higher throughput but require idempotency to handle duplicates safely."
+  },
+  {
+    "id": 4,
+    "question": "Why can standard queues process the same message twice?",
+    "answer": "Both queue types redeliver messages if the visibility timeout expires. The difference is **FIFO prevents concurrent duplicate processing**, while standard queues don't enforce that — so two consumers can process the same message at different times."
+  },
+  {
+    "id": 5,
+    "question": "What's the maximum message size in SQS?",
+    "answer": "**256KB**. For larger payloads, store the data in S3 and send a reference link through SQS."
+  },
+  {
+    "id": 6,
+    "question": "How do you monitor SQS?",
+    "answer": "Use **CloudWatch** to track metrics like queue size, messages sent/received, and set up alarms for anomalies."
+  },
+  {
+    "id": 7,
+    "question": "Describe a real-world SQS use case.",
+    "answer": "Sending notifications when an RFI is created. If the notification isn't critical, push it to a queue and let the notification service handle it **asynchronously**. If it's critical, call the service directly."
+  },
+  {
+    "id": 8,
+    "question": "What's the Outbox Pattern?",
+    "answer": "A pattern to handle **distributed transaction failures** — store both the DB transaction and the notification intent together, then a separate process handles delivery.\n\nEnsures consistency between the two operations."
+  },
+  {
+    "id": 9,
+    "question": "What's the difference between long and short polling?",
+    "answer": "**Short polling** checks the queue immediately and returns empty if nothing's there.\n\n**Long polling** waits up to 20 seconds for a message to arrive, reducing unnecessary requests. Messages are returned immediately when they arrive, not at the end of the window."
+  },
+  {
+    "id": 10,
+    "question": "How do you handle large message batches?",
+    "answer": "Set a **batch size** to pull multiple messages at once. Use `DeleteMessageBatch` to delete them in one API call. Handle individual failures within the batch carefully."
+  },
+  {
+    "id": 11,
+    "question": "What's a Dead Letter Queue (DLQ)?",
+    "answer": "A separate queue that stores messages that **failed to process** after a set number of retries (max receive count). Used for debugging failed messages and reprocessing them after fixing the issue."
+  },
+  {
+    "id": 12,
+    "question": "How do you implement a retry mechanism?",
+    "answer": "Set a **max receive count** on the main queue and attach a DLQ. Use **exponential backoff** by periodically extending the visibility timeout with `ChangeMessageVisibility` while processing long tasks."
+  },
+  {
+    "id": 13,
+    "question": "How do you process messages in order across multiple services?",
+    "answer": "Use **FIFO queues** and chain them — Service A consumes from Queue 1, then publishes to Queue 2 for Service B. This ensures dependency and ordering between services."
+  },
+  {
+    "id": 14,
+    "question": "What are SQS best practices?",
+    "answer": "- Use separate queues per topic\n- Implement idempotency\n- Set appropriate visibility timeouts\n- Use DLQs\n- Use long polling\n- Batch messages for efficiency\n- Monitor with CloudWatch"
+  },
+  {
+    "id": 15,
+    "question": "How do DLQs work differently for FIFO vs Standard queues?",
+    "answer": "For both queue types, messages are moved to the DLQ after exceeding the max receive count.\n\n**Key differences:**\n- A FIFO queue's DLQ must also be a **FIFO queue** to preserve ordering and exactly-once semantics\n- A standard queue's DLQ must be a **standard queue**\n- With standard queues you need to manually track the receive count using `ApproximateReceiveCount` to decide when to move messages, while FIFO handles this more strictly and automatically"
+  }
+]

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS IAM Flashcards</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+  <header>
+    <h1 id="topicTitle"></h1>
+    <p id="topicSubtitle"></p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <span class="progress-text" id="progressText">1 / ?</span>
+  </div>
+
+  <div class="controls">
+    <button id="btnSequential" class="active" onclick="setMode('sequential')">Sequential</button>
+    <button id="btnShuffle" onclick="setMode('shuffle')">Shuffle</button>
+    <button id="btnMissedOnly" onclick="setMode('missed')">Missed Only</button>
+  </div>
+
+  <div id="flashcardArea">
+    <div class="card-container" onclick="flipCard()">
+      <div class="card" id="card">
+        <div class="card-face card-front">
+          <div class="question-number" id="questionNumber">Question 1</div>
+          <div class="question-text" id="questionText"></div>
+          <div class="flip-hint">Click or press Space to reveal answer</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="answer-label">Answer</div>
+          <div class="answer-text" id="answerText"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-nav" onclick="prevCard()">Previous</button>
+      <button class="btn btn-flip" onclick="flipCard()">Flip Card</button>
+      <button class="btn btn-nav" onclick="nextCard()">Next</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-didnt" onclick="markMissed()">Didn't know</button>
+      <span class="score-display"><span class="wrong" id="missedCount">0</span> missed</span>
+    </div>
+
+    <div class="keyboard-hints">
+      <kbd>&larr;</kbd> Previous &nbsp; <kbd>Space</kbd> Flip &nbsp; <kbd>&rarr;</kbd> Next &nbsp; <kbd>2</kbd> Didn't know
+    </div>
+  </div>
+
+  <div class="completion-screen" id="completionScreen">
+    <h2>Session Complete!</h2>
+    <div class="final-score" id="finalScore"></div>
+    <button onclick="restart()">Start Over</button>
+  </div>
+
+  <script src="../shared/flashcards.js"></script>
+  <script>
+    initFlashcards({
+      title: 'AWS IAM Flashcards',
+      subtitle: '20 questions to test your IAM knowledge'
+    });
+  </script>
+
+</body>
+</html>

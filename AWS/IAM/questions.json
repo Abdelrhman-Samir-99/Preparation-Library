@@ -1,0 +1,146 @@
+[
+  {
+    "id": 1,
+    "question": "What is the difference between a trust policy and a permissions policy?",
+    "answer": "**Trust policy** — defines WHO can assume the role (the gatekeeper).\n\n**Permissions policy** — defines WHAT the role can do once assumed.\n\nEvery IAM role has both, and they are always separate documents.",
+    "code": {
+      "trust_policy": {
+        "title": "Trust Policy — allows EC2 to assume the role",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"Service\": \"ec2.amazonaws.com\"\n      },\n      \"Action\": \"sts:AssumeRole\"\n    }\n  ]\n}"
+      },
+      "permissions_policy": {
+        "title": "Permissions Policy — defines what the role can do",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"ReadFromS3\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"s3:GetObject\",\n        \"s3:ListBucket\"\n      ],\n      \"Resource\": [\n        \"arn:aws:s3:::my-app-bucket\",\n        \"arn:aws:s3:::my-app-bucket/*\"\n      ]\n    }\n  ]\n}"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "question": "What does \"assuming a role\" mean?",
+    "answer": "Assuming a role means temporarily taking on that role's identity and permissions. A service like EC2 \"assumes\" the role to borrow its credentials and perform actions. Users don't assume roles — they authenticate directly with their own credentials."
+  },
+  {
+    "id": 3,
+    "question": "What happens if a role has no trust policy?",
+    "answer": "Nothing can assume the role — not a service, not a user. Even if the permissions policy grants full access, without a trust policy the role is completely unusable."
+  },
+  {
+    "id": 4,
+    "question": "What is the difference between an inline policy and a managed policy?",
+    "answer": "**Inline policy** — embedded directly into one role/user/group. Cannot be reused elsewhere. Deleted when the role is deleted.\n\n**Managed policy** — a standalone resource with its own ARN. Can be attached to multiple roles, users, or groups. Updating it once applies the change everywhere it's attached.",
+    "code": {
+      "inline_policy": {
+        "title": "Inline Policy",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Sid\": \"DynamoAccess\",\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"dynamodb:GetItem\",\n        \"dynamodb:PutItem\",\n        \"dynamodb:Query\"\n      ],\n      \"Resource\":\n        \"arn:aws:dynamodb:us-east-1:123456789012:table/MyTable\"\n    }\n  ]\n}"
+      },
+      "managed_policy": {
+        "title": "Managed Policy (standalone, referenced by ARN)",
+        "json": "{\n  \"PolicyName\": \"ReadSecretsPolicy\",\n  \"PolicyArn\":\n    \"arn:aws:iam::123456789012:policy/ReadSecretsPolicy\",\n  \"PolicyDocument\": {\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n      {\n        \"Effect\": \"Allow\",\n        \"Action\": [\n          \"secretsmanager:GetSecretValue\",\n          \"secretsmanager:DescribeSecret\"\n        ],\n        \"Resource\":\n          \"arn:aws:secretsmanager:us-east-1:123456789012:secret:my-app/*\"\n      }\n    ]\n  }\n}"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "question": "What does a role with both an inline and a managed policy look like?",
+    "answer": "A role has three distinct sections: the trust policy, a list of attached managed policies (ARN references only), and inline policies (full document embedded).",
+    "code": {
+      "full_role": {
+        "title": "Role with trust, managed, and inline policies",
+        "json": "{\n  \"RoleName\": \"MyAppRole\",\n  \"RoleArn\":\n    \"arn:aws:iam::123456789012:role/MyAppRole\",\n\n  \"AssumeRolePolicyDocument\": {\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [{\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"Service\": \"ec2.amazonaws.com\"\n      },\n      \"Action\": \"sts:AssumeRole\"\n    }]\n  },\n\n  \"AttachedManagedPolicies\": [\n    {\n      \"PolicyName\": \"ReadSecretsPolicy\",\n      \"PolicyArn\":\n        \"arn:aws:iam::123456789012:policy/ReadSecretsPolicy\"\n    }\n  ],\n\n  \"InlinePolicies\": {\n    \"DynamoAccess\": {\n      \"Version\": \"2012-10-17\",\n      \"Statement\": [{\n        \"Effect\": \"Allow\",\n        \"Action\": [\n          \"dynamodb:GetItem\",\n          \"dynamodb:PutItem\"\n        ],\n        \"Resource\":\n          \"arn:aws:dynamodb:us-east-1:123456789012:table/MyTable\"\n      }]\n    }\n  }\n}"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "question": "Can a permissions policy be attached directly to a user?",
+    "answer": "Yes. Permissions policies can be attached directly to IAM users or groups without any trust policy. Trust policies are only needed for roles, because roles are assumed — users are not."
+  },
+  {
+    "id": 7,
+    "question": "Does an explicit Deny always win?",
+    "answer": "Yes. If any policy contains an explicit `\"Effect\": \"Deny\"` for an action, that deny always wins — regardless of how many other policies allow it. This is one of the most important AWS IAM principles.",
+    "code": {
+      "deny_example": {
+        "title": "Explicit Deny — blocks all S3 access",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Deny\",\n      \"Action\": \"s3:*\",\n      \"Resource\": \"*\"\n    }\n  ]\n}"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "question": "What is the difference between an IAM policy and a resource-based policy?",
+    "answer": "**IAM policy** — attached to an identity (user, role, group). Controls what that identity can do.\n\n**Resource-based policy** — attached directly to a resource (e.g. an S3 bucket). Controls who can access that resource.\n\nBoth must say \"Allow\" for access to work. If either one is missing or denies, access is blocked.",
+    "code": {
+      "resource_policy": {
+        "title": "S3 bucket policy allowing a specific role",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\":\n          \"arn:aws:iam::123456789012:role/MyAppRole\"\n      },\n      \"Action\": [\n        \"s3:GetObject\",\n        \"s3:ListBucket\"\n      ],\n      \"Resource\": [\n        \"arn:aws:s3:::my-app-bucket\",\n        \"arn:aws:s3:::my-app-bucket/*\"\n      ]\n    }\n  ]\n}"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "question": "What is the principle of least privilege?",
+    "answer": "You only get what is explicitly granted — nothing more. If a policy allows creating roles but doesn't mention attaching policies, the user cannot attach policies, even to roles they created themselves."
+  },
+  {
+    "id": 10,
+    "question": "What happens if you delete a managed policy that is still attached to a role?",
+    "answer": "AWS will allow the deletion. The role immediately loses those permissions. The role itself is not broken — it just no longer has that access."
+  },
+  {
+    "id": 11,
+    "question": "Can a role assume another role?",
+    "answer": "Yes. The second role's trust policy must explicitly list the first role as an allowed principal.",
+    "code": {
+      "role_chain": {
+        "title": "Trust policy allowing one role to assume another",
+        "json": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"AWS\":\n          \"arn:aws:iam::123456789012:role/FirstRole\"\n      },\n      \"Action\": \"sts:AssumeRole\"\n    }\n  ]\n}"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "question": "What is an ARN?",
+    "answer": "ARN stands for **Amazon Resource Name**. It is a unique identifier for every AWS resource. Used in policies to specify exactly which resource a statement applies to.\n\n**Format:** `arn:aws:<service>:<region>:<account-id>:<resource>`\n\n**Examples:**\n- `arn:aws:iam::123456789012:role/MyAppRole`\n- `arn:aws:s3:::my-app-bucket`\n- `arn:aws:dynamodb:us-east-1:123456789012:table/MyTable`\n- `arn:aws:iam::123456789012:policy/ReadSecretsPolicy`"
+  },
+  {
+    "id": 13,
+    "question": "Can you attach an IAM policy directly to an EC2 instance?",
+    "answer": "No. You must create a role, attach permissions policies to that role, then assign the role to the EC2 instance. Services like EC2 cannot hold policies directly — they assume roles instead."
+  },
+  {
+    "id": 14,
+    "question": "Does attaching a role to an EC2 instance require a restart?",
+    "answer": "No. IAM role permissions are available almost immediately after attaching. The EC2 instance metadata service provides temporary credentials automatically and refreshes them periodically."
+  },
+  {
+    "id": 15,
+    "question": "What is the difference between an access key and a session token?",
+    "answer": "**Access key** — long-term credential created for an IAM user. Used for permanent programmatic access (CLI, CDK, API calls). Has two parts: an Access Key ID and a Secret Access Key.\n\n**Session token** — temporary credential issued when assuming a role via STS (Security Token Service). Expires after a set time (default: 1 hour)."
+  },
+  {
+    "id": 16,
+    "question": "What is MFA and why does it matter?",
+    "answer": "MFA (Multi-Factor Authentication) adds a second layer of security beyond a password. Even if credentials are stolen, an attacker cannot log in without the second factor (e.g. a code from your phone). Critical for root and admin accounts."
+  },
+  {
+    "id": 17,
+    "question": "What is the AWS root account vs an IAM admin user?",
+    "answer": "**Root account** — created when the AWS account is opened. Has absolute power over everything, including closing the account and changing billing. Should be locked away and almost never used.\n\n**IAM admin user** — a regular IAM user with admin permissions attached. Safer for day-to-day work because it can be monitored, restricted, and revoked."
+  },
+  {
+    "id": 18,
+    "question": "Does an unused IAM role cost money?",
+    "answer": "No. IAM roles, users, and policies are free. You only pay for the actual AWS resources being used (EC2 instances, S3 storage, etc.)."
+  },
+  {
+    "id": 19,
+    "question": "Can the same IAM credentials be used across multiple AWS accounts?",
+    "answer": "No. IAM credentials belong to a specific AWS account and can only be used within that account. Each account has its own separate IAM users and roles."
+  },
+  {
+    "id": 20,
+    "question": "If a policy is created but never attached to anything, does it do anything?",
+    "answer": "No. A policy has no effect until it is attached to a user, role, or group."
+  }
+]
