@@ -1,313 +1,248 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Choreography vs orchestration</title>
-<style>
-  :root {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --border: #e4e4e7;
-    --text: #18181b;
-    --text-muted: #71717a;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --node-bg: #ffffff;
-    --node-border: #d4d4d8;
-    --service: #2563eb;
-    --orchestrator: #8b5cf6;
-    --event: #f59e0b;
-    --command: #10b981;
-    --confirm: #2563eb;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b0d10;
-      --surface: #15181d;
-      --border: #2a2e36;
-      --text: #e8e8ea;
-      --text-muted: #a1a1aa;
-      --accent: #60a5fa;
-      --accent-hover: #93c5fd;
-      --node-bg: #1c2128;
-      --node-border: #2a2e36;
-      --service: #60a5fa;
-      --orchestrator: #a78bfa;
-    }
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    padding: 32px 20px;
-  }
-  .wrap { max-width: 980px; margin: 0 auto; }
-  header { margin-bottom: 20px; }
-  header a { color: var(--accent); text-decoration: none; font-size: 13px; }
-  h1 { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
-  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
-
-  .toolbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; }
-  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .seg button { border: 0; background: transparent; color: var(--text); padding: 7px 14px; font: inherit; cursor: pointer; border-right: 1px solid var(--border); }
-  .seg button:last-child { border-right: 0; }
-  .seg button[aria-pressed="true"] { background: var(--accent); color: white; }
-  .seg button:hover:not([aria-pressed="true"]) { background: var(--bg); }
-  .stepper { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; }
-  .stepper button {
-    font: inherit; color: var(--text); background: var(--surface);
-    border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; min-width: 32px;
-  }
-  .stepper button:hover:not(:disabled) { border-color: var(--accent); }
-  .stepper button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .count { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 500; min-width: 18px; text-align: center; }
-
-  .stage { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; }
-  svg { width: 100%; height: auto; display: block; }
-  .node-bg { fill: var(--node-bg); stroke: var(--node-border); stroke-width: 1.5; transition: stroke 200ms; }
-  .node.svc .node-bg { stroke: var(--service); }
-  .node.orch .node-bg { stroke: var(--orchestrator); stroke-width: 2; }
-  .node-title { fill: var(--text); font-size: 13px; font-weight: 500; text-anchor: middle; }
-  .node-sub { fill: var(--text-muted); font-size: 11px; text-anchor: middle; }
-  .arrow { fill: none; stroke-width: 2; marker-end: url(#ah4); opacity: 0.85; }
-  .arrow.event { stroke: var(--event); stroke-dasharray: 4 3; }
-  .arrow.command { stroke: var(--command); }
-  .arrow.confirm { stroke: var(--confirm); stroke-dasharray: 2 3; }
-  .arrow-label { fill: var(--text-muted); font-size: 10px; text-anchor: middle; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-
-  .panel-grid { display: grid; grid-template-columns: 1fr 280px; gap: 14px; }
-  @media (max-width: 720px) { .panel-grid { grid-template-columns: 1fr; } }
-  .meta {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px 16px; font-size: 13px;
-  }
-  .meta h3 { font-size: 13px; font-weight: 500; margin: 0 0 8px; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
-  .meta .metric { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); }
-  .meta .metric:last-of-type { border-bottom: 0; }
-  .meta .metric-label { color: var(--text-muted); }
-  .meta .metric-value { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--text); }
-  .meta .blurb { color: var(--text-muted); margin: 10px 0 0; line-height: 1.5; }
-
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend-line { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { transition: none !important; animation: none !important; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04 — Choreography vs orchestration</title>
+  <link rel="stylesheet" href="../../../../assets/design.css">
+  <link rel="stylesheet" href="../../../../assets/diagrams.css">
+  <style>
+    /* diagram-specific: service / orchestrator node colors */
+    .node.svc .node-bg { stroke: var(--accent); }
+    .node.orch .node-bg { stroke: var(--state-comp); stroke-width: 2; }
+    .arrow.event   { stroke: var(--state-pending); stroke-dasharray: 4 3; }
+    .arrow.command { stroke: var(--state-success); }
+    .arrow.confirm { stroke: var(--accent); stroke-dasharray: 2 3; }
+    .stepper { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.85rem; }
+    .stepper button { min-width: 32px; padding: 0.25rem 0.6rem; }
+    .count { font-family: var(--font-mono); color: var(--text); font-weight: 500; min-width: 18px; text-align: center; }
+    .panel-grid { display: grid; grid-template-columns: 1fr 280px; gap: 0.85rem; }
+    @media (max-width: 720px) { .panel-grid { grid-template-columns: 1fr; } }
+    .meta h3 { font-size: 0.7rem; font-weight: 500; margin: 0 0 0.5rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.12em; font-family: var(--font-mono); }
+    .meta .metric { display: flex; justify-content: space-between; align-items: baseline; padding: 0.4rem 0; border-bottom: 1px dashed var(--border); font-size: 0.82rem; }
+    .meta .metric:last-of-type { border-bottom: 0; }
+    .meta .metric-label { color: var(--text-muted); }
+    .meta .metric-value { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--text); font-family: var(--font-mono); }
+    .meta .blurb { color: var(--text-muted); margin: 0.7rem 0 0; line-height: 1.5; font-size: 0.82rem; }
+  </style>
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
 </head>
 <body>
-<main class="wrap">
+
   <header>
-    <a href="index.html">← All diagrams</a>
+    <div class="breadcrumb">
+      <a href="../../../../">Preparation Library</a> /
+      <a href="../">Distributed transactions</a> /
+      <a href="index.html">Diagrams</a> /
+      04
+    </div>
+    <span class="eyebrow">Diagram 04</span>
     <h1>Choreography vs orchestration</h1>
-    <p class="sub">Two ways to coordinate a saga across services. The same multi-step flow looks very different depending on who's driving — and the gap widens as steps grow.</p>
+    <p>Two ways to coordinate a saga across services. The same multi-step flow looks very different depending on who's driving — and the gap widens as steps grow.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
   </header>
 
-  <div class="toolbar">
-    <div class="seg" role="tablist" aria-label="Coordination">
-      <button id="mode-chor" aria-pressed="true">Choreography</button>
-      <button id="mode-orch" aria-pressed="false">Orchestration</button>
+  <main class="wrap wide">
+
+    <div class="dctrl">
+      <div class="seg" role="tablist" aria-label="Coordination">
+        <button id="mode-chor" aria-pressed="true">Choreography</button>
+        <button id="mode-orch" aria-pressed="false">Orchestration</button>
+      </div>
+      <div class="stepper">
+        <span>Steps:</span>
+        <button id="dec" class="btn">−</button>
+        <span class="count" id="count">3</span>
+        <button id="inc" class="btn">+</button>
+      </div>
     </div>
-    <div class="stepper">
-      <span>Steps:</span>
-      <button id="dec">−</button>
-      <span class="count" id="count">3</span>
-      <button id="inc">+</button>
+
+    <div class="legend">
+      <span><span class="swatch-line" style="border-top-style: dashed; border-top-color: var(--state-pending)"></span> event (pub/sub)</span>
+      <span><span class="swatch-line" style="border-top-color: var(--state-success)"></span> command (do step)</span>
+      <span><span class="swatch-line" style="border-top-style: dashed; border-top-color: var(--accent)"></span> confirmation</span>
     </div>
-  </div>
 
-  <div class="legend">
-    <span><span class="legend-line" style="border-top-style: dashed; border-top-color: var(--event)"></span> event (pub/sub)</span>
-    <span><span class="legend-line" style="border-top-color: var(--command)"></span> command (do step)</span>
-    <span><span class="legend-line" style="border-top-style: dashed; border-top-color: var(--confirm)"></span> confirmation</span>
-  </div>
-
-  <div class="panel-grid">
-    <div class="stage">
-      <svg id="canvas" viewBox="0 0 640 360" role="img" aria-labelledby="t4 d4">
-        <title id="t4">Coordination styles</title>
-        <desc id="d4">Toggle between choreography (services chained by events) and orchestration (a central orchestrator commanding each service).</desc>
-        <defs>
-          <marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-            <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
-          </marker>
-        </defs>
-        <g id="g-nodes"></g>
-        <g id="g-arrows"></g>
-      </svg>
+    <div class="panel-grid">
+      <div class="stage">
+        <svg id="canvas" class="diagram" viewBox="0 0 640 360" role="img" aria-labelledby="t4 d4">
+          <title id="t4">Coordination styles</title>
+          <desc id="d4">Toggle between choreography (services chained by events) and orchestration (a central orchestrator commanding each service).</desc>
+          <defs>
+            <marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+            </marker>
+          </defs>
+          <g id="g-nodes"></g>
+          <g id="g-arrows"></g>
+        </svg>
+      </div>
+      <aside class="panel padded meta" id="meta">
+        <h3 id="meta-title">Choreography</h3>
+        <div class="metric"><span class="metric-label">Services</span><span class="metric-value" id="m-svc">3</span></div>
+        <div class="metric"><span class="metric-label">Event subscriptions</span><span class="metric-value" id="m-sub">2</span></div>
+        <div class="metric"><span class="metric-label">Places that define the flow</span><span class="metric-value" id="m-defs">3</span></div>
+        <p class="blurb" id="blurb"></p>
+      </aside>
     </div>
-    <aside class="meta" id="meta">
-      <h3 id="meta-title">Choreography</h3>
-      <div class="metric"><span class="metric-label">Services</span><span class="metric-value" id="m-svc">3</span></div>
-      <div class="metric"><span class="metric-label">Event subscriptions</span><span class="metric-value" id="m-sub">2</span></div>
-      <div class="metric"><span class="metric-label">Places that define the flow</span><span class="metric-value" id="m-defs">3</span></div>
-      <p class="blurb" id="blurb"></p>
-    </aside>
-  </div>
-</main>
 
-<script>
-  // The whole diagram is re-rendered when mode or step count changes.
-  // Layout: choreography puts services in a horizontal chain.
-  // Orchestration puts the orchestrator at center with services on a ring.
+  </main>
 
-  const SERVICE_LABELS = ['Order', 'Payment', 'Inventory', 'Shipping', 'Notify', 'Loyalty'];
+  <footer class="site-footer">
+    <a href="index.html">← All diagrams</a>
+  </footer>
 
-  let mode = 'choreography';
-  let steps = 3;
+  <script src="../../../../assets/theme.js"></script>
+  <script>
+    const SERVICE_LABELS = ['Order', 'Payment', 'Inventory', 'Shipping', 'Notify', 'Loyalty'];
 
-  const $nodes = document.getElementById('g-nodes');
-  const $arrows = document.getElementById('g-arrows');
-  const $count = document.getElementById('count');
-  const $inc = document.getElementById('inc');
-  const $dec = document.getElementById('dec');
-  const $metaTitle = document.getElementById('meta-title');
-  const $mSvc = document.getElementById('m-svc');
-  const $mSub = document.getElementById('m-sub');
-  const $mDefs = document.getElementById('m-defs');
-  const $blurb = document.getElementById('blurb');
+    let mode = 'choreography';
+    let steps = 3;
 
-  function rect(x, y, w, h, opts = {}) {
-    const cls = opts.cls || 'svc';
-    return `<g class="node ${cls}">
-      <rect class="node-bg" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>
-      <text class="node-title" x="${x + w/2}" y="${y + h/2 - 2}">${opts.title}</text>
-      ${opts.sub ? `<text class="node-sub" x="${x + w/2}" y="${y + h/2 + 14}">${opts.sub}</text>` : ''}
-    </g>`;
-  }
+    const $nodes = document.getElementById('g-nodes');
+    const $arrows = document.getElementById('g-arrows');
+    const $count = document.getElementById('count');
+    const $inc = document.getElementById('inc');
+    const $dec = document.getElementById('dec');
+    const $metaTitle = document.getElementById('meta-title');
+    const $mSvc = document.getElementById('m-svc');
+    const $mSub = document.getElementById('m-sub');
+    const $mDefs = document.getElementById('m-defs');
+    const $blurb = document.getElementById('blurb');
 
-  function renderChoreography() {
-    $metaTitle.textContent = 'Choreography';
-    const W = 640, H = 360;
-    const n = steps;
-    const nodeW = 92, nodeH = 56;
-    const gap = (W - 40 - n * nodeW) / Math.max(1, n - 1);
-    const y = 110;
-
-    let nodesHtml = '';
-    const centers = [];
-    for (let i = 0; i < n; i++) {
-      const x = 20 + i * (nodeW + gap);
-      centers.push({ x: x + nodeW/2, y: y + nodeH/2, x0: x, x1: x + nodeW, y0: y, y1: y + nodeH });
-      nodesHtml += rect(x, y, nodeW, nodeH, { title: SERVICE_LABELS[i] || `Svc ${i+1}`, sub: 'pub + sub', cls: 'svc' });
-    }
-    // event bus visual underneath
-    nodesHtml += `<rect x="20" y="230" width="${W - 40}" height="44" rx="22" fill="none" stroke="var(--event)" stroke-dasharray="4 3" opacity="0.5"/>`;
-    nodesHtml += `<text x="${W/2}" y="258" class="node-sub" style="font-size:12px">event bus / topic</text>`;
-
-    let arrowsHtml = '';
-    // forward chain: A → B → C ... (each next subscribes to prev)
-    for (let i = 0; i < n - 1; i++) {
-      const a = centers[i], b = centers[i+1];
-      arrowsHtml += `<path class="arrow event" d="M${a.x1} ${a.y} L${b.x0} ${b.y}"/>`;
-      arrowsHtml += `<text class="arrow-label" x="${(a.x1 + b.x0)/2}" y="${a.y - 6}">${SERVICE_LABELS[i]}Done</text>`;
-    }
-    // each service connects to the bus (pub/sub lines down)
-    for (let i = 0; i < n; i++) {
-      const c = centers[i];
-      arrowsHtml += `<path d="M${c.x} ${c.y1} L${c.x} 230" stroke="var(--event)" stroke-dasharray="2 3" stroke-width="1.5" fill="none" opacity="0.4"/>`;
-    }
-    // failure event (back-propagation) — show only if n >= 3
-    if (n >= 3) {
-      const last = centers[n - 1], first = centers[0];
-      arrowsHtml += `<path class="arrow event" d="M${last.x} 305 Q ${W/2} 340 ${first.x} 305" stroke-width="1.5" opacity="0.5" stroke="var(--event)"/>`;
-      arrowsHtml += `<text class="arrow-label" x="${W/2}" y="335">failure event triggers compensations upstream</text>`;
+    function rect(x, y, w, h, opts = {}) {
+      const cls = opts.cls || 'svc';
+      return `<g class="node ${cls}">
+        <rect class="node-bg" x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/>
+        <text class="node-title" x="${x + w/2}" y="${y + h/2 - 2}">${opts.title}</text>
+        ${opts.sub ? `<text class="node-sub" x="${x + w/2}" y="${y + h/2 + 14}">${opts.sub}</text>` : ''}
+      </g>`;
     }
 
-    $nodes.innerHTML = nodesHtml;
-    $arrows.innerHTML = arrowsHtml;
+    function renderChoreography() {
+      $metaTitle.textContent = 'Choreography';
+      const W = 640;
+      const n = steps;
+      const nodeW = 92, nodeH = 56;
+      const gap = (W - 40 - n * nodeW) / Math.max(1, n - 1);
+      const y = 110;
 
-    // metrics
-    $mSvc.textContent = n;
-    $mSub.textContent = n - 1;
-    $mDefs.textContent = n; // every service has flow logic
-    $blurb.innerHTML = n <= 4
-      ? 'Each service knows what it listens for and what it emits. Simple at this size — no single point of failure, no orchestrator to run.'
-      : 'At <b>' + n + '</b> steps the wiring is hard to hold in your head: failure events have to propagate back through subscribers, and tracing one logical flow means walking through ' + n + ' separate codebases.';
-  }
+      let nodesHtml = '';
+      const centers = [];
+      for (let i = 0; i < n; i++) {
+        const x = 20 + i * (nodeW + gap);
+        centers.push({ x: x + nodeW/2, y: y + nodeH/2, x0: x, x1: x + nodeW, y0: y, y1: y + nodeH });
+        nodesHtml += rect(x, y, nodeW, nodeH, { title: SERVICE_LABELS[i] || `Svc ${i+1}`, sub: 'pub + sub', cls: 'svc' });
+      }
+      nodesHtml += `<rect x="20" y="230" width="${W - 40}" height="44" rx="22" fill="none" stroke="var(--state-pending)" stroke-dasharray="4 3" opacity="0.5"/>`;
+      nodesHtml += `<text x="${W/2}" y="258" class="node-sub" style="font-size:12px">event bus / topic</text>`;
 
-  function renderOrchestration() {
-    $metaTitle.textContent = 'Orchestration';
-    const W = 640, H = 360;
-    const cx = W/2, cy = H/2;
-    const orchW = 130, orchH = 70;
-    const n = steps;
+      let arrowsHtml = '';
+      for (let i = 0; i < n - 1; i++) {
+        const a = centers[i], b = centers[i+1];
+        arrowsHtml += `<path class="arrow event" d="M${a.x1} ${a.y} L${b.x0} ${b.y}" marker-end="url(#ah4)"/>`;
+        arrowsHtml += `<text class="arrow-label" x="${(a.x1 + b.x0)/2}" y="${a.y - 6}">${SERVICE_LABELS[i]}Done</text>`;
+      }
+      for (let i = 0; i < n; i++) {
+        const c = centers[i];
+        arrowsHtml += `<path d="M${c.x} ${c.y1} L${c.x} 230" stroke="var(--state-pending)" stroke-dasharray="2 3" stroke-width="1.5" fill="none" opacity="0.4"/>`;
+      }
+      if (n >= 3) {
+        const last = centers[n - 1], first = centers[0];
+        arrowsHtml += `<path class="arrow event" d="M${last.x} 305 Q ${W/2} 340 ${first.x} 305" stroke-width="1.5" opacity="0.5" marker-end="url(#ah4)"/>`;
+        arrowsHtml += `<text class="arrow-label" x="${W/2}" y="335">failure event triggers compensations upstream</text>`;
+      }
 
-    let nodesHtml = '';
-    // orchestrator center
-    nodesHtml += rect(cx - orchW/2, cy - orchH/2, orchW, orchH, { title: 'Orchestrator', sub: 'flow defined here', cls: 'orch' });
+      $nodes.innerHTML = nodesHtml;
+      $arrows.innerHTML = arrowsHtml;
 
-    // services on a ring
-    const radius = 130;
-    const centers = [];
-    for (let i = 0; i < n; i++) {
-      const angle = (-Math.PI / 2) + (i / n) * Math.PI * 2;
-      const ax = cx + Math.cos(angle) * radius;
-      const ay = cy + Math.sin(angle) * radius;
-      const sw = 90, sh = 46;
-      centers.push({ x: ax, y: ay, sw, sh });
-      nodesHtml += rect(ax - sw/2, ay - sh/2, sw, sh, { title: SERVICE_LABELS[i] || `Svc ${i+1}`, cls: 'svc' });
+      $mSvc.textContent = n;
+      $mSub.textContent = n - 1;
+      $mDefs.textContent = n;
+      $blurb.innerHTML = n <= 4
+        ? 'Each service knows what it listens for and what it emits. Simple at this size — no single point of failure, no orchestrator to run.'
+        : 'At <b>' + n + '</b> steps the wiring is hard to hold in your head: failure events have to propagate back through subscribers, and tracing one logical flow means walking through ' + n + ' separate codebases.';
     }
 
-    let arrowsHtml = '';
-    // command (outbound) + confirm (inbound) for each service
-    for (let i = 0; i < n; i++) {
-      const c = centers[i];
-      // line from orchestrator edge to service edge — use slight offsets so the two arrows don't overlap
-      const dx = c.x - cx, dy = c.y - cy;
-      const len = Math.hypot(dx, dy);
-      const ux = dx / len, uy = dy / len;
-      // perpendicular offset
-      const px = -uy * 6, py = ux * 6;
+    function renderOrchestration() {
+      $metaTitle.textContent = 'Orchestration';
+      const W = 640, H = 360;
+      const cx = W/2, cy = H/2;
+      const orchW = 130, orchH = 70;
+      const n = steps;
 
-      // command: out from orchestrator (offset +) to service
-      const ox = cx + ux * (orchW/2 - 5) + px;
-      const oy = cy + uy * (orchH/2 - 5) + py;
-      const tx = c.x - ux * (c.sw/2 - 5) + px;
-      const ty = c.y - uy * (c.sh/2 - 5) + py;
-      arrowsHtml += `<path class="arrow command" d="M${ox} ${oy} L${tx} ${ty}"/>`;
+      let nodesHtml = '';
+      nodesHtml += rect(cx - orchW/2, cy - orchH/2, orchW, orchH, { title: 'Orchestrator', sub: 'flow defined here', cls: 'orch' });
 
-      // confirm: back from service to orchestrator (offset -)
-      const ox2 = cx + ux * (orchW/2 - 5) - px;
-      const oy2 = cy + uy * (orchH/2 - 5) - py;
-      const tx2 = c.x - ux * (c.sw/2 - 5) - px;
-      const ty2 = c.y - uy * (c.sh/2 - 5) - py;
-      arrowsHtml += `<path class="arrow confirm" d="M${tx2} ${ty2} L${ox2} ${oy2}"/>`;
+      const radius = 130;
+      const centers = [];
+      for (let i = 0; i < n; i++) {
+        const angle = (-Math.PI / 2) + (i / n) * Math.PI * 2;
+        const ax = cx + Math.cos(angle) * radius;
+        const ay = cy + Math.sin(angle) * radius;
+        const sw = 90, sh = 46;
+        centers.push({ x: ax, y: ay, sw, sh });
+        nodesHtml += rect(ax - sw/2, ay - sh/2, sw, sh, { title: SERVICE_LABELS[i] || `Svc ${i+1}`, cls: 'svc' });
+      }
+
+      let arrowsHtml = '';
+      for (let i = 0; i < n; i++) {
+        const c = centers[i];
+        const dx = c.x - cx, dy = c.y - cy;
+        const len = Math.hypot(dx, dy);
+        const ux = dx / len, uy = dy / len;
+        const px = -uy * 6, py = ux * 6;
+
+        const ox = cx + ux * (orchW/2 - 5) + px;
+        const oy = cy + uy * (orchH/2 - 5) + py;
+        const tx = c.x - ux * (c.sw/2 - 5) + px;
+        const ty = c.y - uy * (c.sh/2 - 5) + py;
+        arrowsHtml += `<path class="arrow command" d="M${ox} ${oy} L${tx} ${ty}" marker-end="url(#ah4)"/>`;
+
+        const ox2 = cx + ux * (orchW/2 - 5) - px;
+        const oy2 = cy + uy * (orchH/2 - 5) - py;
+        const tx2 = c.x - ux * (c.sw/2 - 5) - px;
+        const ty2 = c.y - uy * (c.sh/2 - 5) - py;
+        arrowsHtml += `<path class="arrow confirm" d="M${tx2} ${ty2} L${ox2} ${oy2}" marker-end="url(#ah4)"/>`;
+      }
+
+      $nodes.innerHTML = nodesHtml;
+      $arrows.innerHTML = arrowsHtml;
+
+      $mSvc.textContent = n;
+      $mSub.textContent = '0 (no peer-to-peer events)';
+      $mDefs.textContent = 1;
+      $blurb.innerHTML = 'The whole flow lives in one place. Services just take commands. At ' + n + ' steps the diagram still shows everything in one glance — add another step and only the orchestrator changes.';
     }
 
-    $nodes.innerHTML = nodesHtml;
-    $arrows.innerHTML = arrowsHtml;
+    function render() {
+      if (mode === 'choreography') renderChoreography(); else renderOrchestration();
+      $count.textContent = steps;
+      $dec.disabled = steps <= 2;
+      $inc.disabled = steps >= 6;
+    }
 
-    $mSvc.textContent = n;
-    $mSub.textContent = '0 (no peer-to-peer events)';
-    $mDefs.textContent = 1;
-    $blurb.innerHTML = 'The whole flow lives in one place. Services just take commands. At ' + n + ' steps the diagram still shows everything in one glance — add another step and only the orchestrator changes.';
-  }
+    function setMode(m) {
+      mode = m;
+      document.getElementById('mode-chor').setAttribute('aria-pressed', m === 'choreography');
+      document.getElementById('mode-orch').setAttribute('aria-pressed', m === 'orchestration');
+      render();
+    }
 
-  function render() {
-    if (mode === 'choreography') renderChoreography(); else renderOrchestration();
-    $count.textContent = steps;
-    $dec.disabled = steps <= 2;
-    $inc.disabled = steps >= 6;
-  }
+    document.getElementById('mode-chor').addEventListener('click', () => setMode('choreography'));
+    document.getElementById('mode-orch').addEventListener('click', () => setMode('orchestration'));
+    $inc.addEventListener('click', () => { if (steps < 6) { steps++; render(); } });
+    $dec.addEventListener('click', () => { if (steps > 2) { steps--; render(); } });
 
-  function setMode(m) {
-    mode = m;
-    document.getElementById('mode-chor').setAttribute('aria-pressed', m === 'choreography');
-    document.getElementById('mode-orch').setAttribute('aria-pressed', m === 'orchestration');
     render();
-  }
-
-  document.getElementById('mode-chor').addEventListener('click', () => setMode('choreography'));
-  document.getElementById('mode-orch').addEventListener('click', () => setMode('orchestration'));
-  $inc.addEventListener('click', () => { if (steps < 6) { steps++; render(); } });
-  $dec.addEventListener('click', () => { if (steps > 2) { steps--; render(); } });
-
-  render();
-</script>
+  </script>
 </body>
 </html>

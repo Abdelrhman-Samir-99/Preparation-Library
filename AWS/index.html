@@ -4,75 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AWS Flashcards</title>
-  <link rel="stylesheet" href="shared/styles.css">
-  <style>
-    .topics-grid {
-      width: calc(100% - 2rem);
-      max-width: 720px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 3rem;
-    }
-
-    .topic-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      box-shadow: var(--card-shadow);
-      border-radius: 14px;
-      padding: 1.75rem 1.5rem;
-      text-decoration: none;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .topic-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(99,102,241,0.1);
-    }
-
-    .topic-card .topic-name {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .topic-card .topic-count {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .topic-card .topic-tag {
-      display: inline-block;
-      margin-top: 0.25rem;
-      padding: 0.2rem 0.6rem;
-      background: var(--code-inline-bg);
-      color: var(--accent);
-      border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      width: fit-content;
-    }
-  </style>
+  <link rel="stylesheet" href="../assets/design.css">
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
   <header>
+    <div class="breadcrumb"><a href="../">Preparation Library</a> / AWS</div>
     <h1 id="topicTitle">AWS Flashcards</h1>
     <p id="topicSubtitle">Pick a service to start studying</p>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
   </header>
 
-  <div class="topics-grid" id="topicsGrid"></div>
+  <main class="wrap narrow">
+    <div class="card-grid cols-2" id="topicsGrid"></div>
+  </main>
 
-  <script src="shared/flashcards.js"></script>
+  <script src="../assets/theme.js"></script>
   <script>
-    initTheme();
-
     const topics = [
       { name: 'IAM', description: 'Identity & Access Management', count: 20, path: 'IAM/' },
       { name: 'SQS', description: 'Simple Queue Service', count: 15, path: 'SQS/' }
@@ -82,11 +39,11 @@
     topics.forEach(t => {
       const a = document.createElement('a');
       a.href = t.path;
-      a.className = 'topic-card';
+      a.className = 'link-card';
       a.innerHTML = `
-        <span class="topic-tag">${t.count} questions</span>
-        <span class="topic-name">${t.name}</span>
-        <span class="topic-count">${t.description}</span>
+        <span class="lc-tag">${t.count} questions</span>
+        <div class="lc-title">${t.name}</div>
+        <p class="lc-desc">${t.description}</p>
       `;
       grid.appendChild(a);
     });

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preparation Library</title>
+  <link rel="stylesheet" href="assets/design.css">
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
+</head>
+<body>
+
+  <header>
+    <span class="eyebrow">Preparation Library</span>
+    <h1>Interview-prep notes &amp; interactive demos</h1>
+    <p>Flashcards, diagrams, and study notes I've built while preparing.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+  </header>
+
+  <main class="wrap">
+
+    <section style="margin-top: 1.5rem;">
+      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Try it</h2>
+      <div class="card-grid">
+        <a class="link-card" href="AWS/">
+          <span class="lc-tag">Flashcards</span>
+          <div class="lc-title">AWS</div>
+          <p class="lc-desc">IAM and SQS flashcard decks — sequential, shuffle, or missed-only modes.</p>
+        </a>
+        <a class="link-card" href="System%20Design/High%20Level%20Design/Distributed%20Transactions/diagrams/">
+          <span class="lc-tag">Interactive diagrams</span>
+          <div class="lc-title">Distributed transactions</div>
+          <p class="lc-desc">Five operable diagrams: sagas, 2PC vs saga under crash, transactional outbox, choreography vs orchestration, and a decision tree.</p>
+        </a>
+      </div>
+    </section>
+
+    <section style="margin-top: 1.5rem;">
+      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Topic notes</h2>
+      <div class="card-grid">
+        <a class="link-card" href="System%20Design/High%20Level%20Design/">
+          <div class="lc-title">System design — high level</div>
+          <p class="lc-desc">Scaling, load balancers, caches, databases, message queues, distributed transactions.</p>
+        </a>
+        <a class="link-card" href="System%20Design/Low%20Level%20Design/">
+          <div class="lc-title">System design — low level</div>
+          <p class="lc-desc">Design patterns, principles, OOD, UML diagrams.</p>
+        </a>
+        <a class="link-card" href="Problem%20Solving/">
+          <div class="lc-title">Problem solving</div>
+          <p class="lc-desc">Data structures and algorithms references.</p>
+        </a>
+        <a class="link-card" href="Programming%20Languages/">
+          <div class="lc-title">Programming languages</div>
+          <p class="lc-desc">Notes and resources for C++, C#, Java, Ruby, Rails, Spring.</p>
+        </a>
+        <a class="link-card" href="Behavioral/">
+          <div class="lc-title">Behavioral</div>
+          <p class="lc-desc">Company-specific prep, starting with Amazon leadership principles.</p>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    Design system: <a href="assets/DESIGN.md">assets/DESIGN.md</a> &middot;
+    Source: <a href="https://github.com/Abdelrhman-Samir-99/Preparation-Library">GitHub</a>
+  </footer>
+
+  <script src="assets/theme.js"></script>
+
+</body>
+</html>

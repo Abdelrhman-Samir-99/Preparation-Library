@@ -1,0 +1,309 @@
+/* ============================================================
+ * diagrams.css — SVG diagram styles
+ *
+ * Pairs with design.css. Provides shared state colors, node/arrow
+ * styles, log panels, and verdict pills used across the interactive
+ * diagrams under /System Design/.../Distributed Transactions/diagrams.
+ *
+ * Each diagram file still owns its specific SVG layout and JS.
+ * ============================================================ */
+
+/* ── Stage container (the SVG wrapper) ────────────────────── */
+.stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.stage h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.stage .tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.stage p.note {
+  margin: 0.25rem 0 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+/* ── Diagram controls bar (between stage and SVG) ─────────── */
+.dctrl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.85rem;
+}
+.dctrl label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.dctrl select,
+.dctrl input[type="checkbox"] {
+  font: inherit;
+  color: var(--text);
+}
+.dctrl select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.6rem;
+}
+
+/* ── Legend ───────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+}
+.legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.legend .swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend .swatch-line {
+  width: 18px;
+  height: 0;
+  border-top: 2px solid;
+  display: inline-block;
+}
+
+/* ── SVG canvas ───────────────────────────────────────────── */
+svg.diagram { width: 100%; height: auto; display: block; }
+
+/* ── Nodes (rounded rectangles for services/components) ───── */
+.node-bg {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  transition: stroke 200ms, fill 200ms;
+}
+.node[data-state="idle"] .node-bg     { stroke: var(--border-strong); }
+.node[data-state="active"] .node-bg   { stroke: var(--accent); }
+.node[data-state="running"] .node-bg  { stroke: var(--state-pending); }
+.node[data-state="committed"] .node-bg{ stroke: var(--state-success); }
+.node[data-state="done"] .node-bg     { stroke: var(--state-success); }
+.node[data-state="free"] .node-bg     { stroke: var(--state-success); }
+.node[data-state="failed"] .node-bg   { stroke: var(--state-danger); }
+.node[data-state="locked"] .node-bg   { stroke: var(--state-locked); stroke-dasharray: 5 3; }
+.node[data-state="compensating"] .node-bg { stroke: var(--state-comp); }
+.node[data-state="compensated"] .node-bg  { stroke: var(--state-comp); stroke-dasharray: 4 4; }
+.node[data-state="crashed"] .node-bg  { stroke: var(--text-muted); opacity: 0.55; stroke-dasharray: 4 4; }
+.node[data-state="recovering"] .node-bg { stroke: var(--accent); animation: dgPulse 1s ease-in-out infinite; }
+
+.node-title {
+  fill: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-anchor: middle;
+  font-family: var(--font-sans);
+}
+.node-sub {
+  fill: var(--text-muted);
+  font-size: 11px;
+  text-anchor: middle;
+  font-family: var(--font-sans);
+}
+.node[data-state="crashed"] .node-title,
+.node[data-state="crashed"] .node-sub { opacity: 0.5; }
+
+/* Status dot + label (inside a node) */
+.status-dot {
+  fill: var(--state-idle);
+  transition: fill 200ms;
+}
+.node[data-state="running"] .status-dot      { fill: var(--state-pending); animation: dgPulse 1.2s ease-in-out infinite; }
+.node[data-state="committed"] .status-dot,
+.node[data-state="done"] .status-dot,
+.node[data-state="free"] .status-dot         { fill: var(--state-success); }
+.node[data-state="failed"] .status-dot       { fill: var(--state-danger); }
+.node[data-state="compensating"] .status-dot { fill: var(--state-comp); animation: dgPulse 1.2s ease-in-out infinite; }
+.node[data-state="compensated"] .status-dot  { fill: var(--state-comp); opacity: 0.5; }
+.status-text {
+  fill: var(--text-muted);
+  font-size: 12px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Status badges/icons that toggle in/out by state */
+.badge {
+  font-size: 11px;
+  text-anchor: middle;
+  font-family: var(--font-mono);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.badge.success { fill: var(--state-success); }
+.badge.comp    { fill: var(--state-comp); }
+.node[data-state="committed"] .badge.success { opacity: 1; }
+.node[data-state="compensated"] .badge.comp  { opacity: 1; }
+
+.lock-icon  { font-size: 14px; text-anchor: middle; fill: var(--state-locked); opacity: 0; transition: opacity 200ms; font-family: var(--font-mono); }
+.check-icon { font-size: 14px; text-anchor: middle; fill: var(--state-success); opacity: 0; transition: opacity 200ms; font-family: var(--font-mono); }
+.skull      { font-size: 28px; text-anchor: middle; fill: var(--text-muted); opacity: 0; transition: opacity 200ms; }
+.node[data-state="locked"] .lock-icon   { opacity: 1; }
+.node[data-state="free"] .check-icon,
+.node[data-state="committed"] .check-icon { opacity: 1; }
+.node[data-state="crashed"] .skull      { opacity: 0.7; }
+
+/* ── Arrows ──────────────────────────────────────────────── */
+.arrow {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: stroke 200ms, opacity 200ms;
+}
+.arrow[data-state="active"] { stroke: var(--accent); }
+.arrow[data-state="good"]   { stroke: var(--state-success); }
+.arrow[data-state="bad"]    { stroke: var(--state-danger); stroke-dasharray: 5 4; }
+.arrow[data-state="comp"]   { stroke: var(--state-comp); stroke-dasharray: 6 4; }
+.arrow[data-state="crashed"]{ stroke: var(--state-danger); stroke-dasharray: 4 4; opacity: 0.5; }
+.arrow-label {
+  fill: var(--text-muted);
+  font-size: 11px;
+  text-anchor: middle;
+  font-family: var(--font-mono);
+}
+
+/* ── Queue indicators (for 2PC locked participants) ───────── */
+.queue-pill {
+  fill: var(--state-warn-bg);
+  stroke: var(--state-warn-border);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.queue-text {
+  fill: var(--state-warn-text);
+  font-size: 11px;
+  text-anchor: middle;
+  opacity: 0;
+  transition: opacity 200ms;
+  font-family: var(--font-mono);
+}
+.queue-visible .queue-pill,
+.queue-visible .queue-text { opacity: 1; }
+
+/* ── Durable-state cards inside SVG ───────────────────────── */
+.durable-card { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+.durable-title {
+  fill: var(--text-muted);
+  font-size: 10px;
+  text-anchor: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+}
+.durable-value {
+  fill: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* ── Table-row indicators (outbox / orders) ──────────────── */
+.row {
+  fill: var(--surface-2);
+  stroke: var(--border);
+  stroke-width: 1;
+  transition: fill 250ms;
+}
+.row[data-state="filled"]    { fill: var(--state-success-soft); }
+.row[data-state="stale"]     { fill: var(--state-danger-soft); }
+.row[data-state="processed"] { fill: var(--surface-2); opacity: 0.5; }
+.row-label {
+  fill: var(--text);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+/* Relay pulse (CDC stream indicator) */
+.relay-pulse { fill: var(--accent); opacity: 0; }
+.relay-pulse.on { animation: dgRelay 1.4s ease-out infinite; }
+
+/* ── Verdict pill (under a diagram, states the outcome) ─── */
+.verdict {
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--radius-md);
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.verdict.neutral { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.verdict.good { background: var(--knew-bg); color: var(--knew-text); border: 1px solid var(--knew-border); }
+.verdict.bad  { background: var(--didnt-bg); color: var(--didnt-text); border: 1px solid var(--didnt-border); }
+.verdict.warn { background: var(--state-warn-bg); color: var(--state-warn-text); border: 1px solid var(--state-warn-border); }
+.verdict b { font-weight: 600; }
+
+/* ── Log panel (event narration under a diagram) ─────────── */
+.log {
+  background: #18181b;
+  color: #e4e4e7;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  font: 0.78rem/1.6 var(--font-mono);
+  height: 180px;
+  overflow-y: auto;
+}
+[data-theme="dark"] .log { background: #08090b; color: #d4d4d8; }
+.log-line { display: block; }
+.log-line.commit { color: #6ee7b7; }
+.log-line.fail   { color: #fca5a5; }
+.log-line.comp   { color: #c4b5fd; }
+.log-line.info   { color: #93c5fd; }
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes dgPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+@keyframes dgRelay {
+  0%   { opacity: 0.7; r: 4; }
+  100% { opacity: 0; r: 18; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot,
+  .node-bg,
+  .arrow,
+  .badge,
+  .relay-pulse,
+  .node[data-state="recovering"] .node-bg {
+    transition: none !important;
+    animation: none !important;
+  }
+}

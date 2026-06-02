@@ -1,407 +1,351 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Do you need a distributed transaction?</title>
-<style>
-  :root {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --border: #e4e4e7;
-    --text: #18181b;
-    --text-muted: #71717a;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --node-bg: #ffffff;
-    --node-border: #d4d4d8;
-    --question: #6366f1;
-    --leaf: #10b981;
-    --leaf-warn: #f59e0b;
-    --chosen: #10b981;
-    --dim: 0.35;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b0d10;
-      --surface: #15181d;
-      --border: #2a2e36;
-      --text: #e8e8ea;
-      --text-muted: #a1a1aa;
-      --accent: #60a5fa;
-      --accent-hover: #93c5fd;
-      --node-bg: #1c2128;
-      --node-border: #2a2e36;
-      --question: #818cf8;
-      --leaf: #34d399;
-      --leaf-warn: #fbbf24;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05 — Do you need a distributed transaction?</title>
+  <link rel="stylesheet" href="../../../../assets/design.css">
+  <link rel="stylesheet" href="../../../../assets/diagrams.css">
+  <style>
+    /* diagram-specific: tree styling */
+    .edge { fill: none; stroke: var(--border); stroke-width: 1.8; transition: stroke 200ms, opacity 200ms; }
+    .edge.chosen { stroke: var(--state-success); stroke-width: 2.5; }
+    .edge.dimmed { opacity: 0.35; }
+    .edge-label { fill: var(--text-muted); font-size: 12px; text-anchor: middle; font-weight: 500; transition: opacity 200ms; font-family: var(--font-mono); }
+    .edge-label.chosen { fill: var(--state-success); }
+    .edge-label.dimmed { opacity: 0.35; }
+
+    .node { transition: opacity 200ms; }
+    .node.dimmed { opacity: 0.35; }
+    .node.question .node-bg { stroke: var(--accent); }
+    .node.leaf .node-bg { stroke: var(--state-success); stroke-width: 2; }
+    .node.leaf.warn .node-bg { stroke: var(--state-pending); stroke-width: 2; stroke-dasharray: 6 3; }
+    .node.chosen .node-bg { stroke: var(--state-success); stroke-width: 2.5; }
+
+    .leaf-tag { fill: var(--state-success); font-size: 10px; text-anchor: middle; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-mono); }
+    .leaf.warn .leaf-tag { fill: var(--state-pending); }
+
+    .choice { cursor: pointer; }
+    .choice rect {
+      fill: var(--bg); stroke: var(--border); stroke-width: 1;
+      transition: fill 120ms, stroke 120ms;
     }
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    padding: 32px 20px;
-  }
-  .wrap { max-width: 1100px; margin: 0 auto; }
-  header { margin-bottom: 20px; }
-  header a { color: var(--accent); text-decoration: none; font-size: 13px; }
-  h1 { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
-  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
+    .choice:hover rect { fill: var(--accent); stroke: var(--accent); }
+    .choice:hover text { fill: white; }
+    .choice text { fill: var(--text); font-size: 12px; text-anchor: middle; font-weight: 500; pointer-events: none; font-family: var(--font-mono); }
+    .choice.chosen rect { fill: var(--state-success); stroke: var(--state-success); }
+    .choice.chosen text { fill: white; }
 
-  .controls {
-    display: flex; gap: 10px; align-items: center;
-    padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px;
-  }
-  button.btn {
-    font: inherit; color: var(--text); background: var(--surface);
-    border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; cursor: pointer;
-    transition: border-color 120ms, background 120ms;
-  }
-  button.btn:hover:not(:disabled) { border-color: var(--accent); }
-  .stage { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 14px; }
-  svg { width: 100%; height: auto; display: block; }
-
-  .edge { fill: none; stroke: var(--border); stroke-width: 1.8; transition: stroke 200ms, opacity 200ms; }
-  .edge.chosen { stroke: var(--chosen); stroke-width: 2.5; }
-  .edge.dimmed { opacity: var(--dim); }
-  .edge-label { fill: var(--text-muted); font-size: 12px; text-anchor: middle; font-weight: 500; transition: opacity 200ms; }
-  .edge-label.chosen { fill: var(--chosen); }
-  .edge-label.dimmed { opacity: var(--dim); }
-
-  .node { transition: opacity 200ms; }
-  .node.dimmed { opacity: var(--dim); }
-
-  .node-bg { fill: var(--node-bg); stroke: var(--node-border); stroke-width: 1.5; transition: stroke 200ms; }
-  .node.question .node-bg { stroke: var(--question); }
-  .node.leaf .node-bg { stroke: var(--leaf); stroke-width: 2; }
-  .node.leaf.warn .node-bg { stroke: var(--leaf-warn); stroke-width: 2; stroke-dasharray: 6 3; }
-  .node.chosen .node-bg { stroke: var(--chosen); stroke-width: 2.5; }
-  .node-title { fill: var(--text); font-size: 13px; font-weight: 500; text-anchor: middle; }
-  .node-sub { fill: var(--text-muted); font-size: 11px; text-anchor: middle; }
-  .leaf-tag { fill: var(--leaf); font-size: 10px; text-anchor: middle; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-  .leaf.warn .leaf-tag { fill: var(--leaf-warn); }
-
-  .choice {
-    cursor: pointer;
-  }
-  .choice rect {
-    fill: var(--bg);
-    stroke: var(--border);
-    stroke-width: 1;
-    transition: fill 120ms, stroke 120ms;
-  }
-  .choice:hover rect { fill: var(--accent); stroke: var(--accent); }
-  .choice:hover text { fill: white; }
-  .choice text { fill: var(--text); font-size: 12px; text-anchor: middle; font-weight: 500; pointer-events: none; }
-  .choice.chosen rect { fill: var(--chosen); stroke: var(--chosen); }
-  .choice.chosen text { fill: white; }
-
-  .result {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 18px 22px; min-height: 100px;
-  }
-  .result.hidden { display: none; }
-  .result-tag { font-size: 11px; color: var(--leaf); font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; }
-  .result.warn .result-tag { color: var(--leaf-warn); }
-  .result-title { font-size: 18px; font-weight: 500; margin: 4px 0 2px; }
-  .result-sub { color: var(--text-muted); font-size: 13px; margin: 0 0 10px; }
-  .result-body { color: var(--text); font-size: 14px; line-height: 1.55; margin: 0; }
-  .result-path { color: var(--text-muted); font-size: 12px; margin-top: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-</style>
+    .result { display: none; padding: 1.1rem 1.4rem; min-height: 100px; }
+    .result.visible { display: block; }
+    .result-tag { font-size: 0.7rem; color: var(--state-success); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; font-family: var(--font-mono); }
+    .result.warn .result-tag { color: var(--state-pending); }
+    .result-title { font-size: 1.2rem; font-weight: 500; margin: 0.25rem 0 0.15rem; }
+    .result-sub { color: var(--text-muted); font-size: 0.82rem; margin: 0 0 0.65rem; }
+    .result-body { color: var(--text); font-size: 0.9rem; line-height: 1.55; margin: 0; }
+    .result-path { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.8rem; font-family: var(--font-mono); }
+  </style>
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
 </head>
 <body>
-<main class="wrap">
+
   <header>
-    <a href="index.html">← All diagrams</a>
+    <div class="breadcrumb">
+      <a href="../../../../">Preparation Library</a> /
+      <a href="../">Distributed transactions</a> /
+      <a href="index.html">Diagrams</a> /
+      05
+    </div>
+    <span class="eyebrow">Diagram 05</span>
     <h1>Do you need a distributed transaction?</h1>
-    <p class="sub">Click <b>yes</b> or <b>no</b> at each question to walk the tree. The chosen path lights up; the recommendation appears below.</p>
+    <p>Click <b>yes</b> or <b>no</b> at each question to walk the tree. The chosen path lights up; the recommendation appears below.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
   </header>
 
-  <div class="controls">
-    <button class="btn" id="reset">Reset</button>
-  </div>
+  <main class="wrap wide">
 
-  <div class="stage">
-    <svg id="canvas" viewBox="0 0 1100 760" role="img" aria-labelledby="t5 d5">
-      <title id="t5">Decision tree for distributed transactions</title>
-      <desc id="d5">A walk from "can you put the data in one database?" through "use a distributed database" or "use a saga (choreography or orchestration)."</desc>
-      <g id="g-edges"></g>
-      <g id="g-nodes"></g>
-    </svg>
-  </div>
+    <div class="dctrl">
+      <button class="btn" id="reset">Reset</button>
+    </div>
 
-  <div class="result hidden" id="result">
-    <div class="result-tag" id="r-tag">Recommendation</div>
-    <h2 class="result-title" id="r-title"></h2>
-    <p class="result-sub" id="r-sub"></p>
-    <p class="result-body" id="r-body"></p>
-    <p class="result-path" id="r-path"></p>
-  </div>
-</main>
+    <div class="stage">
+      <svg id="canvas" class="diagram" viewBox="0 0 1100 760" role="img" aria-labelledby="t5 d5">
+        <title id="t5">Decision tree for distributed transactions</title>
+        <desc id="d5">A walk from "can you put the data in one database?" through "use a distributed database" or "use a saga (choreography or orchestration)."</desc>
+        <g id="g-edges"></g>
+        <g id="g-nodes"></g>
+      </svg>
+    </div>
 
-<script>
-  // Tree definition. Each node has fixed layout coordinates so we can draw edges deterministically.
-  const TREE = {
-    q1: {
-      kind: 'question', x: 420, y: 30, w: 280, h: 100,
-      title: 'Can the data be co-located in one database?',
-      sub: 'one schema, one host (or one shard)',
-      yes: 'leaf_single', no: 'q2',
-    },
-    leaf_single: {
-      kind: 'leaf', x: 60, y: 200, w: 280, h: 150,
-      tag: 'Use this when you can',
-      title: 'Single ACID transaction',
-      sub: 'plain SQL transaction in one DB',
-      body: 'Wrap the work in one local transaction and let the database guarantee atomicity and isolation. Simpler, faster, and more reliable than anything distributed. Always prefer this when the data model allows it.',
-    },
-    q2: {
-      kind: 'question', x: 720, y: 200, w: 320, h: 100,
-      title: 'Do you need strong cross-store consistency?',
-      sub: 'no eventual consistency window allowed',
-      yes: 'leaf_distdb', no: 'q3',
-    },
-    leaf_distdb: {
-      kind: 'leaf', x: 420, y: 370, w: 280, h: 150,
-      tag: 'Let the DB do 2PC',
-      title: 'Use a distributed database',
-      sub: 'Spanner · CockroachDB · YugabyteDB',
-      body: 'These engines implement 2PC internally with tight coordinator/participant coupling and lease-based recovery. They survive the failure modes that make hand-rolled 2PC across services impractical. Don\'t build 2PC over your own services.',
-    },
-    q3: {
-      kind: 'question', x: 820, y: 370, w: 260, h: 100,
-      title: 'Is the saga simple (≲ 5 steps)?',
-      sub: 'few teams, few services',
-      yes: 'leaf_chor', no: 'leaf_orch',
-    },
-    leaf_chor: {
-      kind: 'leaf', x: 520, y: 620, w: 220, h: 110,
-      tag: 'Saga · decentralized',
-      title: 'Choreography',
-      sub: 'events + subscribers',
-      body: 'Each service emits an event when it finishes a step; the next service subscribes. No central runtime. Easy to start; gets hard to trace and debug as the flow grows.',
-    },
-    leaf_orch: {
-      kind: 'leaf', x: 800, y: 620, w: 280, h: 110,
-      tag: 'Saga · centralized',
-      title: 'Orchestration',
-      sub: 'Temporal · AWS Step Functions',
-      body: 'A dedicated orchestrator runs the flow. One place defines and owns the saga; durable state survives restarts. Recommended for serious scale and complex flows.',
-    },
-  };
+    <div class="panel result" id="result">
+      <div class="result-tag" id="r-tag">Recommendation</div>
+      <h2 class="result-title" id="r-title"></h2>
+      <p class="result-sub" id="r-sub"></p>
+      <p class="result-body" id="r-body"></p>
+      <p class="result-path" id="r-path"></p>
+    </div>
 
-  const PATH_LABELS = {
-    q1: { yes: 'all in one DB', no: 'data is split' },
-    q2: { yes: 'strong consistency', no: 'eventual is fine' },
-    q3: { yes: 'simple flow', no: 'complex flow' },
-  };
+  </main>
 
-  const $edges = document.getElementById('g-edges');
-  const $nodes = document.getElementById('g-nodes');
-  const $result = document.getElementById('result');
-  const $reset = document.getElementById('reset');
+  <footer class="site-footer">
+    <a href="index.html">← All diagrams</a>
+  </footer>
 
-  let chosenEdges = new Set();   // edges in the chosen path, e.g. "q1:yes"
-  let chosenNodes = new Set(['q1']);
-  let walkedChoices = [];        // [{ from: 'q1', choice: 'yes', label: '...' }]
+  <script src="../../../../assets/theme.js"></script>
+  <script>
+    const TREE = {
+      q1: {
+        kind: 'question', x: 420, y: 30, w: 280, h: 100,
+        title: 'Can the data be co-located in one database?',
+        sub: 'one schema, one host (or one shard)',
+        yes: 'leaf_single', no: 'q2',
+      },
+      leaf_single: {
+        kind: 'leaf', x: 60, y: 200, w: 280, h: 150,
+        tag: 'Use this when you can',
+        title: 'Single ACID transaction',
+        sub: 'plain SQL transaction in one DB',
+        body: 'Wrap the work in one local transaction and let the database guarantee atomicity and isolation. Simpler, faster, and more reliable than anything distributed. Always prefer this when the data model allows it.',
+      },
+      q2: {
+        kind: 'question', x: 720, y: 200, w: 320, h: 100,
+        title: 'Do you need strong cross-store consistency?',
+        sub: 'no eventual consistency window allowed',
+        yes: 'leaf_distdb', no: 'q3',
+      },
+      leaf_distdb: {
+        kind: 'leaf', x: 420, y: 370, w: 280, h: 150,
+        tag: 'Let the DB do 2PC',
+        title: 'Use a distributed database',
+        sub: 'Spanner · CockroachDB · YugabyteDB',
+        body: 'These engines implement 2PC internally with tight coordinator/participant coupling and lease-based recovery. They survive the failure modes that make hand-rolled 2PC across services impractical. Don\'t build 2PC over your own services.',
+      },
+      q3: {
+        kind: 'question', x: 820, y: 370, w: 260, h: 100,
+        title: 'Is the saga simple (≲ 5 steps)?',
+        sub: 'few teams, few services',
+        yes: 'leaf_chor', no: 'leaf_orch',
+      },
+      leaf_chor: {
+        kind: 'leaf', x: 520, y: 620, w: 220, h: 110,
+        tag: 'Saga · decentralized',
+        title: 'Choreography',
+        sub: 'events + subscribers',
+        body: 'Each service emits an event when it finishes a step; the next service subscribes. No central runtime. Easy to start; gets hard to trace and debug as the flow grows.',
+      },
+      leaf_orch: {
+        kind: 'leaf', x: 800, y: 620, w: 280, h: 110,
+        tag: 'Saga · centralized',
+        title: 'Orchestration',
+        sub: 'Temporal · AWS Step Functions',
+        body: 'A dedicated orchestrator runs the flow. One place defines and owns the saga; durable state survives restarts. Recommended for serious scale and complex flows.',
+      },
+    };
 
-  function nodeCenter(id) {
-    const n = TREE[id];
-    return { x: n.x + n.w/2, y: n.y + n.h/2, top: n.y, bot: n.y + n.h, left: n.x, right: n.x + n.w };
-  }
+    const PATH_LABELS = {
+      q1: { yes: 'all in one DB', no: 'data is split' },
+      q2: { yes: 'strong consistency', no: 'eventual is fine' },
+      q3: { yes: 'simple flow', no: 'complex flow' },
+    };
 
-  function renderEdges() {
-    // Collect all edges, then draw unchosen first so chosen lines paint on top
-    // of any shared trunk segment (both children of a question share the same
-    // vertical drop from the parent down to the midline).
-    const edges = [];
-    for (const [id, n] of Object.entries(TREE)) {
-      if (n.kind !== 'question') continue;
-      for (const choice of ['yes', 'no']) {
-        const target = n[choice];
-        const from = nodeCenter(id);
-        const to = nodeCenter(target);
-        const x1 = from.x, y1 = from.bot;
-        const x2 = to.x, y2 = to.top;
-        const my = (y1 + y2) / 2;
-        const d = `M${x1} ${y1} L${x1} ${my} L${x2} ${my} L${x2} ${y2}`;
-        const edgeId = `${id}:${choice}`;
-        const chosen = chosenEdges.has(edgeId);
-        const dimmed = !chosen && pathHasOtherChoiceAt(id);
-        edges.push({ d, edgeId, chosen, dimmed, choice, labelX: x1 + (x2 - x1) * 0.5, labelY: my - 6 });
+    const $edges = document.getElementById('g-edges');
+    const $nodes = document.getElementById('g-nodes');
+    const $result = document.getElementById('result');
+    const $reset = document.getElementById('reset');
+
+    let chosenEdges = new Set();
+    let chosenNodes = new Set(['q1']);
+    let walkedChoices = [];
+
+    function nodeCenter(id) {
+      const n = TREE[id];
+      return { x: n.x + n.w/2, y: n.y + n.h/2, top: n.y, bot: n.y + n.h, left: n.x, right: n.x + n.w };
+    }
+
+    function renderEdges() {
+      const edges = [];
+      for (const [id, n] of Object.entries(TREE)) {
+        if (n.kind !== 'question') continue;
+        for (const choice of ['yes', 'no']) {
+          const target = n[choice];
+          const from = nodeCenter(id);
+          const to = nodeCenter(target);
+          const x1 = from.x, y1 = from.bot;
+          const x2 = to.x, y2 = to.top;
+          const my = (y1 + y2) / 2;
+          const d = `M${x1} ${y1} L${x1} ${my} L${x2} ${my} L${x2} ${y2}`;
+          const edgeId = `${id}:${choice}`;
+          const chosen = chosenEdges.has(edgeId);
+          const dimmed = !chosen && pathHasOtherChoiceAt(id);
+          edges.push({ d, edgeId, chosen, dimmed, choice, labelX: x1 + (x2 - x1) * 0.5, labelY: my - 6 });
+        }
       }
+      edges.sort((a, b) => (a.chosen ? 1 : 0) - (b.chosen ? 1 : 0));
+
+      let html = '';
+      for (const e of edges) {
+        const cls = 'edge' + (e.chosen ? ' chosen' : e.dimmed ? ' dimmed' : '');
+        const lcls = 'edge-label' + (e.chosen ? ' chosen' : e.dimmed ? ' dimmed' : '');
+        html += `<path class="${cls}" d="${e.d}"/>`;
+        html += `<text class="${lcls}" x="${e.labelX}" y="${e.labelY}">${e.choice}</text>`;
+      }
+      $edges.innerHTML = html;
     }
-    edges.sort((a, b) => (a.chosen ? 1 : 0) - (b.chosen ? 1 : 0));
 
-    let html = '';
-    for (const e of edges) {
-      const cls = 'edge' + (e.chosen ? ' chosen' : e.dimmed ? ' dimmed' : '');
-      const lcls = 'edge-label' + (e.chosen ? ' chosen' : e.dimmed ? ' dimmed' : '');
-      html += `<path class="${cls}" d="${e.d}"/>`;
-      html += `<text class="${lcls}" x="${e.labelX}" y="${e.labelY}">${e.choice}</text>`;
+    function pathHasOtherChoiceAt(qid) {
+      return walkedChoices.some(c => c.from === qid);
     }
-    $edges.innerHTML = html;
-  }
 
-  function pathHasOtherChoiceAt(qid) {
-    return walkedChoices.some(c => c.from === qid);
-  }
-
-  function renderNodes() {
-    let html = '';
-    for (const [id, n] of Object.entries(TREE)) {
-      const isChosen = chosenNodes.has(id);
-      const isDimmed = !isChosen && walkedChoices.length > 0 && isOnAbandonedBranch(id);
-      let cls = `node ${n.kind}`;
-      if (id === 'leaf_distdb' || id === 'leaf_chor' || id === 'leaf_orch') {
-        // visual variation for sagas vs distributed DB
+    function renderNodes() {
+      let html = '';
+      for (const [id, n] of Object.entries(TREE)) {
+        const isChosen = chosenNodes.has(id);
+        const isDimmed = !isChosen && walkedChoices.length > 0 && isOnAbandonedBranch(id);
+        let cls = `node ${n.kind}`;
         if (id === 'leaf_distdb') cls += ' warn';
-      }
-      if (isChosen) cls += ' chosen';
-      if (isDimmed) cls += ' dimmed';
+        if (isChosen) cls += ' chosen';
+        if (isDimmed) cls += ' dimmed';
 
-      html += `<g class="${cls}" data-id="${id}">`;
-      html += `<rect class="node-bg" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="10"/>`;
-      const cx = n.x + n.w/2;
-      let textY = n.y + 28;
-      if (n.kind === 'leaf') {
-        html += `<text class="leaf-tag" x="${cx}" y="${n.y + 22}">${n.tag}</text>`;
-        textY = n.y + 48;
+        html += `<g class="${cls}" data-id="${id}">`;
+        html += `<rect class="node-bg" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="10"/>`;
+        const cx = n.x + n.w/2;
+        let textY = n.y + 28;
+        if (n.kind === 'leaf') {
+          html += `<text class="leaf-tag" x="${cx}" y="${n.y + 22}">${n.tag}</text>`;
+          textY = n.y + 48;
+        }
+        const titleLines = wrap(n.title, n.kind === 'question' ? 32 : 26);
+        titleLines.forEach((line, i) => {
+          html += `<text class="node-title" x="${cx}" y="${textY + i * 16}">${esc(line)}</text>`;
+        });
+        const subY = textY + titleLines.length * 16 + 6;
+        if (n.sub) html += `<text class="node-sub" x="${cx}" y="${subY}">${esc(n.sub)}</text>`;
+
+        if (n.kind === 'question') {
+          const btnY = n.y + n.h - 26;
+          const btnW = 60, btnH = 22, gap = 12;
+          const totalW = btnW * 2 + gap;
+          const startX = cx - totalW / 2;
+          const yesChosen = walkedChoices.find(c => c.from === id && c.choice === 'yes');
+          const noChosen = walkedChoices.find(c => c.from === id && c.choice === 'no');
+          html += `<g class="choice ${yesChosen ? 'chosen' : ''}" data-q="${id}" data-c="yes">
+            <rect x="${startX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="11"/>
+            <text x="${startX + btnW/2}" y="${btnY + 15}">yes</text>
+          </g>`;
+          html += `<g class="choice ${noChosen ? 'chosen' : ''}" data-q="${id}" data-c="no">
+            <rect x="${startX + btnW + gap}" y="${btnY}" width="${btnW}" height="${btnH}" rx="11"/>
+            <text x="${startX + btnW + gap + btnW/2}" y="${btnY + 15}">no</text>
+          </g>`;
+        }
+        html += `</g>`;
       }
-      // wrap title in a tspan that handles up to ~30 chars per line manually
-      const titleLines = wrap(n.title, n.kind === 'question' ? 32 : 26);
-      titleLines.forEach((line, i) => {
-        html += `<text class="node-title" x="${cx}" y="${textY + i * 16}">${esc(line)}</text>`;
+      $nodes.innerHTML = html;
+
+      $nodes.querySelectorAll('.choice').forEach(el => {
+        el.addEventListener('click', () => {
+          choose(el.dataset.q, el.dataset.c);
+        });
       });
-      const subY = textY + titleLines.length * 16 + 6;
-      if (n.sub) html += `<text class="node-sub" x="${cx}" y="${subY}">${esc(n.sub)}</text>`;
+    }
 
-      // For question nodes, add yes/no buttons
-      if (n.kind === 'question') {
-        const btnY = n.y + n.h - 26;
-        const btnW = 60, btnH = 22, gap = 12;
-        const totalW = btnW * 2 + gap;
-        const startX = cx - totalW / 2;
-        const yesChosen = walkedChoices.find(c => c.from === id && c.choice === 'yes');
-        const noChosen = walkedChoices.find(c => c.from === id && c.choice === 'no');
-        html += `<g class="choice ${yesChosen ? 'chosen' : ''}" data-q="${id}" data-c="yes">
-          <rect x="${startX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="11"/>
-          <text x="${startX + btnW/2}" y="${btnY + 15}">yes</text>
-        </g>`;
-        html += `<g class="choice ${noChosen ? 'chosen' : ''}" data-q="${id}" data-c="no">
-          <rect x="${startX + btnW + gap}" y="${btnY}" width="${btnW}" height="${btnH}" rx="11"/>
-          <text x="${startX + btnW + gap + btnW/2}" y="${btnY + 15}">no</text>
-        </g>`;
+    function isOnAbandonedBranch(id) {
+      if (chosenNodes.has(id)) return false;
+      const reachable = new Set(['q1']);
+      let cur = 'q1';
+      for (const step of walkedChoices) {
+        const next = TREE[cur][step.choice];
+        reachable.add(next);
+        cur = next;
       }
-      html += `</g>`;
-    }
-    $nodes.innerHTML = html;
-
-    // wire click handlers
-    $nodes.querySelectorAll('.choice').forEach(el => {
-      el.addEventListener('click', () => {
-        choose(el.dataset.q, el.dataset.c);
-      });
-    });
-  }
-
-  function isOnAbandonedBranch(id) {
-    // A node is "abandoned" if the user picked a different branch at some ancestor question.
-    // We compute reachability from the chosen path; nodes not reachable from current end are dimmed.
-    if (chosenNodes.has(id)) return false;
-    // walk down from root following chosen choices; collect reachable IDs
-    const reachable = new Set(['q1']);
-    let cur = 'q1';
-    for (const step of walkedChoices) {
-      const next = TREE[cur][step.choice];
-      reachable.add(next);
-      cur = next;
-    }
-    // if user hasn't reached a leaf, also keep all descendants of the current node visible (not dimmed)
-    if (TREE[cur].kind === 'question') {
-      descendants(cur).forEach(d => reachable.add(d));
-    }
-    return !reachable.has(id);
-  }
-
-  function descendants(id) {
-    const out = new Set();
-    const stack = [id];
-    while (stack.length) {
-      const n = TREE[stack.pop()];
-      if (!n) continue;
-      if (n.kind === 'question') {
-        out.add(n.yes); out.add(n.no);
-        stack.push(n.yes); stack.push(n.no);
+      if (TREE[cur].kind === 'question') {
+        descendants(cur).forEach(d => reachable.add(d));
       }
+      return !reachable.has(id);
     }
-    return out;
-  }
 
-  function choose(qid, choice) {
-    // truncate path if this is a re-decision at an earlier point
-    const idx = walkedChoices.findIndex(c => c.from === qid);
-    if (idx >= 0) walkedChoices = walkedChoices.slice(0, idx);
-
-    walkedChoices.push({ from: qid, choice, label: PATH_LABELS[qid][choice] });
-    chosenEdges = new Set(walkedChoices.map(c => `${c.from}:${c.choice}`));
-    chosenNodes = new Set(['q1']);
-    let cur = 'q1';
-    for (const step of walkedChoices) {
-      cur = TREE[cur][step.choice];
-      chosenNodes.add(cur);
-    }
-    renderEdges();
-    renderNodes();
-    renderResult(cur);
-  }
-
-  function renderResult(leafId) {
-    const n = TREE[leafId];
-    if (!n || n.kind !== 'leaf') {
-      $result.classList.add('hidden');
-      return;
-    }
-    $result.classList.remove('hidden');
-    $result.classList.toggle('warn', leafId === 'leaf_distdb');
-    document.getElementById('r-tag').textContent = n.tag;
-    document.getElementById('r-title').textContent = n.title;
-    document.getElementById('r-sub').textContent = n.sub || '';
-    document.getElementById('r-body').textContent = n.body;
-    document.getElementById('r-path').textContent = 'Path: ' + walkedChoices.map(c => c.label).join(' → ');
-  }
-
-  function reset() {
-    chosenEdges.clear();
-    chosenNodes = new Set(['q1']);
-    walkedChoices = [];
-    renderEdges();
-    renderNodes();
-    $result.classList.add('hidden');
-  }
-
-  function wrap(text, maxChars) {
-    const words = text.split(/\s+/);
-    const lines = [];
-    let line = '';
-    for (const w of words) {
-      if ((line + ' ' + w).trim().length > maxChars) {
-        if (line) lines.push(line);
-        line = w;
-      } else {
-        line = (line + ' ' + w).trim();
+    function descendants(id) {
+      const out = new Set();
+      const stack = [id];
+      while (stack.length) {
+        const n = TREE[stack.pop()];
+        if (!n) continue;
+        if (n.kind === 'question') {
+          out.add(n.yes); out.add(n.no);
+          stack.push(n.yes); stack.push(n.no);
+        }
       }
+      return out;
     }
-    if (line) lines.push(line);
-    return lines;
-  }
 
-  function esc(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+    function choose(qid, choice) {
+      const idx = walkedChoices.findIndex(c => c.from === qid);
+      if (idx >= 0) walkedChoices = walkedChoices.slice(0, idx);
 
-  $reset.addEventListener('click', reset);
-  reset();
-</script>
+      walkedChoices.push({ from: qid, choice, label: PATH_LABELS[qid][choice] });
+      chosenEdges = new Set(walkedChoices.map(c => `${c.from}:${c.choice}`));
+      chosenNodes = new Set(['q1']);
+      let cur = 'q1';
+      for (const step of walkedChoices) {
+        cur = TREE[cur][step.choice];
+        chosenNodes.add(cur);
+      }
+      renderEdges();
+      renderNodes();
+      renderResult(cur);
+    }
+
+    function renderResult(leafId) {
+      const n = TREE[leafId];
+      if (!n || n.kind !== 'leaf') {
+        $result.classList.remove('visible');
+        return;
+      }
+      $result.classList.add('visible');
+      $result.classList.toggle('warn', leafId === 'leaf_distdb');
+      document.getElementById('r-tag').textContent = n.tag;
+      document.getElementById('r-title').textContent = n.title;
+      document.getElementById('r-sub').textContent = n.sub || '';
+      document.getElementById('r-body').textContent = n.body;
+      document.getElementById('r-path').textContent = 'Path: ' + walkedChoices.map(c => c.label).join(' → ');
+    }
+
+    function reset() {
+      chosenEdges.clear();
+      chosenNodes = new Set(['q1']);
+      walkedChoices = [];
+      renderEdges();
+      renderNodes();
+      $result.classList.remove('visible');
+    }
+
+    function wrap(text, maxChars) {
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = '';
+      for (const w of words) {
+        if ((line + ' ' + w).trim().length > maxChars) {
+          if (line) lines.push(line);
+          line = w;
+        } else {
+          line = (line + ' ' + w).trim();
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function esc(s) { return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+    $reset.addEventListener('click', reset);
+    reset();
+  </script>
 </body>
 </html>

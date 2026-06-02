@@ -4,11 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AWS SQS Flashcards</title>
-  <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="../../assets/design.css">
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
   <header>
+    <div class="breadcrumb"><a href="../../">Preparation Library</a> / <a href="../">AWS</a> / SQS</div>
     <h1 id="topicTitle"></h1>
     <p id="topicSubtitle"></p>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
@@ -43,13 +53,13 @@
     </div>
 
     <div class="actions">
-      <button class="btn btn-nav" onclick="prevCard()">Previous</button>
-      <button class="btn btn-flip" onclick="flipCard()">Flip Card</button>
-      <button class="btn btn-nav" onclick="nextCard()">Next</button>
+      <button class="btn-nav" onclick="prevCard()">Previous</button>
+      <button class="btn-flip" onclick="flipCard()">Flip Card</button>
+      <button class="btn-nav" onclick="nextCard()">Next</button>
     </div>
 
     <div class="actions">
-      <button class="btn btn-didnt" onclick="markMissed()">Didn't know</button>
+      <button class="btn-didnt" onclick="markMissed()">Didn't know</button>
       <span class="score-display"><span class="wrong" id="missedCount">0</span> missed</span>
     </div>
 
@@ -64,7 +74,8 @@
     <button onclick="restart()">Start Over</button>
   </div>
 
-  <script src="../shared/flashcards.js"></script>
+  <script src="../../assets/theme.js"></script>
+  <script src="../../assets/flashcards.js"></script>
   <script>
     initFlashcards({
       title: 'AWS SQS Flashcards',

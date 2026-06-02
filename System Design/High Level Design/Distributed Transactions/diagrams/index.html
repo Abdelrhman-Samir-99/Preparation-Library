@@ -1,105 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Distributed transactions — interactive diagrams</title>
-<style>
-  :root {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --border: #e4e4e7;
-    --text: #18181b;
-    --text-muted: #71717a;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0b0d10;
-      --surface: #15181d;
-      --border: #2a2e36;
-      --text: #e8e8ea;
-      --text-muted: #a1a1aa;
-      --accent: #60a5fa;
-      --accent-hover: #93c5fd;
-    }
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    padding: 48px 24px;
-  }
-  .wrap { max-width: 760px; margin: 0 auto; }
-  h1 { font-size: 28px; margin: 0 0 8px; font-weight: 500; }
-  .lede { color: var(--text-muted); margin: 0 0 32px; }
-  .card {
-    display: block;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-    margin: 0 0 12px;
-    color: var(--text);
-    text-decoration: none;
-    transition: border-color 120ms, transform 120ms;
-  }
-  .card:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .card-title {
-    font-weight: 500;
-    font-size: 17px;
-    margin: 0 0 4px;
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-  .card-num {
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-    font-size: 14px;
-  }
-  .card-desc { margin: 0; color: var(--text-muted); font-size: 14px; }
-  footer { margin-top: 40px; color: var(--text-muted); font-size: 13px; }
-  footer a { color: var(--accent); }
-  @media (prefers-reduced-motion: reduce) {
-    .card { transition: none; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagrams — Distributed transactions</title>
+  <link rel="stylesheet" href="../../../../assets/design.css">
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
 </head>
 <body>
-<main class="wrap">
-  <h1>Distributed transactions</h1>
-  <p class="lede">Five interactive diagrams. Operate each one — inject a failure, crash a node, flip a setting — and watch the mechanism behave.</p>
 
-  <a class="card" href="01-saga-order-flow.html">
-    <div class="card-title"><span class="card-num">01</span> Saga order flow with compensation</div>
-    <p class="card-desc">Step through a 3-service saga (payment → inventory → shipping). Inject a failure and watch compensations fire in reverse.</p>
-  </a>
+  <header>
+    <div class="breadcrumb">
+      <a href="../../../../">Preparation Library</a> /
+      <a href="../">Distributed transactions</a> /
+      Diagrams
+    </div>
+    <span class="eyebrow">Interactive diagrams</span>
+    <h1>Distributed transactions</h1>
+    <p>Five operable diagrams. Inject a failure, crash a node, flip a setting — and watch the mechanism behave.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+  </header>
 
-  <a class="card" href="02-2pc-vs-saga-crash.html">
-    <div class="card-title"><span class="card-num">02</span> 2PC vs Saga under coordinator crash</div>
-    <p class="card-desc">Crash the coordinator mid-flight. 2PC freezes with locks held; Saga keeps moving and resumes from durable state.</p>
-  </a>
+  <main class="wrap narrow">
+    <div class="card-grid">
+      <a class="link-card" href="01-saga-order-flow.html">
+        <div class="lc-title"><span class="lc-num">01</span> Saga order flow with compensation</div>
+        <p class="lc-desc">Step through a 3-service saga (payment → inventory → shipping). Inject a failure and watch compensations fire in reverse.</p>
+      </a>
+      <a class="link-card" href="02-2pc-vs-saga-crash.html">
+        <div class="lc-title"><span class="lc-num">02</span> 2PC vs Saga under coordinator crash</div>
+        <p class="lc-desc">Crash the coordinator mid-flight. 2PC freezes with locks held; Saga keeps moving and resumes from durable state.</p>
+      </a>
+      <a class="link-card" href="03-transactional-outbox.html">
+        <div class="lc-title"><span class="lc-num">03</span> Transactional outbox vs naive dual-write</div>
+        <p class="lc-desc">Toggle naive dual-write and trigger the inconsistency. Switch to outbox + relay (CDC or polling) to see it fixed.</p>
+      </a>
+      <a class="link-card" href="04-choreography-vs-orchestration.html">
+        <div class="lc-title"><span class="lc-num">04</span> Choreography vs orchestration</div>
+        <p class="lc-desc">Same saga, two coordination styles. Add steps and watch choreography's wiring grow faster than orchestration's.</p>
+      </a>
+      <a class="link-card" href="05-do-you-need-a-distributed-transaction.html">
+        <div class="lc-title"><span class="lc-num">05</span> Do you need a distributed transaction?</div>
+        <p class="lc-desc">Decision tree from "co-locate the data" through "use a distributed database" with a one-line rationale per leaf.</p>
+      </a>
+    </div>
+  </main>
 
-  <a class="card" href="03-transactional-outbox.html">
-    <div class="card-title"><span class="card-num">03</span> Transactional outbox vs naive dual-write</div>
-    <p class="card-desc">Toggle naive dual-write and trigger the inconsistency. Switch to outbox + relay (CDC or polling) to see it fixed.</p>
-  </a>
+  <footer class="site-footer">
+    <a href="../">← Distributed transactions</a>
+  </footer>
 
-  <a class="card" href="04-choreography-vs-orchestration.html">
-    <div class="card-title"><span class="card-num">04</span> Choreography vs orchestration</div>
-    <p class="card-desc">Same saga, two coordination styles. Add steps and watch choreography's wiring grow faster than orchestration's.</p>
-  </a>
-
-  <a class="card" href="05-do-you-need-a-distributed-transaction.html">
-    <div class="card-title"><span class="card-num">05</span> Do you need a distributed transaction?</div>
-    <p class="card-desc">Decision tree from "co-locate the data" through "use a distributed database" with a one-line rationale per leaf.</p>
-  </a>
-
-  <footer>Source notes in <a href="../README.md">../README.md</a>. Each diagram is a single self-contained HTML file — view source to read or extend.</footer>
-</main>
+  <script src="../../../../assets/theme.js"></script>
 </body>
 </html>

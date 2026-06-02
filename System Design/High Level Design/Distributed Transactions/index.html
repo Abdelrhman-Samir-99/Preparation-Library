@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed transactions — Preparation Library</title>
+  <link rel="stylesheet" href="../../../assets/design.css">
+  <script>
+    try {
+      const s = localStorage.getItem('site-theme');
+      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.setAttribute('data-theme', 'dark');
+      else if (s === 'light')
+        document.documentElement.setAttribute('data-theme', 'light');
+    } catch (e) {}
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="breadcrumb">
+      <a href="../../../">Preparation Library</a> /
+      <a href="../../">System design</a> /
+      <a href="../">High level</a> /
+      Distributed transactions
+    </div>
+    <span class="eyebrow">High level design</span>
+    <h1>Distributed transactions</h1>
+    <p>2PC, sagas, transactional outbox — with interactive diagrams to operate the mechanisms.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+  </header>
+
+  <main class="wrap">
+
+    <section style="margin-top: 1.5rem;">
+      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Interactive diagrams</h2>
+      <div class="card-grid">
+        <a class="link-card" href="diagrams/01-saga-order-flow.html">
+          <span class="lc-tag">Diagram</span>
+          <div class="lc-title"><span class="lc-num">01</span> Saga order flow with compensation</div>
+          <p class="lc-desc">Step through a 3-service saga, inject a failure at any step, watch compensations fire in reverse.</p>
+        </a>
+        <a class="link-card" href="diagrams/02-2pc-vs-saga-crash.html">
+          <span class="lc-tag">Diagram</span>
+          <div class="lc-title"><span class="lc-num">02</span> 2PC vs Saga under coordinator crash</div>
+          <p class="lc-desc">Same crash, two protocols. 2PC freezes with locks held; Saga keeps moving and resumes from durable state.</p>
+        </a>
+        <a class="link-card" href="diagrams/03-transactional-outbox.html">
+          <span class="lc-tag">Diagram</span>
+          <div class="lc-title"><span class="lc-num">03</span> Transactional outbox vs naive dual-write</div>
+          <p class="lc-desc">Trigger the dual-write inconsistency, then switch to outbox + relay (CDC or polling) to see it fixed.</p>
+        </a>
+        <a class="link-card" href="diagrams/04-choreography-vs-orchestration.html">
+          <span class="lc-tag">Diagram</span>
+          <div class="lc-title"><span class="lc-num">04</span> Choreography vs orchestration</div>
+          <p class="lc-desc">Same saga, two coordination styles. Add steps and watch choreography's wiring grow.</p>
+        </a>
+        <a class="link-card" href="diagrams/05-do-you-need-a-distributed-transaction.html">
+          <span class="lc-tag">Diagram</span>
+          <div class="lc-title"><span class="lc-num">05</span> Do you need a distributed transaction?</div>
+          <p class="lc-desc">Decision tree from "co-locate the data" through "use a distributed database."</p>
+        </a>
+      </div>
+    </section>
+
+    <section style="margin-top: 2rem;">
+      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Notes</h2>
+      <div class="panel padded">
+        <p style="margin-bottom: 0.8rem;"><strong>The setup.</strong> With a single database, a business operation is one ACID transaction. When data spreads across shards or microservices, there's no global coordinator, so a single logical operation now spans separate local transactions. That's a distributed transaction — it needs a strategy for "all commit, or clean up on failure."</p>
+        <p style="margin-bottom: 0.8rem;"><strong>2PC</strong> gives strong consistency but is <em>blocking</em>: if the coordinator crashes after collecting votes, participants stay locked. Practical only inside distributed databases (Spanner, CockroachDB) — don't build 2PC across services yourself.</p>
+        <p style="margin-bottom: 0.8rem;"><strong>Sagas</strong> drop all-or-nothing in exchange for non-blocking behavior. A chain of local transactions, each committing and releasing immediately; if a later step fails, run business-level compensations to undo earlier ones. Two flavors: <em>choreography</em> (events + subscribers, fine up to ~5 steps) and <em>orchestration</em> (Temporal, AWS Step Functions, scales further).</p>
+        <p style="margin-bottom: 0.8rem;"><strong>Transactional outbox</strong> fixes the dual-write problem: write the business row and the event into the same DB transaction, then a background relay (CDC or polling) reliably publishes from the outbox.</p>
+        <p style="margin: 0;">Full notes in <a href="README.md">README.md</a>.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <a href="../../../">← Preparation Library</a>
+  </footer>
+
+  <script src="../../../assets/theme.js"></script>
+</body>
+</html>

@@ -1,3 +1,12 @@
+/* flashcards.js — generic flashcard runtime.
+ *
+ * Each topic page loads this together with theme.js, then calls
+ * initFlashcards({ title, subtitle }). Questions are fetched from
+ * ./questions.json (sibling to the page).
+ *
+ * Theme handling lives in theme.js.
+ */
+
 const CARD_FRONT_HEIGHT = 280;
 
 let questions = [];
@@ -6,33 +15,6 @@ let currentIndex = 0;
 let isFlipped = false;
 let missed = new Set();
 let mode = 'sequential';
-
-function initTheme() {
-  const saved = localStorage.getItem('flashcard-theme');
-  if (saved === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
-  updateThemeIcon();
-}
-
-function toggleTheme() {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  if (isDark) {
-    document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('flashcard-theme', 'light');
-  } else {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('flashcard-theme', 'dark');
-  }
-  updateThemeIcon();
-}
-
-function updateThemeIcon() {
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  btn.innerHTML = isDark ? '\u2600\uFE0F Light Mode' : '\uD83C\uDF19 Dark Mode';
-}
 
 function initFlashcards(config) {
   initTheme();
