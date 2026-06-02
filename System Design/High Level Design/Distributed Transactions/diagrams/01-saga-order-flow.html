@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saga order flow with compensation</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --node-bg: #ffffff;
+    --node-border: #d4d4d8;
+    --idle: #a1a1aa;
+    --running: #f59e0b;
+    --committed: #10b981;
+    --failed: #ef4444;
+    --compensating: #8b5cf6;
+    --arrow-idle: #d4d4d8;
+    --arrow-active: #10b981;
+    --arrow-comp: #8b5cf6;
+    --log-bg: #18181b;
+    --log-text: #e4e4e7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0d10;
+      --surface: #15181d;
+      --border: #2a2e36;
+      --text: #e8e8ea;
+      --text-muted: #a1a1aa;
+      --accent: #60a5fa;
+      --accent-hover: #93c5fd;
+      --node-bg: #1c2128;
+      --node-border: #2a2e36;
+      --arrow-idle: #3f3f46;
+      --log-bg: #08090b;
+      --log-text: #d4d4d8;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 20px; }
+  header a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  h1 { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
+  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  button, select {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: border-color 120ms, background 120ms;
+  }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
+  label { color: var(--text-muted); font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  .node-bg { fill: var(--node-bg); stroke: var(--node-border); stroke-width: 1.5; }
+  .node[data-state="running"] .node-bg { stroke: var(--running); }
+  .node[data-state="committed"] .node-bg { stroke: var(--committed); }
+  .node[data-state="failed"] .node-bg { stroke: var(--failed); }
+  .node[data-state="compensating"] .node-bg { stroke: var(--compensating); }
+  .node[data-state="compensated"] .node-bg { stroke: var(--compensating); stroke-dasharray: 4 4; }
+  .node-title { fill: var(--text); font-size: 16px; font-weight: 500; text-anchor: middle; }
+  .node-sub { fill: var(--text-muted); font-size: 12px; text-anchor: middle; }
+  .status-dot { fill: var(--idle); transition: fill 200ms; }
+  .node[data-state="running"] .status-dot { fill: var(--running); animation: pulse 1.2s ease-in-out infinite; }
+  .node[data-state="committed"] .status-dot { fill: var(--committed); }
+  .node[data-state="failed"] .status-dot { fill: var(--failed); }
+  .node[data-state="compensating"] .status-dot { fill: var(--compensating); animation: pulse 1.2s ease-in-out infinite; }
+  .node[data-state="compensated"] .status-dot { fill: var(--compensating); opacity: 0.5; }
+  .status-text { fill: var(--text-muted); font-size: 12px; text-anchor: middle; font-variant-numeric: tabular-nums; }
+  .badge { fill: var(--committed); font-size: 11px; text-anchor: middle; opacity: 0; transition: opacity 200ms; }
+  .node[data-state="committed"] .badge { opacity: 1; }
+  .node[data-state="compensated"] .badge { fill: var(--compensating); opacity: 1; }
+  .arrow { fill: none; stroke: var(--arrow-idle); stroke-width: 2; marker-end: url(#arrowhead); transition: stroke 200ms; }
+  .arrow[data-state="active"] { stroke: var(--arrow-active); }
+  .arrow[data-state="comp"] { stroke: var(--arrow-comp); stroke-dasharray: 6 4; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot, .node-bg, .arrow, .badge { transition: none; animation: none !important; }
+  }
+  .log {
+    background: var(--log-bg);
+    color: var(--log-text);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    height: 180px;
+    overflow-y: auto;
+  }
+  .log-line { display: block; }
+  .log-line.commit { color: #6ee7b7; }
+  .log-line.fail { color: #fca5a5; }
+  .log-line.comp { color: #c4b5fd; }
+  .log-line.info { color: #93c5fd; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <a href="index.html">← All diagrams</a>
+    <h1>Saga order flow with compensation</h1>
+    <p class="sub">Each step commits to its own database and releases immediately — there are no locks held across services. If a later step fails, compensating actions undo the earlier committed steps as new business operations.</p>
+  </header>
+
+  <div class="controls">
+    <button id="step" class="primary">Step forward</button>
+    <button id="play">Play</button>
+    <button id="reset">Reset</button>
+    <label>
+      Inject failure at:
+      <select id="failure">
+        <option value="">None (happy path)</option>
+        <option value="payment">Payment</option>
+        <option value="inventory">Inventory</option>
+        <option value="shipping">Shipping</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--idle)"></i>Idle</span>
+    <span><i class="swatch" style="background:var(--running)"></i>Running</span>
+    <span><i class="swatch" style="background:var(--committed)"></i>Committed (lock released)</span>
+    <span><i class="swatch" style="background:var(--failed)"></i>Failed</span>
+    <span><i class="swatch" style="background:var(--compensating)"></i>Compensating</span>
+  </div>
+
+  <div class="stage">
+    <svg viewBox="0 0 820 260" role="img" aria-labelledby="t1 d1">
+      <title id="t1">Three-service saga</title>
+      <desc id="d1">Payment, Inventory, and Shipping services connected left to right. Each shows status and whether its local transaction committed.</desc>
+      <defs>
+        <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <path class="arrow" id="arrow-0" d="M240 130 L300 130"/>
+      <path class="arrow" id="arrow-1" d="M500 130 L560 130"/>
+
+      <g class="node" id="node-payment" data-state="idle">
+        <rect class="node-bg" x="40" y="60" width="200" height="160" rx="12"/>
+        <text class="node-title" x="140" y="92">Payment</text>
+        <text class="node-sub" x="140" y="110">Charge card</text>
+        <circle class="status-dot" cx="140" cy="145" r="9"/>
+        <text class="status-text" x="140" y="172">idle</text>
+        <text class="badge" x="140" y="200">✓ committed · lock released</text>
+      </g>
+
+      <g class="node" id="node-inventory" data-state="idle">
+        <rect class="node-bg" x="300" y="60" width="200" height="160" rx="12"/>
+        <text class="node-title" x="400" y="92">Inventory</text>
+        <text class="node-sub" x="400" y="110">Reserve stock</text>
+        <circle class="status-dot" cx="400" cy="145" r="9"/>
+        <text class="status-text" x="400" y="172">idle</text>
+        <text class="badge" x="400" y="200">✓ committed · lock released</text>
+      </g>
+
+      <g class="node" id="node-shipping" data-state="idle">
+        <rect class="node-bg" x="560" y="60" width="200" height="160" rx="12"/>
+        <text class="node-title" x="660" y="92">Shipping</text>
+        <text class="node-sub" x="660" y="110">Ship order</text>
+        <circle class="status-dot" cx="660" cy="145" r="9"/>
+        <text class="status-text" x="660" y="172">idle</text>
+        <text class="badge" x="660" y="200">✓ committed · lock released</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="log" id="log" role="log" aria-live="polite"></div>
+</main>
+
+<script>
+  // Three local transactions chained left-to-right.
+  // On failure, walk backward and run a business-level undo for each already-committed step.
+
+  const SERVICES = [
+    { key: 'payment',   label: 'Payment',   compensation: 'refund issued' },
+    { key: 'inventory', label: 'Inventory', compensation: 'stock released' },
+    { key: 'shipping',  label: 'Shipping',  compensation: 'shipment cancelled' },
+  ];
+  const STEP_MS = 900;
+  const COMP_MS = 800;
+
+  let cursor = 0;        // next forward step index
+  let busy = false;
+  let stopped = false;
+  let injected = '';
+
+  const $log = document.getElementById('log');
+  const $step = document.getElementById('step');
+  const $play = document.getElementById('play');
+  const $reset = document.getElementById('reset');
+  const $failure = document.getElementById('failure');
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => reduced ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+
+  function setState(key, state) {
+    const node = document.getElementById('node-' + key);
+    node.dataset.state = state;
+    const labelMap = { idle: 'idle', running: 'running…', committed: 'committed', failed: 'failed', compensating: 'undoing…', compensated: 'undone' };
+    node.querySelector('.status-text').textContent = labelMap[state];
+  }
+
+  function setArrow(i, state) {
+    const a = document.getElementById('arrow-' + i);
+    if (!a) return;
+    if (state) a.dataset.state = state; else delete a.dataset.state;
+  }
+
+  function log(msg, cls = '') {
+    const line = document.createElement('span');
+    line.className = 'log-line' + (cls ? ' ' + cls : '');
+    line.textContent = '› ' + msg;
+    $log.appendChild(line);
+    $log.scrollTop = $log.scrollHeight;
+  }
+
+  function setBusy(b) {
+    busy = b;
+    $step.disabled = b || cursor >= SERVICES.length;
+    $play.disabled = b;
+    $failure.disabled = b;
+  }
+
+  async function stepForward() {
+    if (cursor >= SERVICES.length) return;
+    setBusy(true);
+    const s = SERVICES[cursor];
+
+    setState(s.key, 'running');
+    log(`${s.label}: starting local transaction`, 'info');
+    await wait(STEP_MS);
+
+    if (injected === s.key) {
+      setState(s.key, 'failed');
+      log(`${s.label}: FAILED`, 'fail');
+      await wait(400);
+      await compensate(cursor - 1);
+      cursor = SERVICES.length; // halt forward progress
+      setBusy(false);
+      return;
+    }
+
+    setState(s.key, 'committed');
+    if (cursor > 0) setArrow(cursor - 1, 'active');
+    log(`${s.label}: committed locally, lock released`, 'commit');
+    cursor++;
+
+    if (cursor === SERVICES.length) {
+      setArrow(SERVICES.length - 2, 'active');
+      log('Order completed successfully.', 'info');
+    }
+    setBusy(false);
+  }
+
+  async function compensate(fromIdx) {
+    if (fromIdx < 0) {
+      log('Nothing to compensate — order cancelled.', 'info');
+      return;
+    }
+    for (let i = fromIdx; i >= 0; i--) {
+      if (stopped) return;
+      const s = SERVICES[i];
+      setArrow(i, 'comp');
+      setState(s.key, 'compensating');
+      log(`Compensating ${s.label}…`, 'comp');
+      await wait(COMP_MS);
+      setState(s.key, 'compensated');
+      log(`${s.label}: ${s.compensation}`, 'comp');
+    }
+    log('Order cancelled (state consistent, no locks held).', 'info');
+  }
+
+  async function play() {
+    stopped = false;
+    while (cursor < SERVICES.length && !stopped) {
+      await stepForward();
+    }
+  }
+
+  function reset() {
+    stopped = true;
+    cursor = 0;
+    busy = false;
+    SERVICES.forEach(s => setState(s.key, 'idle'));
+    for (let i = 0; i < SERVICES.length - 1; i++) setArrow(i, null);
+    $log.innerHTML = '';
+    log('Ready. Pick a failure target or step through the happy path.', 'info');
+    setBusy(false);
+  }
+
+  $step.addEventListener('click', stepForward);
+  $play.addEventListener('click', play);
+  $reset.addEventListener('click', reset);
+  $failure.addEventListener('change', e => { injected = e.target.value; });
+
+  reset();
+</script>
+</body>
+</html>

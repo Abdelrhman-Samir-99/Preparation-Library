@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transactional outbox vs naive dual-write</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --node-bg: #ffffff;
+    --node-border: #d4d4d8;
+    --idle: #a1a1aa;
+    --running: #f59e0b;
+    --committed: #10b981;
+    --failed: #ef4444;
+    --arrow-idle: #d4d4d8;
+    --arrow-active: #2563eb;
+    --arrow-good: #10b981;
+    --arrow-bad: #ef4444;
+    --row-bg: #f4f4f5;
+    --row-filled: #d1fae5;
+    --row-stale: #fee2e2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0d10;
+      --surface: #15181d;
+      --border: #2a2e36;
+      --text: #e8e8ea;
+      --text-muted: #a1a1aa;
+      --accent: #60a5fa;
+      --accent-hover: #93c5fd;
+      --node-bg: #1c2128;
+      --node-border: #2a2e36;
+      --arrow-idle: #3f3f46;
+      --row-bg: #22262e;
+      --row-filled: #064e3b;
+      --row-stale: #450a0a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 20px; }
+  header a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  h1 { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
+  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: transparent; color: var(--text); padding: 7px 14px; font: inherit; cursor: pointer; border-right: 1px solid var(--border); }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: white; }
+  .seg button:hover:not([aria-pressed="true"]) { background: var(--bg); }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; }
+  button.btn {
+    font: inherit; color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; cursor: pointer;
+    transition: border-color 120ms, background 120ms;
+  }
+  button.btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.btn.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+  button.btn.danger { background: var(--failed); color: white; border-color: var(--failed); }
+  button.btn:hover:not(:disabled) { border-color: var(--accent); }
+  button.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  label.check { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 14px; cursor: pointer; }
+  .seg-mini { display: inline-flex; gap: 4px; padding: 2px; background: var(--bg); border-radius: 6px; }
+  .seg-mini button { font-size: 13px; padding: 4px 10px; border-radius: 4px; border: 0; background: transparent; cursor: pointer; color: var(--text-muted); }
+  .seg-mini button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+
+  .stage { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; }
+  svg { width: 100%; height: auto; display: block; }
+  .node-bg { fill: var(--node-bg); stroke: var(--node-border); stroke-width: 1.5; transition: stroke 200ms; }
+  .node[data-state="active"] .node-bg { stroke: var(--accent); }
+  .node[data-state="crashed"] .node-bg { stroke: var(--failed); opacity: 0.55; stroke-dasharray: 4 4; }
+  .node[data-state="done"] .node-bg { stroke: var(--committed); }
+  .node-title { fill: var(--text); font-size: 14px; font-weight: 500; text-anchor: middle; }
+  .node-sub { fill: var(--text-muted); font-size: 11px; text-anchor: middle; }
+  .node[data-state="crashed"] .node-title, .node[data-state="crashed"] .node-sub { opacity: 0.5; }
+
+  .row { fill: var(--row-bg); stroke: var(--border); stroke-width: 1; transition: fill 250ms; }
+  .row[data-state="filled"] { fill: var(--row-filled); }
+  .row[data-state="stale"] { fill: var(--row-stale); }
+  .row[data-state="processed"] { fill: var(--row-bg); opacity: 0.5; }
+  .row-label { fill: var(--text); font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .arrow { fill: none; stroke: var(--arrow-idle); stroke-width: 2; marker-end: url(#ah3); transition: stroke 200ms, opacity 200ms; }
+  .arrow[data-state="active"] { stroke: var(--arrow-active); }
+  .arrow[data-state="good"] { stroke: var(--arrow-good); }
+  .arrow[data-state="bad"] { stroke: var(--arrow-bad); stroke-dasharray: 5 4; }
+  .arrow-label { fill: var(--text-muted); font-size: 11px; text-anchor: middle; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  /* mode visibility */
+  svg[data-mode="naive"] .outbox-only { display: none; }
+  svg[data-mode="outbox"] .naive-only { display: none; }
+  svg[data-relay="cdc"] .polling-only { display: none; }
+  svg[data-relay="polling"] .cdc-only { display: none; }
+
+  .relay-pulse { fill: var(--accent); opacity: 0; }
+  .relay-pulse.on { animation: relay 1.4s ease-out infinite; }
+  @keyframes relay { 0% { opacity: 0.7; r: 4; } 100% { opacity: 0; r: 18; } }
+
+  .verdict { padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
+  .verdict.bad { background: rgba(239,68,68,0.1); color: var(--failed); border: 1px solid rgba(239,68,68,0.3); }
+  .verdict.good { background: rgba(16,185,129,0.1); color: var(--committed); border: 1px solid rgba(16,185,129,0.3); }
+  .verdict.neutral { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <a href="index.html">← All diagrams</a>
+    <h1>Transactional outbox vs naive dual-write</h1>
+    <p class="sub">After a local DB commit, a service needs to publish an event. Two writes to two systems → an atomicity hole. Try the naive version, watch it break, then switch on the outbox.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="seg" role="tablist" aria-label="Pattern">
+      <button id="mode-naive" aria-pressed="true">Naive (two writes)</button>
+      <button id="mode-outbox" aria-pressed="false">Outbox pattern</button>
+    </div>
+    <div id="relay-toolbar" hidden>
+      <span style="color:var(--text-muted);font-size:13px;margin-right:6px">Relay:</span>
+      <div class="seg-mini">
+        <button id="relay-cdc" aria-pressed="true">CDC (tail log)</button>
+        <button id="relay-poll" aria-pressed="false">Polling</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="run" class="btn primary">Place order</button>
+    <label class="check" id="crash-toggle-wrap">
+      <input type="checkbox" id="crash-toggle"> Crash service after DB write
+    </label>
+    <button id="reset" class="btn">Reset</button>
+  </div>
+
+  <div class="stage">
+    <svg viewBox="0 0 940 280" data-mode="naive" data-relay="cdc" role="img" aria-labelledby="t3 d3">
+      <title id="t3">Dual-write atomicity</title>
+      <desc id="d3">A service writes to its database and publishes to a message broker. The outbox pattern makes the two writes atomic by writing the event into a DB table inside the same transaction and using a background relay to publish it.</desc>
+      <defs>
+        <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <!-- Service -->
+      <g class="node" id="svc" data-state="idle">
+        <rect class="node-bg" x="30" y="90" width="160" height="110" rx="10"/>
+        <text class="node-title" x="110" y="125">Order service</text>
+        <text class="node-sub" x="110" y="145">place order</text>
+        <text class="node-sub" x="110" y="180" id="svc-status" style="font-size:12px">idle</text>
+      </g>
+
+      <!-- Database -->
+      <g class="node" id="db" data-state="idle">
+        <rect class="node-bg" x="320" y="50" width="240" height="190" rx="10"/>
+        <text class="node-title" x="440" y="78">Order DB</text>
+        <text class="node-sub" x="440" y="94">postgres</text>
+
+        <!-- orders table row -->
+        <rect class="row" id="row-orders" x="340" y="110" width="200" height="36" rx="6" data-state="empty"/>
+        <text class="row-label" x="352" y="125">orders</text>
+        <text class="row-label" x="352" y="139" id="row-orders-text" style="fill:var(--text-muted)">— empty —</text>
+
+        <!-- outbox table row, only in outbox mode -->
+        <g class="outbox-only">
+          <rect class="row" id="row-outbox" x="340" y="156" width="200" height="36" rx="6" data-state="empty"/>
+          <text class="row-label" x="352" y="171">outbox_events</text>
+          <text class="row-label" x="352" y="185" id="row-outbox-text" style="fill:var(--text-muted)">— empty —</text>
+        </g>
+
+        <!-- footer note -->
+        <text class="node-sub" x="440" y="222" id="tx-note">single transaction wraps both rows</text>
+      </g>
+
+      <!-- Naive: service publishes directly to broker -->
+      <path class="arrow naive-only" id="arr-pub-naive" d="M190 130 Q 340 30 760 100" />
+      <text class="arrow-label naive-only" x="500" y="40">publish event</text>
+
+      <!-- Service -> DB arrow -->
+      <path class="arrow" id="arr-svc-db" d="M190 160 L320 150"/>
+      <text class="arrow-label" x="255" y="142">write</text>
+
+      <!-- Outbox: DB -> Relay -> Broker -->
+      <g class="outbox-only">
+        <g class="node" id="relay" data-state="idle">
+          <rect class="node-bg" x="600" y="120" width="120" height="80" rx="10"/>
+          <text class="node-title" x="660" y="145">Relay</text>
+          <text class="node-sub cdc-only" x="660" y="163">CDC: streams log</text>
+          <text class="node-sub polling-only" x="660" y="163">poll every 2s</text>
+          <circle class="relay-pulse" id="relay-pulse" cx="660" cy="180" r="4"/>
+          <text class="node-sub" x="660" y="190" id="relay-status" style="font-size:11px">idle</text>
+        </g>
+        <path class="arrow" id="arr-db-relay" d="M560 160 L600 160"/>
+        <path class="arrow" id="arr-relay-broker" d="M720 160 L800 145"/>
+      </g>
+
+      <!-- Broker -->
+      <g class="node" id="broker" data-state="idle">
+        <rect class="node-bg" x="800" y="90" width="130" height="110" rx="10"/>
+        <text class="node-title" x="865" y="125">Broker</text>
+        <text class="node-sub" x="865" y="145">Kafka / RabbitMQ</text>
+        <rect class="row" id="row-broker" x="813" y="158" width="105" height="32" rx="6" data-state="empty"/>
+        <text class="row-label" x="822" y="178" id="row-broker-text" style="fill:var(--text-muted)">— no event —</text>
+      </g>
+    </svg>
+    <div class="verdict neutral" id="verdict">Pick a mode and click <b>Place order</b>.</div>
+  </div>
+</main>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => reduced ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+
+  const svg = document.querySelector('svg');
+  const $svc = document.getElementById('svc');
+  const $svcStatus = document.getElementById('svc-status');
+  const $db = document.getElementById('db');
+  const $broker = document.getElementById('broker');
+  const $relay = document.getElementById('relay');
+  const $relayStatus = document.getElementById('relay-status');
+  const $relayPulse = document.getElementById('relay-pulse');
+  const $verdict = document.getElementById('verdict');
+  const $crash = document.getElementById('crash-toggle');
+  const $run = document.getElementById('run');
+
+  const rowOrders = { rect: document.getElementById('row-orders'), text: document.getElementById('row-orders-text') };
+  const rowOutbox = { rect: document.getElementById('row-outbox'), text: document.getElementById('row-outbox-text') };
+  const rowBroker = { rect: document.getElementById('row-broker'), text: document.getElementById('row-broker-text') };
+
+  const arrSvcDb = document.getElementById('arr-svc-db');
+  const arrPubNaive = document.getElementById('arr-pub-naive');
+  const arrDbRelay = document.getElementById('arr-db-relay');
+  const arrRelayBroker = document.getElementById('arr-relay-broker');
+
+  let mode = 'naive';
+  let relayKind = 'cdc';
+  let busy = false;
+
+  function setMode(m) {
+    mode = m;
+    svg.dataset.mode = m;
+    document.getElementById('mode-naive').setAttribute('aria-pressed', m === 'naive');
+    document.getElementById('mode-outbox').setAttribute('aria-pressed', m === 'outbox');
+    document.getElementById('relay-toolbar').hidden = m !== 'outbox';
+    document.getElementById('tx-note').textContent = (m === 'outbox')
+      ? 'single transaction wraps both rows'
+      : 'single transaction wraps just orders';
+    reset();
+  }
+  function setRelay(r) {
+    relayKind = r;
+    svg.dataset.relay = r;
+    document.getElementById('relay-cdc').setAttribute('aria-pressed', r === 'cdc');
+    document.getElementById('relay-poll').setAttribute('aria-pressed', r === 'polling');
+  }
+  function setNode(el, state) { el.dataset.state = state; }
+  function setArrow(el, state) { if (state) el.dataset.state = state; else delete el.dataset.state; }
+  function setRow(row, state, text) {
+    row.rect.dataset.state = state;
+    if (text !== undefined) {
+      row.text.textContent = text;
+      row.text.style.fill = state === 'empty' ? 'var(--text-muted)' : 'var(--text)';
+    }
+  }
+  function setVerdict(cls, html) { $verdict.className = 'verdict ' + cls; $verdict.innerHTML = html; }
+  function setBusy(b) { busy = b; $run.disabled = b; }
+
+  async function runNaive() {
+    setBusy(true);
+    // Step 1: service writes to DB
+    setNode($svc, 'active'); $svcStatus.textContent = 'writing to DB…';
+    setArrow(arrSvcDb, 'active');
+    await wait(700);
+    setRow(rowOrders, 'filled', 'order #1042  ✓ committed');
+    setNode($db, 'done'); $svcStatus.textContent = 'DB committed';
+    await wait(300);
+
+    if ($crash.checked) {
+      // Crash before publish — broker stays empty
+      setNode($svc, 'crashed'); $svcStatus.textContent = 'CRASHED';
+      setArrow(arrPubNaive, 'bad');
+      setRow(rowBroker, 'stale', '— event never published —');
+      setVerdict('bad',
+        '<b>Inconsistent.</b> The order row is committed in the DB but no event was published. The next saga step never fires — the system is stuck in a partial state with no signal to recover from. This is the dual-write problem.');
+      setBusy(false);
+      return;
+    }
+
+    // Step 2: service publishes to broker
+    $svcStatus.textContent = 'publishing event…';
+    setArrow(arrPubNaive, 'active');
+    await wait(700);
+    setRow(rowBroker, 'filled', 'OrderPlaced #1042');
+    setNode($broker, 'done');
+    $svcStatus.textContent = 'done';
+    setVerdict('neutral',
+      'Happy path worked — but the two writes were independent. If the broker (or the network, or the service) had failed between them, the order would be committed without an event. Try checking the crash box.');
+    setBusy(false);
+  }
+
+  async function runOutbox() {
+    setBusy(true);
+    // Step 1: single transaction writes orders + outbox
+    setNode($svc, 'active'); $svcStatus.textContent = 'one transaction →';
+    setArrow(arrSvcDb, 'active');
+    await wait(700);
+    setRow(rowOrders, 'filled', 'order #1042  ✓ committed');
+    setRow(rowOutbox, 'filled', 'OrderPlaced #1042  pending');
+    setNode($db, 'done'); $svcStatus.textContent = 'orders + outbox atomic';
+    await wait(300);
+
+    if ($crash.checked) {
+      setNode($svc, 'crashed'); $svcStatus.textContent = 'CRASHED';
+      // The outbox row is durable — relay will still publish it.
+    }
+
+    // Step 2: relay picks up outbox row
+    const relayDelay = relayKind === 'cdc' ? 500 : 1800;
+    $relayStatus.textContent = relayKind === 'cdc' ? 'tailing log…' : 'polling…';
+    $relayPulse.classList.add('on');
+    setArrow(arrDbRelay, 'active');
+    await wait(relayDelay);
+    setNode($relay, 'active');
+    $relayStatus.textContent = 'publishing';
+    setArrow(arrRelayBroker, 'active');
+    await wait(700);
+    setRow(rowBroker, 'filled', 'OrderPlaced #1042');
+    setNode($broker, 'done');
+    // mark outbox row as processed
+    setRow(rowOutbox, 'processed', 'OrderPlaced #1042  ✓ relayed');
+    $relayStatus.textContent = 'caught up';
+    setNode($relay, 'done');
+    $relayPulse.classList.remove('on');
+
+    if ($crash.checked) {
+      setVerdict('good',
+        '<b>Consistent — even though the service crashed.</b> Because the event was committed to the outbox in the same transaction as the order, it survived the crash. The relay published it on its next tick. No lost event, no manual recovery.');
+    } else {
+      setVerdict('good',
+        '<b>Atomic.</b> The order and the event were committed together. The relay picked up the outbox row ' +
+        (relayKind === 'cdc' ? 'almost instantly by tailing the transaction log' : 'on its next poll interval') +
+        ' and published it. Now try checking the crash box and re-running.');
+    }
+    setBusy(false);
+  }
+
+  function reset() {
+    setNode($svc, 'idle'); $svcStatus.textContent = 'idle';
+    setNode($db, 'idle');
+    setNode($broker, 'idle');
+    setNode($relay, 'idle');
+    $relayStatus.textContent = 'idle';
+    $relayPulse.classList.remove('on');
+    setRow(rowOrders, 'empty', '— empty —');
+    setRow(rowOutbox, 'empty', '— empty —');
+    setRow(rowBroker, 'empty', '— no event —');
+    setArrow(arrSvcDb, null);
+    setArrow(arrPubNaive, null);
+    setArrow(arrDbRelay, null);
+    setArrow(arrRelayBroker, null);
+    setVerdict('neutral', mode === 'naive'
+      ? 'Naive mode: service writes to DB <em>then</em> publishes to broker as two separate operations.'
+      : 'Outbox mode: service writes business row + outbox row in one transaction; the relay reliably publishes from the outbox.');
+    setBusy(false);
+  }
+
+  document.getElementById('mode-naive').addEventListener('click', () => setMode('naive'));
+  document.getElementById('mode-outbox').addEventListener('click', () => setMode('outbox'));
+  document.getElementById('relay-cdc').addEventListener('click', () => setRelay('cdc'));
+  document.getElementById('relay-poll').addEventListener('click', () => setRelay('polling'));
+  document.getElementById('reset').addEventListener('click', reset);
+  $run.addEventListener('click', () => (mode === 'naive' ? runNaive() : runOutbox()));
+
+  setMode('naive');
+</script>
+</body>
+</html>

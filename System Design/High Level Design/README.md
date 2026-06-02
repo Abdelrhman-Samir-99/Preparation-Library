@@ -27,4 +27,9 @@
   + Sharding
 + [Message Queue](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/Message%20Queue/README.md)
   + RabbitMQ
++ [Distributed Transactions](https://github.com/Abdelrhman-Samir-99/Preparation-Library/blob/main/System%20Design/High%20Level%20Design/Distributed%20Transactions/README.md)
+  + Two-phase commit (2PC)
+  + Saga pattern (choreography vs orchestration)
+  + Transactional outbox
+  + Interactive diagrams (open in browser)
 + [High Level Design Videos](https://www.youtube.com/c/SystemDesignInterview/videos) **(Highly Recommended)**

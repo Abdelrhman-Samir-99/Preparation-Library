@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2PC vs Saga under coordinator crash</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --text-muted: #71717a;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --node-bg: #ffffff;
+    --node-border: #d4d4d8;
+    --idle: #a1a1aa;
+    --running: #f59e0b;
+    --committed: #10b981;
+    --locked: #f97316;
+    --failed: #ef4444;
+    --crashed: #71717a;
+    --arrow-idle: #d4d4d8;
+    --arrow-active: #2563eb;
+    --arrow-crashed: #ef4444;
+    --queue-bg: #fef3c7;
+    --queue-border: #f59e0b;
+    --queue-text: #92400e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0d10;
+      --surface: #15181d;
+      --border: #2a2e36;
+      --text: #e8e8ea;
+      --text-muted: #a1a1aa;
+      --accent: #60a5fa;
+      --accent-hover: #93c5fd;
+      --node-bg: #1c2128;
+      --node-border: #2a2e36;
+      --arrow-idle: #3f3f46;
+      --queue-bg: #422006;
+      --queue-border: #f59e0b;
+      --queue-text: #fbbf24;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 20px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 20px; }
+  header a { color: var(--accent); text-decoration: none; font-size: 13px; }
+  h1 { font-size: 22px; font-weight: 500; margin: 8px 0 4px; }
+  .sub { color: var(--text-muted); margin: 0 0 24px; font-size: 14px; }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px;
+  }
+  button {
+    font: inherit; color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; cursor: pointer;
+    transition: border-color 120ms, background 120ms;
+  }
+  button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+  button.danger { background: var(--failed); color: white; border-color: var(--failed); }
+  button.danger:hover:not(:disabled) { opacity: 0.9; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 14px;
+  }
+  .stage h2 { margin: 0 0 4px; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+  .stage .tag { font-size: 11px; font-weight: 400; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+  .stage p.note { margin: 4px 0 12px; color: var(--text-muted); font-size: 13px; }
+  svg { width: 100%; height: auto; display: block; }
+  .node-bg { fill: var(--node-bg); stroke: var(--node-border); stroke-width: 1.5; transition: stroke 200ms, fill 200ms; }
+  .node[data-state="active"] .node-bg { stroke: var(--accent); }
+  .node[data-state="committed"] .node-bg { stroke: var(--committed); }
+  .node[data-state="locked"] .node-bg { stroke: var(--locked); stroke-dasharray: 5 3; }
+  .node[data-state="crashed"] .node-bg { stroke: var(--crashed); opacity: 0.55; }
+  .node[data-state="recovering"] .node-bg { stroke: var(--accent); animation: pulse 1s ease-in-out infinite; }
+  .node[data-state="free"] .node-bg { stroke: var(--committed); }
+  .node-title { fill: var(--text); font-size: 14px; font-weight: 500; text-anchor: middle; }
+  .node-sub { fill: var(--text-muted); font-size: 11px; text-anchor: middle; }
+  .node[data-state="crashed"] .node-title,
+  .node[data-state="crashed"] .node-sub { opacity: 0.5; }
+  .arrow { fill: none; stroke: var(--arrow-idle); stroke-width: 2; marker-end: url(#ahead); transition: stroke 200ms, opacity 200ms; }
+  .arrow[data-state="active"] { stroke: var(--arrow-active); }
+  .arrow[data-state="crashed"] { stroke: var(--arrow-crashed); stroke-dasharray: 4 4; opacity: 0.5; }
+  .lock-icon { font-size: 14px; text-anchor: middle; fill: var(--locked); opacity: 0; transition: opacity 200ms; }
+  .node[data-state="locked"] .lock-icon { opacity: 1; }
+  .check-icon { font-size: 14px; text-anchor: middle; fill: var(--committed); opacity: 0; transition: opacity 200ms; }
+  .node[data-state="free"] .check-icon, .node[data-state="committed"] .check-icon { opacity: 1; }
+  .skull { font-size: 28px; text-anchor: middle; fill: var(--crashed); opacity: 0; transition: opacity 200ms; }
+  .node[data-state="crashed"] .skull { opacity: 0.7; }
+  .queue-pill { fill: var(--queue-bg); stroke: var(--queue-border); stroke-width: 1; opacity: 0; transition: opacity 200ms; }
+  .queue-text { fill: var(--queue-text); font-size: 11px; text-anchor: middle; opacity: 0; transition: opacity 200ms; }
+  .queue-visible .queue-pill, .queue-visible .queue-text { opacity: 1; }
+  .durable-card { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+  .durable-title { fill: var(--text-muted); font-size: 10px; text-anchor: middle; text-transform: uppercase; letter-spacing: 0.5px; }
+  .durable-value { fill: var(--text); font-size: 13px; font-weight: 500; text-anchor: middle; font-variant-numeric: tabular-nums; }
+  .verdict { padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
+  .verdict.bad { background: rgba(239,68,68,0.1); color: var(--failed); border: 1px solid rgba(239,68,68,0.3); }
+  .verdict.good { background: rgba(16,185,129,0.1); color: var(--committed); border: 1px solid rgba(16,185,129,0.3); }
+  .verdict.neutral { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <a href="index.html">← All diagrams</a>
+    <h1>2PC vs Saga under coordinator crash</h1>
+    <p class="sub">Run both protocols. Crash the coordinator at the worst possible moment — after votes are in but before the commit decision is sent. Watch what each side does about it.</p>
+  </header>
+
+  <div class="controls">
+    <button id="run" class="primary">Run to crisis point</button>
+    <button id="crash" class="danger" disabled>Crash coordinator</button>
+    <button id="restart" disabled>Restart orchestrator</button>
+    <button id="reset">Reset</button>
+  </div>
+
+  <!-- Two-phase commit panel -->
+  <div class="stage">
+    <h2>Two-phase commit <span class="tag">strong consistency, blocking</span></h2>
+    <p class="note">Coordinator runs <em>prepare</em> on both participants. They lock their rows and vote yes. Coordinator is about to send <em>commit</em>…</p>
+    <svg viewBox="0 0 920 240" role="img" aria-labelledby="t2pc d2pc">
+      <title id="t2pc">Two-phase commit</title>
+      <desc id="d2pc">A coordinator coordinates commit between two participants. When the coordinator crashes after votes, participants stay locked and other work queues up.</desc>
+      <defs>
+        <marker id="ahead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+        </marker>
+      </defs>
+
+      <!-- coordinator -->
+      <g class="node" id="pc-coord" data-state="idle">
+        <rect class="node-bg" x="30" y="70" width="180" height="100" rx="10"/>
+        <text class="node-title" x="120" y="105">Coordinator</text>
+        <text class="node-sub" x="120" y="125">drives prepare + commit</text>
+        <text class="skull" x="120" y="155">✕</text>
+      </g>
+
+      <!-- arrows -->
+      <path class="arrow" id="pc-arr-a" d="M210 100 L330 60"/>
+      <path class="arrow" id="pc-arr-b" d="M210 140 L330 180"/>
+
+      <!-- participant A -->
+      <g class="node" id="pc-a" data-state="idle">
+        <rect class="node-bg" x="330" y="30" width="200" height="80" rx="10"/>
+        <text class="node-title" x="430" y="58">Participant A</text>
+        <text class="node-sub" x="430" y="76">orders DB</text>
+        <text class="lock-icon" x="430" y="98">🔒 locked, waiting</text>
+        <text class="check-icon" x="430" y="98">✓ committed</text>
+      </g>
+      <!-- queued work A -->
+      <g id="pc-q-a">
+        <rect class="queue-pill" x="555" y="35" width="160" height="22" rx="11"/>
+        <text class="queue-text" x="635" y="51">▦ ▦ ▦ requests queued</text>
+        <rect class="queue-pill" x="555" y="62" width="160" height="22" rx="11"/>
+        <text class="queue-text" x="635" y="78">other txns blocked</text>
+      </g>
+
+      <!-- participant B -->
+      <g class="node" id="pc-b" data-state="idle">
+        <rect class="node-bg" x="330" y="150" width="200" height="80" rx="10"/>
+        <text class="node-title" x="430" y="178">Participant B</text>
+        <text class="node-sub" x="430" y="196">inventory DB</text>
+        <text class="lock-icon" x="430" y="218">🔒 locked, waiting</text>
+        <text class="check-icon" x="430" y="218">✓ committed</text>
+      </g>
+      <!-- queued work B -->
+      <g id="pc-q-b">
+        <rect class="queue-pill" x="555" y="155" width="160" height="22" rx="11"/>
+        <text class="queue-text" x="635" y="171">▦ ▦ ▦ requests queued</text>
+        <rect class="queue-pill" x="555" y="182" width="160" height="22" rx="11"/>
+        <text class="queue-text" x="635" y="198">other txns blocked</text>
+      </g>
+
+      <!-- coordinator state card -->
+      <rect class="durable-card" x="745" y="80" width="150" height="80" rx="8"/>
+      <text class="durable-title" x="820" y="100">Coordinator state</text>
+      <text class="durable-value" id="pc-state" x="820" y="130">idle</text>
+      <text class="node-sub" x="820" y="150" id="pc-decision">decision: —</text>
+    </svg>
+    <div class="verdict neutral" id="pc-verdict">Idle. Click <b>Run to crisis point</b> to begin.</div>
+  </div>
+
+  <!-- Saga panel -->
+  <div class="stage">
+    <h2>Saga (orchestrated) <span class="tag">eventual consistency, non-blocking</span></h2>
+    <p class="note">Orchestrator commands each service in turn. Each service commits locally and releases <em>immediately</em>. Orchestrator persists its progress so it can resume on restart.</p>
+    <svg viewBox="0 0 920 240" role="img" aria-labelledby="tsg dsg">
+      <title id="tsg">Saga orchestrator</title>
+      <desc id="dsg">An orchestrator coordinates two independent services. Services commit locally and never hold locks for the orchestrator. The orchestrator's state is durable.</desc>
+
+      <!-- orchestrator -->
+      <g class="node" id="sg-coord" data-state="idle">
+        <rect class="node-bg" x="30" y="70" width="180" height="100" rx="10"/>
+        <text class="node-title" x="120" y="105">Orchestrator</text>
+        <text class="node-sub" x="120" y="125">issues commands</text>
+        <text class="skull" x="120" y="155">✕</text>
+      </g>
+
+      <path class="arrow" id="sg-arr-a" d="M210 100 L330 60"/>
+      <path class="arrow" id="sg-arr-b" d="M210 140 L330 180"/>
+
+      <!-- service A -->
+      <g class="node" id="sg-a" data-state="idle">
+        <rect class="node-bg" x="330" y="30" width="200" height="80" rx="10"/>
+        <text class="node-title" x="430" y="58">Service A</text>
+        <text class="node-sub" x="430" y="76">orders DB</text>
+        <text class="check-icon" x="430" y="98">✓ committed · free</text>
+      </g>
+
+      <!-- service B -->
+      <g class="node" id="sg-b" data-state="idle">
+        <rect class="node-bg" x="330" y="150" width="200" height="80" rx="10"/>
+        <text class="node-title" x="430" y="178">Service B</text>
+        <text class="node-sub" x="430" y="196">inventory DB</text>
+        <text class="check-icon" x="430" y="218">✓ committed · free</text>
+      </g>
+
+      <!-- durable state card -->
+      <rect class="durable-card" x="600" y="60" width="290" height="120" rx="8"/>
+      <text class="durable-title" x="745" y="80">Durable saga state</text>
+      <text class="durable-value" id="sg-step" x="745" y="105">step: 0 / 2</text>
+      <text class="node-sub" x="745" y="125" id="sg-history">history: —</text>
+      <text class="node-sub" x="745" y="150">↳ survives crash; orchestrator</text>
+      <text class="node-sub" x="745" y="166">resumes from here on restart</text>
+    </svg>
+    <div class="verdict neutral" id="sg-verdict">Idle. Click <b>Run to crisis point</b> to begin.</div>
+  </div>
+</main>
+
+<script>
+  // Two side-by-side simulations driven by the same three buttons.
+  // The narrative: same crash, same moment — 2PC freezes, saga shrugs.
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms => reduced ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+
+  const $run = document.getElementById('run');
+  const $crash = document.getElementById('crash');
+  const $restart = document.getElementById('restart');
+  const $reset = document.getElementById('reset');
+
+  // 2PC handles
+  const pc = {
+    coord: document.getElementById('pc-coord'),
+    a: document.getElementById('pc-a'),
+    b: document.getElementById('pc-b'),
+    arrA: document.getElementById('pc-arr-a'),
+    arrB: document.getElementById('pc-arr-b'),
+    qA: document.getElementById('pc-q-a'),
+    qB: document.getElementById('pc-q-b'),
+    state: document.getElementById('pc-state'),
+    decision: document.getElementById('pc-decision'),
+    verdict: document.getElementById('pc-verdict'),
+  };
+  // Saga handles
+  const sg = {
+    coord: document.getElementById('sg-coord'),
+    a: document.getElementById('sg-a'),
+    b: document.getElementById('sg-b'),
+    arrA: document.getElementById('sg-arr-a'),
+    arrB: document.getElementById('sg-arr-b'),
+    step: document.getElementById('sg-step'),
+    history: document.getElementById('sg-history'),
+    verdict: document.getElementById('sg-verdict'),
+  };
+
+  function setNode(el, state) { el.dataset.state = state; }
+  function setArrow(el, state) { if (state) el.dataset.state = state; else delete el.dataset.state; }
+  function setVerdict(el, cls, html) { el.className = 'verdict ' + cls; el.innerHTML = html; }
+
+  async function runToCrisis() {
+    $run.disabled = true;
+    // -- 2PC: prepare phase
+    pc.state.textContent = 'prepare phase';
+    setArrow(pc.arrA, 'active'); setArrow(pc.arrB, 'active');
+    setNode(pc.coord, 'active');
+    await wait(700);
+    setNode(pc.a, 'locked'); setNode(pc.b, 'locked');
+    pc.state.textContent = 'votes collected';
+    pc.decision.textContent = 'decision: about to send commit…';
+    setVerdict(pc.verdict, 'neutral', 'Both participants voted yes and are <b>holding locks</b>. Coordinator is one message away from sending commit.');
+
+    // -- Saga: commit step A, then start B
+    sg.history.textContent = 'history: —';
+    sg.step.textContent = 'step: 1 / 2 in progress';
+    setArrow(sg.arrA, 'active');
+    setNode(sg.coord, 'active');
+    await wait(500);
+    setNode(sg.a, 'committed');
+    sg.history.textContent = 'history: A committed';
+    sg.step.textContent = 'step: 2 / 2 in progress';
+    setArrow(sg.arrB, 'active');
+    await wait(400);
+    setVerdict(sg.verdict, 'neutral', 'Service A already committed locally and released. Orchestrator is mid-flight on step 2.');
+
+    $crash.disabled = false;
+  }
+
+  async function crash() {
+    $crash.disabled = true;
+    // -- 2PC: coordinator dies
+    setNode(pc.coord, 'crashed');
+    setArrow(pc.arrA, 'crashed'); setArrow(pc.arrB, 'crashed');
+    pc.state.textContent = 'CRASHED';
+    pc.decision.textContent = 'decision: lost in transit';
+    // Participants stay locked, waiting forever (without heuristic intervention).
+    await wait(400);
+    pc.qA.classList.add('queue-visible');
+    pc.qB.classList.add('queue-visible');
+    setVerdict(pc.verdict, 'bad',
+      '<b>Stuck.</b> Participants cannot safely commit or abort on their own — they don\'t know the decision. Locks stay held; other transactions on those rows queue up indefinitely. Recovery needs operator intervention or a heuristic resolution that risks divergence.');
+
+    // -- Saga: orchestrator dies, but services are already free
+    setNode(sg.coord, 'crashed');
+    setArrow(sg.arrA, 'crashed'); setArrow(sg.arrB, 'crashed');
+    // Service A was committed → mark "free" (already was, just emphasize). Service B was in-flight; assume command never landed.
+    setNode(sg.a, 'free');
+    setNode(sg.b, 'idle');
+    setVerdict(sg.verdict, 'neutral',
+      'Orchestrator process is gone. <b>Service A is already committed and free</b> — nothing is locked on its behalf. Service B never received the command. Click <b>Restart orchestrator</b> to resume.');
+    $restart.disabled = false;
+  }
+
+  async function restart() {
+    $restart.disabled = true;
+    setNode(sg.coord, 'recovering');
+    setVerdict(sg.verdict, 'neutral', 'Orchestrator restarting… reading durable state.');
+    await wait(700);
+    setNode(sg.coord, 'active');
+    setArrow(sg.arrB, 'active');
+    setNode(sg.b, 'active');
+    sg.history.textContent = 'history: A committed (recovered)';
+    await wait(700);
+    setNode(sg.b, 'free');
+    sg.step.textContent = 'step: 2 / 2 done';
+    sg.history.textContent = 'history: A committed, B committed';
+    setVerdict(sg.verdict, 'good',
+      '<b>Resumed from durable state.</b> Service B committed. End-to-end saga complete. At no point were other transactions blocked.');
+    // The 2PC verdict stays bad — that is the point.
+  }
+
+  function reset() {
+    [pc.coord, pc.a, pc.b].forEach(n => setNode(n, 'idle'));
+    [pc.arrA, pc.arrB].forEach(a => setArrow(a, null));
+    pc.qA.classList.remove('queue-visible');
+    pc.qB.classList.remove('queue-visible');
+    pc.state.textContent = 'idle';
+    pc.decision.textContent = 'decision: —';
+    setVerdict(pc.verdict, 'neutral', 'Idle. Click <b>Run to crisis point</b> to begin.');
+
+    [sg.coord, sg.a, sg.b].forEach(n => setNode(n, 'idle'));
+    [sg.arrA, sg.arrB].forEach(a => setArrow(a, null));
+    sg.step.textContent = 'step: 0 / 2';
+    sg.history.textContent = 'history: —';
+    setVerdict(sg.verdict, 'neutral', 'Idle. Click <b>Run to crisis point</b> to begin.');
+
+    $run.disabled = false;
+    $crash.disabled = true;
+    $restart.disabled = true;
+  }
+
+  $run.addEventListener('click', runToCrisis);
+  $crash.addEventListener('click', crash);
+  $restart.addEventListener('click', restart);
+  $reset.addEventListener('click', reset);
+  reset();
+</script>
+</body>
+</html>
