@@ -17,62 +17,84 @@
 </head>
 <body>
 
-  <header>
-    <span class="eyebrow">Preparation Library</span>
+  <header class="site-header wrap">
+    <span class="eyebrow">Preparation library</span>
     <h1>Interview-prep notes &amp; interactive demos</h1>
-    <p>Flashcards, diagrams, and study notes I've built while preparing.</p>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+    <p class="lede">A personal notebook of flashcards, operable SVG diagrams, and study notes I keep while preparing for senior engineering interviews.</p>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
   </header>
 
   <main class="wrap">
 
-    <section style="margin-top: 1.5rem;">
-      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Try it</h2>
-      <div class="card-grid">
-        <a class="link-card" href="AWS/">
+    <section>
+      <h2 class="eyebrow" style="display:block; margin-top: var(--space-8); margin-bottom: var(--space-5);">Try it</h2>
+      <a class="link-card" href="AWS/">
+        <span class="lc-num">01</span>
+        <div>
           <span class="lc-tag">Flashcards</span>
-          <div class="lc-title">AWS</div>
-          <p class="lc-desc">IAM and SQS flashcard decks — sequential, shuffle, or missed-only modes.</p>
-        </a>
-        <a class="link-card" href="System%20Design/High%20Level%20Design/Distributed%20Transactions/diagrams/">
-          <span class="lc-tag">Interactive diagrams</span>
-          <div class="lc-title">Distributed transactions</div>
-          <p class="lc-desc">Five operable diagrams: sagas, 2PC vs saga under crash, transactional outbox, choreography vs orchestration, and a decision tree.</p>
-        </a>
-      </div>
+          <h3 class="lc-title">AWS</h3>
+          <p class="lc-desc">IAM and SQS flashcards, with sequential/shuffle/missed-only modes</p>
+        </div>
+      </a>
+      <a class="link-card" href="System%20Design/High%20Level%20Design/Distributed%20Transactions/">
+        <span class="lc-num">02</span>
+        <div>
+          <span class="lc-tag">Diagrams</span>
+          <h3 class="lc-title">Distributed transactions</h3>
+          <p class="lc-desc">Notes + 5 interactive SVG diagrams you can operate</p>
+        </div>
+      </a>
     </section>
 
-    <section style="margin-top: 1.5rem;">
-      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Topic notes</h2>
-      <div class="card-grid">
-        <a class="link-card" href="System%20Design/High%20Level%20Design/">
-          <div class="lc-title">System design — high level</div>
-          <p class="lc-desc">Scaling, load balancers, caches, databases, message queues, distributed transactions.</p>
-        </a>
-        <a class="link-card" href="System%20Design/Low%20Level%20Design/">
-          <div class="lc-title">System design — low level</div>
-          <p class="lc-desc">Design patterns, principles, OOD, UML diagrams.</p>
-        </a>
-        <a class="link-card" href="Problem%20Solving/">
-          <div class="lc-title">Problem solving</div>
-          <p class="lc-desc">Data structures and algorithms references.</p>
-        </a>
-        <a class="link-card" href="Programming%20Languages/">
-          <div class="lc-title">Programming languages</div>
-          <p class="lc-desc">Notes and resources for C++, C#, Java, Ruby, Rails, Spring.</p>
-        </a>
-        <a class="link-card" href="Behavioral/">
-          <div class="lc-title">Behavioral</div>
-          <p class="lc-desc">Company-specific prep, starting with Amazon leadership principles.</p>
-        </a>
-      </div>
+    <section style="margin-top: var(--space-9); padding-top: var(--space-9); border-top: 1px solid var(--border);">
+      <h2 class="eyebrow" style="display:block; margin-bottom: var(--space-5);">Topic notes</h2>
+      <a class="link-card" href="System%20Design/High%20Level%20Design/">
+        <span class="lc-num">03</span>
+        <div>
+          <span class="lc-tag">System design</span>
+          <h3 class="lc-title">High-level design</h3>
+          <p class="lc-desc">Scaling, caches, databases, message queues, distributed transactions</p>
+        </div>
+      </a>
+      <a class="link-card" href="System%20Design/Low%20Level%20Design/">
+        <span class="lc-num">04</span>
+        <div>
+          <span class="lc-tag">System design</span>
+          <h3 class="lc-title">Low-level design</h3>
+          <p class="lc-desc">Patterns, principles, OOD</p>
+        </div>
+      </a>
+      <a class="link-card" href="Problem%20Solving/">
+        <span class="lc-num">05</span>
+        <div>
+          <span class="lc-tag">Algorithms</span>
+          <h3 class="lc-title">Problem solving</h3>
+          <p class="lc-desc">Data structures &amp; algorithms</p>
+        </div>
+      </a>
+      <a class="link-card" href="Programming%20Languages/">
+        <span class="lc-num">06</span>
+        <div>
+          <span class="lc-tag">Languages</span>
+          <h3 class="lc-title">Programming languages</h3>
+          <p class="lc-desc">Language notes (C++, C#, Java, Ruby, Rails, Spring)</p>
+        </div>
+      </a>
+      <a class="link-card" href="Behavioral/">
+        <span class="lc-num">07</span>
+        <div>
+          <span class="lc-tag">Interviews</span>
+          <h3 class="lc-title">Behavioral</h3>
+          <p class="lc-desc">Company-specific prep</p>
+        </div>
+      </a>
     </section>
 
   </main>
 
-  <footer class="site-footer">
-    Design system: <a href="assets/DESIGN.md">assets/DESIGN.md</a> &middot;
-    Source: <a href="https://github.com/Abdelrhman-Samir-99/Preparation-Library">GitHub</a>
+  <footer class="site-footer wrap">
+    <span>Last updated <code>2026-06-02</code> &middot; Design system: <a href="assets/DESIGN.md">assets/DESIGN.md</a></span>
+    <a href="https://github.com/Abdelrhman-Samir-99/Preparation-Library">GitHub</a>
   </footer>
 
   <script src="assets/theme.js"></script>

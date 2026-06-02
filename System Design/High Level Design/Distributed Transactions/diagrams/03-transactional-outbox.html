@@ -191,6 +191,7 @@
     function setBusy(b) { busy = b; $run.disabled = b; }
 
     async function runNaive() {
+      reset();
       setBusy(true);
       setNode($svc, 'active'); $svcStatus.textContent = 'writing to DB…';
       setArrow(arrSvcDb, 'active');
@@ -221,6 +222,7 @@
     }
 
     async function runOutbox() {
+      reset();
       setBusy(true);
       setNode($svc, 'active'); $svcStatus.textContent = 'one transaction →';
       setArrow(arrSvcDb, 'active');

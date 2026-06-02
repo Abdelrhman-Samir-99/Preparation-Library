@@ -35,7 +35,7 @@ function updateThemeIcon() {
   const btn = document.getElementById('themeToggle');
   if (!btn) return;
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  btn.innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+  btn.textContent = isDark ? 'Light' : 'Dark';
 }
 
 document.addEventListener('DOMContentLoaded', initTheme);

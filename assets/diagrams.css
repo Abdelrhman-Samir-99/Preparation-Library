@@ -1,309 +1,455 @@
 /* ============================================================
- * diagrams.css — SVG diagram styles
- *
- * Pairs with design.css. Provides shared state colors, node/arrow
- * styles, log panels, and verdict pills used across the interactive
- * diagrams under /System Design/.../Distributed Transactions/diagrams.
- *
- * Each diagram file still owns its specific SVG layout and JS.
+ * Preparation Library — diagrams.css
+ * Inherits all tokens from design.css. No re-imports.
+ * Margin Notes: hairlines + desaturated state. No glow, no fill-as-accent.
  * ============================================================ */
 
-/* ── Stage container (the SVG wrapper) ────────────────────── */
+/* ── Stage (diagram container) ─────────────────────────── */
 .stage {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
-  margin-bottom: 1rem;
+  padding: var(--space-7) 0;
+  border-bottom: 1px solid var(--border);
 }
+.stage:last-of-type { border-bottom: none; }
 .stage h2 {
-  font-size: 1rem;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-serif);
   font-weight: 500;
-  margin: 0 0 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.stage .tag {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 400;
-  padding: 0.15rem 0.55rem;
-  border-radius: var(--radius-pill);
-  background: var(--bg);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-}
-.stage p.note {
-  margin: 0.25rem 0 0.85rem;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-}
-
-/* ── Diagram controls bar (between stage and SVG) ─────────── */
-.dctrl {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0.85rem 1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  margin-bottom: 0.85rem;
-}
-.dctrl label {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-.dctrl select,
-.dctrl input[type="checkbox"] {
-  font: inherit;
+  letter-spacing: var(--track-tight);
+  line-height: var(--leading-tight);
   color: var(--text);
 }
+.stage .tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 2px var(--space-3);
+  margin-bottom: var(--space-5);
+  background: transparent;
+}
+.stage p.note,
+.stage .note {
+  font-family: var(--font-sans);
+  font-size: var(--text-15);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin-bottom: var(--space-6);
+}
+
+/* ── Diagram controls ──────────────────────────────────── */
+.dctrl {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+  margin: var(--space-5) 0;
+}
+.dctrl label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-muted);
+}
 .dctrl select {
-  background: var(--surface);
+  height: 32px;
+  padding: 0 var(--space-3);
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 0.35rem 0.6rem;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease);
 }
+.dctrl select:hover { border-color: var(--border-strong); }
+.dctrl select:focus-visible { outline: none; box-shadow: var(--ring-focus); }
 
-/* ── Legend ───────────────────────────────────────────────── */
+/* ── Legend ────────────────────────────────────────────── */
 .legend {
+  list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.9rem;
-  padding: 0.6rem 0.9rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 0.85rem;
+  gap: var(--space-5);
+  font-size: var(--text-12);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  padding: 0;
+  margin: var(--space-5) 0;
 }
-.legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
-.legend .swatch {
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+.swatch {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
-  display: inline-block;
+  border-radius: var(--radius-xs);
+  background: var(--state-idle);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.legend .swatch-line {
-  width: 18px;
-  height: 0;
-  border-top: 2px solid;
-  display: inline-block;
+.swatch.swatch-idle    { background: var(--state-idle);    border-color: var(--state-idle); }
+.swatch.swatch-pending { background: var(--state-pending); border-color: var(--state-pending); }
+.swatch.swatch-success { background: var(--state-success); border-color: var(--state-success); }
+.swatch.swatch-danger  { background: var(--state-danger);  border-color: var(--state-danger); }
+.swatch.swatch-locked  { background: var(--state-locked);  border-color: var(--state-locked); }
+.swatch.swatch-comp    { background: var(--state-comp);    border-color: var(--state-comp); }
+.swatch-line {
+  width: 16px;
+  height: 2px;
+  background: var(--text-secondary);
+  border: none;
+  border-radius: 0;
 }
 
-/* ── SVG canvas ───────────────────────────────────────────── */
-svg.diagram { width: 100%; height: auto; display: block; }
+/* ── SVG diagram surface ───────────────────────────────── */
+svg.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: var(--space-5) 0;
+  font-family: var(--font-sans);
+  color: var(--text);
+  overflow: visible;
+}
 
-/* ── Nodes (rounded rectangles for services/components) ───── */
+/* Node backgrounds — rect-based, 6px corner, 1.5px stroke in state color */
 .node-bg {
   fill: var(--surface);
   stroke: var(--border-strong);
   stroke-width: 1.5;
-  transition: stroke 200ms, fill 200ms;
+  rx: 6;
+  ry: 6;
+  transition: fill var(--dur) var(--ease), stroke var(--dur) var(--ease);
 }
-.node[data-state="idle"] .node-bg     { stroke: var(--border-strong); }
-.node[data-state="active"] .node-bg   { stroke: var(--accent); }
-.node[data-state="running"] .node-bg  { stroke: var(--state-pending); }
-.node[data-state="committed"] .node-bg{ stroke: var(--state-success); }
-.node[data-state="done"] .node-bg     { stroke: var(--state-success); }
-.node[data-state="free"] .node-bg     { stroke: var(--state-success); }
-.node[data-state="failed"] .node-bg   { stroke: var(--state-danger); }
-.node[data-state="locked"] .node-bg   { stroke: var(--state-locked); stroke-dasharray: 5 3; }
-.node[data-state="compensating"] .node-bg { stroke: var(--state-comp); }
-.node[data-state="compensated"] .node-bg  { stroke: var(--state-comp); stroke-dasharray: 4 4; }
-.node[data-state="crashed"] .node-bg  { stroke: var(--text-muted); opacity: 0.55; stroke-dasharray: 4 4; }
-.node[data-state="recovering"] .node-bg { stroke: var(--accent); animation: dgPulse 1s ease-in-out infinite; }
+.node-bg[data-state="idle"]         { fill: var(--surface);             stroke: var(--state-idle); }
+.node-bg[data-state="active"]       { fill: var(--accent-soft);         stroke: var(--accent); }
+.node-bg[data-state="running"]      { fill: var(--state-warn-bg);       stroke: var(--state-pending); }
+.node-bg[data-state="committed"]    { fill: var(--state-success-soft);  stroke: var(--state-success); }
+.node-bg[data-state="done"]         { fill: var(--state-success-soft);  stroke: var(--state-success); }
+.node-bg[data-state="free"]         { fill: var(--surface);             stroke: var(--state-idle); }
+.node-bg[data-state="locked"]       { fill: var(--state-warn-bg);       stroke: var(--state-locked); }
+.node-bg[data-state="failed"]       { fill: var(--state-danger-soft);   stroke: var(--state-danger); }
+.node-bg[data-state="compensating"] { fill: var(--state-warn-bg);       stroke: var(--state-comp); }
+.node-bg[data-state="compensated"]  { fill: var(--surface-2);           stroke: var(--state-comp); }
+.node-bg[data-state="crashed"]      { fill: var(--state-danger-soft);   stroke: var(--state-danger); stroke-dasharray: 4 3; }
+.node-bg[data-state="recovering"]   { fill: var(--state-warn-bg);       stroke: var(--state-pending); stroke-dasharray: 4 3; }
 
+/* Node text */
 .node-title {
-  fill: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-  text-anchor: middle;
   font-family: var(--font-sans);
+  font-size: var(--text-13);
+  font-weight: 600;
+  fill: var(--text);
+  letter-spacing: -0.005em;
 }
 .node-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
   fill: var(--text-muted);
-  font-size: 11px;
-  text-anchor: middle;
-  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
 }
-.node[data-state="crashed"] .node-title,
-.node[data-state="crashed"] .node-sub { opacity: 0.5; }
 
-/* Status dot + label (inside a node) */
+/* Status dot — small square indicator top-left of a node */
 .status-dot {
+  width: 6px;
+  height: 6px;
   fill: var(--state-idle);
-  transition: fill 200ms;
+  stroke: none;
+  transition: fill var(--dur) var(--ease);
 }
-.node[data-state="running"] .status-dot      { fill: var(--state-pending); animation: dgPulse 1.2s ease-in-out infinite; }
-.node[data-state="committed"] .status-dot,
-.node[data-state="done"] .status-dot,
-.node[data-state="free"] .status-dot         { fill: var(--state-success); }
-.node[data-state="failed"] .status-dot       { fill: var(--state-danger); }
-.node[data-state="compensating"] .status-dot { fill: var(--state-comp); animation: dgPulse 1.2s ease-in-out infinite; }
-.node[data-state="compensated"] .status-dot  { fill: var(--state-comp); opacity: 0.5; }
+.status-dot[data-state="idle"]         { fill: var(--state-idle); }
+.status-dot[data-state="active"]       { fill: var(--accent); }
+.status-dot[data-state="running"]      { fill: var(--state-pending); }
+.status-dot[data-state="committed"]    { fill: var(--state-success); }
+.status-dot[data-state="done"]         { fill: var(--state-success); }
+.status-dot[data-state="free"]         { fill: var(--state-idle); }
+.status-dot[data-state="locked"]       { fill: var(--state-locked); }
+.status-dot[data-state="failed"]       { fill: var(--state-danger); }
+.status-dot[data-state="compensating"] { fill: var(--state-comp); }
+.status-dot[data-state="compensated"]  { fill: var(--state-comp); }
+.status-dot[data-state="crashed"]      { fill: var(--state-danger); }
+.status-dot[data-state="recovering"]   { fill: var(--state-pending); }
+
+.status-dot.pulse,
+.status-dot[data-pulse="true"] {
+  animation: dgPulse 1.6s var(--ease) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Status text (mono, tabular) — small label under a node */
 .status-text {
-  fill: var(--text-muted);
-  font-size: 12px;
-  text-anchor: middle;
-  font-variant-numeric: tabular-nums;
   font-family: var(--font-mono);
+  font-size: var(--text-11);
+  fill: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  font-variant-numeric: tabular-nums lining-nums;
 }
+.status-text[data-state="committed"],
+.status-text[data-state="done"]      { fill: var(--state-success); }
+.status-text[data-state="failed"],
+.status-text[data-state="crashed"]   { fill: var(--state-danger); }
+.status-text[data-state="locked"]    { fill: var(--state-locked); }
+.status-text[data-state="running"],
+.status-text[data-state="recovering"]{ fill: var(--state-pending); }
+.status-text[data-state="compensating"],
+.status-text[data-state="compensated"] { fill: var(--state-comp); }
 
-/* Status badges/icons that toggle in/out by state */
+/* Badges — tiny hairline rect next to a node title */
 .badge {
-  font-size: 11px;
-  text-anchor: middle;
   font-family: var(--font-mono);
-  opacity: 0;
-  transition: opacity 200ms;
+  font-size: var(--text-11);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  fill: var(--text-muted);
 }
-.badge.success { fill: var(--state-success); }
-.badge.comp    { fill: var(--state-comp); }
-.node[data-state="committed"] .badge.success { opacity: 1; }
-.node[data-state="compensated"] .badge.comp  { opacity: 1; }
+.badge-bg {
+  fill: transparent;
+  stroke: var(--border);
+  stroke-width: 1;
+  rx: 2;
+  ry: 2;
+}
+.badge.success     { fill: var(--state-success); }
+.badge-bg.success  { stroke: var(--state-success); }
+.badge.comp        { fill: var(--state-comp); }
+.badge-bg.comp     { stroke: var(--state-comp); }
 
-.lock-icon  { font-size: 14px; text-anchor: middle; fill: var(--state-locked); opacity: 0; transition: opacity 200ms; font-family: var(--font-mono); }
-.check-icon { font-size: 14px; text-anchor: middle; fill: var(--state-success); opacity: 0; transition: opacity 200ms; font-family: var(--font-mono); }
-.skull      { font-size: 28px; text-anchor: middle; fill: var(--text-muted); opacity: 0; transition: opacity 200ms; }
-.node[data-state="locked"] .lock-icon   { opacity: 1; }
-.node[data-state="free"] .check-icon,
-.node[data-state="committed"] .check-icon { opacity: 1; }
-.node[data-state="crashed"] .skull      { opacity: 0.7; }
+/* Glyphs — lock / check / skull (SVG, not emoji) */
+.lock-icon {
+  fill: none;
+  stroke: var(--state-locked);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.check-icon {
+  fill: none;
+  stroke: var(--state-success);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.skull {
+  fill: var(--state-danger);
+  stroke: none;
+  opacity: 0.85;
+}
 
-/* ── Arrows ──────────────────────────────────────────────── */
+/* Arrows / edges */
 .arrow {
   fill: none;
   stroke: var(--border-strong);
-  stroke-width: 2;
-  transition: stroke 200ms, opacity 200ms;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke var(--dur) var(--ease), stroke-dasharray var(--dur) var(--ease);
 }
-.arrow[data-state="active"] { stroke: var(--accent); }
-.arrow[data-state="good"]   { stroke: var(--state-success); }
-.arrow[data-state="bad"]    { stroke: var(--state-danger); stroke-dasharray: 5 4; }
-.arrow[data-state="comp"]   { stroke: var(--state-comp); stroke-dasharray: 6 4; }
-.arrow[data-state="crashed"]{ stroke: var(--state-danger); stroke-dasharray: 4 4; opacity: 0.5; }
+.arrow[data-state="active"]  {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  animation: dgRelay 1.2s linear infinite;
+}
+.arrow[data-state="good"]    { stroke: var(--state-success); stroke-width: 1.5; }
+.arrow[data-state="bad"]     { stroke: var(--state-danger);  stroke-width: 1.5; stroke-dasharray: 6 3; }
+.arrow[data-state="comp"]    { stroke: var(--state-comp);    stroke-width: 1.5; stroke-dasharray: 2 4; }
+.arrow[data-state="crashed"] { stroke: var(--state-danger);  stroke-width: 1;   stroke-dasharray: 2 5; opacity: 0.6; }
+
+.arrow-head { fill: var(--border-strong); stroke: none; }
+.arrow-head[data-state="active"]  { fill: var(--accent); }
+.arrow-head[data-state="good"]    { fill: var(--state-success); }
+.arrow-head[data-state="bad"]     { fill: var(--state-danger); }
+.arrow-head[data-state="comp"]    { fill: var(--state-comp); }
+.arrow-head[data-state="crashed"] { fill: var(--state-danger); opacity: 0.6; }
+
 .arrow-label {
-  fill: var(--text-muted);
-  font-size: 11px;
-  text-anchor: middle;
   font-family: var(--font-mono);
+  font-size: var(--text-11);
+  fill: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* ── Queue indicators (for 2PC locked participants) ───────── */
+/* Queue (message bus / inbox / outbox) — hairline pill block */
 .queue-pill {
-  fill: var(--state-warn-bg);
-  stroke: var(--state-warn-border);
+  fill: var(--surface-2);
+  stroke: var(--border-strong);
   stroke-width: 1;
+  rx: 4;
+  ry: 4;
   opacity: 0;
-  transition: opacity 200ms;
+  transition: opacity var(--dur) var(--ease);
 }
 .queue-text {
-  fill: var(--state-warn-text);
-  font-size: 11px;
-  text-anchor: middle;
-  opacity: 0;
-  transition: opacity 200ms;
   font-family: var(--font-mono);
+  font-size: var(--text-11);
+  fill: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  font-variant-numeric: tabular-nums lining-nums;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
 }
 .queue-visible .queue-pill,
 .queue-visible .queue-text { opacity: 1; }
 
-/* ── Durable-state cards inside SVG ───────────────────────── */
-.durable-card { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
-.durable-title {
-  fill: var(--text-muted);
-  font-size: 10px;
-  text-anchor: middle;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: var(--font-mono);
-}
-.durable-value {
-  fill: var(--text);
-  font-size: 13px;
-  font-weight: 500;
-  text-anchor: middle;
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
-}
-
-/* ── Table-row indicators (outbox / orders) ──────────────── */
-.row {
-  fill: var(--surface-2);
+/* Durable storage card (e.g. WAL, log file, snapshot) */
+.durable-card {
+  fill: var(--surface);
   stroke: var(--border);
   stroke-width: 1;
-  transition: fill 250ms;
+  rx: 4;
+  ry: 4;
 }
-.row[data-state="filled"]    { fill: var(--state-success-soft); }
-.row[data-state="stale"]     { fill: var(--state-danger-soft); }
-.row[data-state="processed"] { fill: var(--surface-2); opacity: 0.5; }
-.row-label {
-  fill: var(--text);
-  font-size: 11px;
+.durable-title {
   font-family: var(--font-mono);
+  font-size: var(--text-11);
+  fill: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+}
+.durable-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  fill: var(--text);
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* Relay pulse (CDC stream indicator) */
-.relay-pulse { fill: var(--accent); opacity: 0; }
-.relay-pulse.on { animation: dgRelay 1.4s ease-out infinite; }
+/* Row — used inside durable-card or queue listings (one event per row) */
+.row {
+  fill: transparent;
+  stroke: var(--border);
+  stroke-width: 0;
+  stroke-dasharray: 0;
+  transition: fill var(--dur) var(--ease);
+}
+.row[data-state="committed"]    { fill: var(--state-success-soft); }
+.row[data-state="failed"]       { fill: var(--state-danger-soft); }
+.row[data-state="compensating"],
+.row[data-state="compensated"]  { fill: rgba(110, 91, 142, 0.10); }
+.row[data-state="pending"],
+.row[data-state="running"]      { fill: var(--state-warn-bg); }
+.row[data-state="locked"]       { fill: var(--state-warn-bg); }
 
-/* ── Verdict pill (under a diagram, states the outcome) ─── */
+/* Relay pulse — small moving indicator on an arrow */
+.relay-pulse {
+  fill: var(--accent);
+  r: 3;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.relay-pulse.on {
+  opacity: 1;
+  animation: dgRelay 1.2s linear infinite;
+}
+
+/* ── Verdict callouts (diagram outcomes) ───────────────── */
 .verdict {
-  padding: 0.7rem 0.95rem;
-  border-radius: var(--radius-md);
-  margin-top: 0.7rem;
-  font-size: 0.85rem;
-  line-height: 1.55;
+  display: block;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: var(--leading-snug);
+  margin: var(--space-5) 0;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums lining-nums;
 }
-.verdict.neutral { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
-.verdict.good { background: var(--knew-bg); color: var(--knew-text); border: 1px solid var(--knew-border); }
-.verdict.bad  { background: var(--didnt-bg); color: var(--didnt-text); border: 1px solid var(--didnt-border); }
-.verdict.warn { background: var(--state-warn-bg); color: var(--state-warn-text); border: 1px solid var(--state-warn-border); }
-.verdict b { font-weight: 600; }
+.verdict.neutral {
+  border-left-color: var(--text-muted);
+  color: var(--text-secondary);
+  background: var(--surface);
+}
+.verdict.good {
+  border-left-color: var(--state-success);
+  color: var(--state-success);
+  background: var(--state-success-soft);
+}
+.verdict.bad {
+  border-left-color: var(--state-danger);
+  color: var(--state-danger);
+  background: var(--state-danger-soft);
+}
+.verdict.warn {
+  border-left-color: var(--state-warn-border);
+  color: var(--state-warn-text);
+  background: var(--state-warn-bg);
+}
 
-/* ── Log panel (event narration under a diagram) ─────────── */
+/* ── Log (terminal-style event stream) ─────────────────── */
 .log {
-  background: #18181b;
-  color: #e4e4e7;
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1rem;
-  font: 0.78rem/1.6 var(--font-mono);
-  height: 180px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  line-height: var(--leading-snug);
+  color: var(--code-text);
+  white-space: pre-wrap;
+  max-height: 280px;
   overflow-y: auto;
+  margin: var(--space-5) 0;
+  font-variant-numeric: tabular-nums lining-nums;
 }
-[data-theme="dark"] .log { background: #08090b; color: #d4d4d8; }
-.log-line { display: block; }
-.log-line.commit { color: #6ee7b7; }
-.log-line.fail   { color: #fca5a5; }
-.log-line.comp   { color: #c4b5fd; }
-.log-line.info   { color: #93c5fd; }
+.log-line {
+  display: block;
+  padding: 2px 0 2px var(--space-3);
+  border-left: 2px solid transparent;
+}
+.log-line.commit { border-left-color: var(--state-success); color: var(--state-success); }
+.log-line.fail   { border-left-color: var(--state-danger);  color: var(--state-danger); }
+.log-line.comp   { border-left-color: var(--state-comp);    color: var(--state-comp); }
+.log-line.info   { border-left-color: var(--text-muted);    color: var(--text-secondary); }
 
-/* ── Animations ──────────────────────────────────────────── */
+/* ── Animations ────────────────────────────────────────── */
 @keyframes dgPulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.45; }
-}
-@keyframes dgRelay {
-  0%   { opacity: 0.7; r: 4; }
-  100% { opacity: 0; r: 18; }
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.35; transform: scale(1.6); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes dgRelay {
+  0%   { stroke-dashoffset: 8; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* ── Reduced motion ────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .status-dot,
-  .node-bg,
-  .arrow,
-  .badge,
-  .relay-pulse,
-  .node[data-state="recovering"] .node-bg {
-    transition: none !important;
+  .status-dot.pulse,
+  .status-dot[data-pulse="true"],
+  .arrow[data-state="active"],
+  .relay-pulse.on {
     animation: none !important;
   }
+  .arrow[data-state="active"] { stroke-dasharray: 0; }
+}
+
+/* ── Mobile ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .stage { padding: var(--space-6) 0; }
+  .legend { gap: var(--space-3); }
+  .dctrl { gap: var(--space-2); }
+  .log { font-size: var(--text-12); max-height: 220px; }
 }

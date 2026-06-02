@@ -208,6 +208,7 @@
     }
 
     async function play() {
+      reset();
       stopped = false;
       while (cursor < SERVICES.length && !stopped) {
         await stepForward();

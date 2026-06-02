@@ -14,70 +14,226 @@
         document.documentElement.setAttribute('data-theme', 'light');
     } catch (e) {}
   </script>
+  <style>
+    /* Page-local prose tuning — stays within token system */
+    .prose { max-width: 64ch; }
+    .prose > * + * { margin-top: var(--space-5); }
+    .prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: var(--text-24); line-height: var(--leading-snug); margin-top: var(--space-9); margin-bottom: var(--space-4); }
+    .prose h3 { font-family: var(--font-serif); font-weight: 500; font-size: var(--text-20); line-height: var(--leading-snug); margin-top: var(--space-7); margin-bottom: var(--space-3); }
+    .prose p { font-family: var(--font-sans); font-size: var(--text-15); line-height: var(--leading-prose); color: var(--text); }
+    .prose ul, .prose ol { padding-left: var(--space-6); }
+    .prose li { font-family: var(--font-sans); font-size: var(--text-15); line-height: var(--leading-prose); color: var(--text); margin-top: var(--space-2); }
+    .prose li::marker { color: var(--text-faint); }
+    .prose strong { font-weight: 600; color: var(--text); }
+    .prose em { font-style: italic; }
+    .prose a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+    .prose a:hover { border-bottom-color: var(--accent); }
+    .prose .eyebrow { display: block; margin-top: var(--space-9); margin-bottom: var(--space-3); }
+    .prose .panel { margin-top: var(--space-5); }
+    .prose .panel p + p { margin-top: var(--space-3); }
+    .diagram-cta { margin-top: var(--space-6); }
+    .diagram-cta .lc-num { font-size: var(--text-11); }
+    .group-head { margin-top: var(--space-10); padding-top: var(--space-7); border-top: 1px solid var(--border); }
+  </style>
 </head>
 <body>
 
-  <header>
-    <div class="breadcrumb">
-      <a href="../../../">Preparation Library</a> /
-      <a href="../../">System design</a> /
-      <a href="../">High level</a> /
-      Distributed transactions
+  <header class="site-header">
+    <div class="wrap">
+      <nav class="breadcrumb">
+        <a href="../../../">Preparation Library</a>
+        <span>/</span>
+        <a href="../../">System design</a>
+        <span>/</span>
+        <a href="../">High level</a>
+        <span>/</span>
+        <span>Distributed transactions</span>
+      </nav>
+      <span class="eyebrow">§ 02 — High level design</span>
+      <h1>Distributed transactions</h1>
+      <p class="lede">One logical operation, many independent databases. The job is to pick a strategy for "all commit, or clean up on failure" — and to know why the obvious answer (two-phase commit) almost never survives contact with production.</p>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
     </div>
-    <span class="eyebrow">High level design</span>
-    <h1>Distributed transactions</h1>
-    <p>2PC, sagas, transactional outbox — with interactive diagrams to operate the mechanisms.</p>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
   </header>
 
   <main class="wrap">
+    <article class="prose">
 
-    <section style="margin-top: 1.5rem;">
-      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Interactive diagrams</h2>
-      <div class="card-grid">
-        <a class="link-card" href="diagrams/01-saga-order-flow.html">
-          <span class="lc-tag">Diagram</span>
-          <div class="lc-title"><span class="lc-num">01</span> Saga order flow with compensation</div>
-          <p class="lc-desc">Step through a 3-service saga, inject a failure at any step, watch compensations fire in reverse.</p>
-        </a>
-        <a class="link-card" href="diagrams/02-2pc-vs-saga-crash.html">
-          <span class="lc-tag">Diagram</span>
-          <div class="lc-title"><span class="lc-num">02</span> 2PC vs Saga under coordinator crash</div>
-          <p class="lc-desc">Same crash, two protocols. 2PC freezes with locks held; Saga keeps moving and resumes from durable state.</p>
-        </a>
-        <a class="link-card" href="diagrams/03-transactional-outbox.html">
-          <span class="lc-tag">Diagram</span>
-          <div class="lc-title"><span class="lc-num">03</span> Transactional outbox vs naive dual-write</div>
-          <p class="lc-desc">Trigger the dual-write inconsistency, then switch to outbox + relay (CDC or polling) to see it fixed.</p>
-        </a>
-        <a class="link-card" href="diagrams/04-choreography-vs-orchestration.html">
-          <span class="lc-tag">Diagram</span>
-          <div class="lc-title"><span class="lc-num">04</span> Choreography vs orchestration</div>
-          <p class="lc-desc">Same saga, two coordination styles. Add steps and watch choreography's wiring grow.</p>
-        </a>
-        <a class="link-card" href="diagrams/05-do-you-need-a-distributed-transaction.html">
-          <span class="lc-tag">Diagram</span>
-          <div class="lc-title"><span class="lc-num">05</span> Do you need a distributed transaction?</div>
-          <p class="lc-desc">Decision tree from "co-locate the data" through "use a distributed database."</p>
-        </a>
-      </div>
-    </section>
+      <section>
+        <span class="eyebrow">§ 01 — Setup</span>
+        <h2>The setup</h2>
+        <p>With a single database, a business operation — place an order, charge the card, reserve inventory, write the ledger entry — wraps in one transaction. ACID does the heavy lifting: atomicity makes it all-or-nothing, isolation hides partial state from other readers. The database is the coordinator and you never have to think about it.</p>
+        <p>Scale breaks that arrangement. Either you shard the database across machines, or you split the monolith into microservices and each service owns its own store. The data ends up on independent databases on different hosts, and nothing sits above them as a global coordinator. A single logical operation now spans several local transactions on machines that don't trust each other and can fail independently. That is a <strong>distributed transaction</strong>, and it needs a deliberate strategy.</p>
+        <p>Two classical approaches surface in every interview and every system: <strong>two-phase commit (2PC)</strong> and the <strong>saga pattern</strong>. The industry has overwhelmingly settled on sagas. The rest of this page explains why.</p>
+      </section>
 
-    <section style="margin-top: 2rem;">
-      <h2 style="font-size: 0.78rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.7rem; font-family: var(--font-mono);">Notes</h2>
-      <div class="panel padded">
-        <p style="margin-bottom: 0.8rem;"><strong>The setup.</strong> With a single database, a business operation is one ACID transaction. When data spreads across shards or microservices, there's no global coordinator, so a single logical operation now spans separate local transactions. That's a distributed transaction — it needs a strategy for "all commit, or clean up on failure."</p>
-        <p style="margin-bottom: 0.8rem;"><strong>2PC</strong> gives strong consistency but is <em>blocking</em>: if the coordinator crashes after collecting votes, participants stay locked. Practical only inside distributed databases (Spanner, CockroachDB) — don't build 2PC across services yourself.</p>
-        <p style="margin-bottom: 0.8rem;"><strong>Sagas</strong> drop all-or-nothing in exchange for non-blocking behavior. A chain of local transactions, each committing and releasing immediately; if a later step fails, run business-level compensations to undo earlier ones. Two flavors: <em>choreography</em> (events + subscribers, fine up to ~5 steps) and <em>orchestration</em> (Temporal, AWS Step Functions, scales further).</p>
-        <p style="margin-bottom: 0.8rem;"><strong>Transactional outbox</strong> fixes the dual-write problem: write the business row and the event into the same DB transaction, then a background relay (CDC or polling) reliably publishes from the outbox.</p>
-        <p style="margin: 0;">Full notes in <a href="README.md">README.md</a>.</p>
-      </div>
-    </section>
+      <section>
+        <span class="eyebrow">§ 02 — 2PC</span>
+        <h2>Two-phase commit (2PC)</h2>
+        <p>2PC is the textbook answer. A <strong>coordinator</strong> drives consensus across every <strong>participant</strong> that holds part of the data.</p>
+        <ol>
+          <li><strong>Phase 1 — prepare.</strong> The coordinator asks each participant <em>"can you commit?"</em> Each one does the work, durably records the changes (so they can be replayed after a crash), <strong>locks the rows</strong> it touched, and votes yes or no.</li>
+          <li><strong>Phase 2 — commit.</strong> If every vote is yes, the coordinator broadcasts <em>commit</em> and participants release locks. If any vote is no, the coordinator broadcasts <em>abort</em> and everyone rolls back.</li>
+        </ol>
+        <p>It gives you strong consistency — the same all-or-nothing guarantee a single database offers — at the cost of holding locks across the network for the duration of both phases.</p>
 
+        <h3>Why 2PC breaks in distributed systems</h3>
+        <p>2PC is a <strong>blocking protocol</strong>, and its failure modes are nasty:</p>
+        <ul>
+          <li><strong>Coordinator crash mid-decision.</strong> If the coordinator collects votes and dies before sending the decision, participants are stuck. They've prepared, they're holding locks, and they cannot safely commit or abort on their own — they don't know what the other participants voted.</li>
+          <li><strong>Locks block the world.</strong> Those held locks block every other transaction that touches the same rows. One stuck saga can stall the system.</li>
+          <li><strong>One slow participant slows everyone.</strong> Locks are held all the way through prepare, so the slowest voter sets the tempo for every concurrent transaction.</li>
+          <li><strong>Network partitions are unresolvable.</strong> A partition between coordinator and participant looks identical to a crash. You cannot tell the difference, and you cannot make progress.</li>
+        </ul>
+        <p>Pat Helland's <em>Life Beyond Distributed Transactions</em> made the case years ago: 2PC is the wrong primitive for autonomous services at internet scale. Where 2PC <em>does</em> live is <strong>inside</strong> distributed databases that tightly couple coordinator and participants on the same trust boundary — Google Spanner, CockroachDB, YugabyteDB. They handle 2PC internally so you don't have to. <strong>Don't hand-roll 2PC across independent services.</strong></p>
+
+        <a class="link-card diagram-cta" href="diagrams/02-2pc-vs-saga-crash.html">
+          <span class="lc-num">02</span>
+          <div>
+            <span class="lc-tag">Diagram 02</span>
+            <h3 class="lc-title">2PC vs Saga under coordinator crash</h3>
+            <p class="lc-desc">Crash the coordinator mid-flight and compare blast radius. 2PC freezes with locks held; saga keeps moving.</p>
+          </div>
+        </a>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 03 — Saga</span>
+        <h2>The saga pattern</h2>
+        <p>Sagas are how Uber, Netflix, Amazon, and DoorDash run distributed work. The pattern drops the all-or-nothing guarantee and accepts <strong>eventual consistency</strong> in exchange for being non-blocking.</p>
+        <p>A saga is a <strong>chain of local transactions</strong>, one per service. Each step commits to its own database and releases its locks immediately. If a later step fails, you don't roll back the database — you run <strong>compensating actions</strong>, which are business-level undos. A charge becomes a refund. A reservation becomes a cancellation. A welcome email becomes — well, an apology email, because some actions are not really undoable.</p>
+        <p>The crucial property is that <strong>no locks are held across services</strong>. Each step grabs its locks, commits, releases. A failure six steps deep triggers compensations walking backwards, but it never freezes the system.</p>
+
+        <a class="link-card diagram-cta" href="diagrams/01-saga-order-flow.html">
+          <span class="lc-num">01</span>
+          <div>
+            <span class="lc-tag">Diagram 01</span>
+            <h3 class="lc-title">Saga order flow with compensation</h3>
+            <p class="lc-desc">Step through a 3-service saga, inject a failure at any step, watch compensations fire in reverse.</p>
+          </div>
+        </a>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 04 — Coordination</span>
+        <h2>Choreography vs orchestration</h2>
+        <p>There are two ways to coordinate a saga, and the right choice depends on how many steps you have and how badly you need to debug them.</p>
+
+        <h3>Choreography (decentralized)</h3>
+        <p>Each service emits events when it finishes a step. Other services subscribe to those events and react. There is no central brain — the saga's flow is implicit in who listens to what. An <code>OrderPlaced</code> event triggers the payment service; a <code>PaymentCaptured</code> event triggers inventory; and so on. Failure events propagate back and trigger compensations.</p>
+        <p>This works well for small flows, roughly five steps or fewer. Past that, you're chasing the saga across a tangle of subscriptions, and a single misrouted event can leave the system in a weird half-state that no one can see.</p>
+
+        <h3>Orchestration (centralized)</h3>
+        <p>A dedicated <strong>orchestrator</strong> service directs the whole flow. It calls each participant in turn, waits for confirmation, and triggers compensations on failure. The saga's logic lives in one place you can read top-to-bottom. Tooling like <strong>Temporal</strong> (built by the team behind Uber's Cadence) and <strong>AWS Step Functions</strong> exists precisely to make this durable and observable. For anything serious — multi-step business flows, long-running processes, anything you need to debug at 3am — orchestration is the default.</p>
+
+        <a class="link-card diagram-cta" href="diagrams/04-choreography-vs-orchestration.html">
+          <span class="lc-num">04</span>
+          <div>
+            <span class="lc-tag">Diagram 04</span>
+            <h3 class="lc-title">Choreography vs orchestration</h3>
+            <p class="lc-desc">Same saga, two coordination styles. Add steps and watch choreography's wiring grow.</p>
+          </div>
+        </a>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 05 — Crash behavior</span>
+        <h2>Saga crash behavior</h2>
+        <p>This is where the contrast with 2PC is sharpest. The orchestrator persists its state durably after every step — which step ran, which one is in flight, which inputs it had. When the orchestrator crashes and restarts, it reads its state and resumes exactly where it left off.</p>
+        <p>Critically, <strong>no locks are held while it's down</strong>. Other transactions touching the same data keep flowing. The saga's recovery is a private problem for the orchestrator; the rest of the system never noticed.</p>
+        <p>The trade is real, though. Sagas swap the blocking problem for <strong>compensation complexity</strong>, which is the next section.</p>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 06 — Compensation</span>
+        <h2>Compensation is hard</h2>
+        <p>Compensations are not database rollbacks. They are visible business operations that the customer can see and feel.</p>
+        <ul>
+          <li><strong>Visibility.</strong> A user gets charged, then refunded. They get a confirmation email, then a cancellation. The system is technically consistent at the end, but the user lived through an inconsistent moment. Sometimes that's fine. Sometimes it's a support ticket.</li>
+          <li><strong>Irreversibility.</strong> A sent email cannot be unsent. A shipped package can be recalled but not un-shipped. Compensations have to be designed around what the real world actually allows.</li>
+          <li><strong>Compensations can fail too.</strong> The refund API itself can be down. You need retry logic, and that retry logic needs <strong>idempotency</strong> so you don't refund the customer twice. Every compensating action carries an idempotency key, and every retry uses the same key.</li>
+        </ul>
+        <aside class="panel padded">
+          <span class="eyebrow">Note</span>
+          <p>Idempotency is the load-bearing property of every saga. If a step or compensation can be safely re-run with the same input and produce the same outcome, the orchestrator can retry freely. If it can't, you're one network blip away from a duplicate charge.</p>
+        </aside>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 07 — Outbox</span>
+        <h2>The dual-write problem and the transactional outbox</h2>
+        <p>There's a subtle bug lurking in every naive saga step. After a service commits its local transaction, it has to publish an event so the next step can pick up — for example, write the <code>Order</code> row, then publish <code>OrderPlaced</code> to Kafka. That's <strong>two separate writes</strong>: one to the database, one to the broker. If the first succeeds and the second fails (broker is down, network blip, service crashes between them), the data is committed but no one downstream ever hears about it. The saga stalls or goes silently inconsistent.</p>
+        <p>The fix is the <strong>transactional outbox</strong>:</p>
+        <ol>
+          <li>In a single local DB transaction, write the business data <em>and</em> insert a row into an <code>outbox_events</code> table. Both writes are atomic — they share the transaction.</li>
+          <li>A separate background process reads from <code>outbox_events</code> and publishes to the broker. Two implementations dominate:
+            <ul>
+              <li><strong>Change Data Capture (CDC).</strong> A tool tails the database's transaction log and publishes new outbox rows as they appear. Lowest latency, no polling overhead, but requires CDC infrastructure (Debezium, native CDC).</li>
+              <li><strong>Polling.</strong> A worker queries <code>outbox_events</code> on an interval, publishes unsent rows, marks them sent. Simpler to operate, higher latency, and the polling interval is a knob you have to tune.</li>
+            </ul>
+          </li>
+        </ol>
+        <p>Either way, the business write and the event become atomic — they live or die together inside the same local transaction. The event is guaranteed to be published <em>at least once</em>, which is why downstream consumers must be idempotent.</p>
+
+        <a class="link-card diagram-cta" href="diagrams/03-transactional-outbox.html">
+          <span class="lc-num">03</span>
+          <div>
+            <span class="lc-tag">Diagram 03</span>
+            <h3 class="lc-title">Transactional outbox vs naive dual-write</h3>
+            <p class="lc-desc">Trigger the dual-write inconsistency, then switch to outbox plus relay (CDC or polling) to see it fixed.</p>
+          </div>
+        </a>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 08 — Decision</span>
+        <h2>Do you actually need a distributed transaction?</h2>
+        <p>Before reaching for any of this, ask the question honestly.</p>
+        <ol>
+          <li><strong>Can the data be co-located?</strong> If two pieces of state always change together, putting them in the same database is simpler, faster, and more reliable than any distributed pattern. Splitting them for organizational reasons and then re-coordinating with a saga is a self-inflicted wound. Co-locate first.</li>
+          <li><strong>If the split is unavoidable, use a saga.</strong> Choreography for simple flows, orchestration with Temporal or AWS Step Functions for anything serious. Pair it with a transactional outbox for reliable event publication.</li>
+          <li><strong>If you genuinely need strong cross-store consistency,</strong> reach for a <strong>distributed database</strong> — Spanner, CockroachDB, YugabyteDB. They handle 2PC internally on a trust boundary they control. Don't hand-roll 2PC across services. You will regret it.</li>
+        </ol>
+
+        <a class="link-card diagram-cta" href="diagrams/05-do-you-need-a-distributed-transaction.html">
+          <span class="lc-num">05</span>
+          <div>
+            <span class="lc-tag">Diagram 05</span>
+            <h3 class="lc-title">Do you need a distributed transaction?</h3>
+            <p class="lc-desc">Decision tree from "co-locate the data" through "use a distributed database," with a one-line rationale per leaf.</p>
+          </div>
+        </a>
+      </section>
+
+      <section>
+        <span class="eyebrow">§ 09 — Takeaway</span>
+        <h2>The summary</h2>
+        <aside class="panel padded">
+          <span class="eyebrow">Takeaway</span>
+          <p>Most large-scale systems converge on the same recipe: <strong>saga + orchestration + transactional outbox</strong>. Eventual consistency is the price; non-blocking behavior, independent service evolution, and survivable failure modes are what you buy with it.</p>
+          <p>2PC is not wrong — it's just in the wrong place. Inside a distributed database, on a tight trust boundary, it's the right tool. Across independent services, it's a trap.</p>
+        </aside>
+      </section>
+
+      <section class="group-head">
+        <span class="eyebrow">§ 10 — Where to next</span>
+        <h2>Where to next</h2>
+        <p>Open any diagram above to operate the mechanism interactively. Full source notes live in <a href="README.md">README.md</a>. Related material:</p>
+        <ul>
+          <li><a href="../">High level design — index</a> · other patterns in this section.</li>
+          <li><a href="../../">System design — index</a> · low-level and high-level notes.</li>
+          <li><a href="../../../AWS/">AWS notes</a> · where Step Functions, SQS, and DynamoDB intersect with these patterns.</li>
+        </ul>
+      </section>
+
+    </article>
   </main>
 
   <footer class="site-footer">
-    <a href="../../../">← Preparation Library</a>
+    <div class="wrap" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); width: 100%;">
+      <span>Last updated · 2026-06-02</span>
+      <a href="../../../">← Preparation Library</a>
+    </div>
   </footer>
 
   <script src="../../../assets/theme.js"></script>
