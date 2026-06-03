@@ -105,13 +105,17 @@ function Lesson() {
           </SectionHead>
           <div className="preamble">
             <p>
-              A customer clicks <b>Place Order</b>. Behind that one button the request fans out to three independent services — <b>Orders</b>, <b>Payment</b>, <b>Inventory</b> — each owning its own database. Orders saves the order and commits. Payment charges the card and commits. Then Inventory finds the item out of stock and refuses.
+              A customer clicks <b>Place Order</b>. Behind that one button the request needs to touch three independent services — <b>Orders</b>, <b>Payment</b>, <b>Inventory</b> — each owning its own database.
             </p>
             <p>
-              The card is already charged. The order is already saved. <b>No single transaction can undo work that already happened inside another service.</b> The system is left in a split-brain state — money taken, nothing to ship — and that is the exact failure both 2PC and the Saga pattern exist to prevent.
+              <em>There is no coordinator and no orchestrator here yet.</em> Some application code (a request handler, or one service calling the next) walks through the calls in order, committing each step's local transaction as soon as it gets a successful response. That ad-hoc sequencing is what falls apart the moment any step fails — and the failure can land on different sides depending on the call order, as the two tracks below show.
             </p>
             <p>
-              Step through the scenario below to see it play out.
+              <b>Inventory fails</b> — Orders commits, Payment commits, Inventory refuses → the card is charged but nothing is reserved.
+              {' '}<b>Payment fails</b> — Orders commits, Inventory reserves, Payment is declined → stock is held for an order that was never paid.
+            </p>
+            <p>
+              Different services, different failure points, <b>same underlying mess</b>: no single transaction can undo work that already committed inside another service.
             </p>
           </div>
           <ProblemScenario />
