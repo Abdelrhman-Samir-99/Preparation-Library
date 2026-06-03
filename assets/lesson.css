@@ -27,26 +27,40 @@
 }
 .back:hover { background: var(--card); }
 
-/* ── Lesson hero ─────────────────────────────────────────── */
+/* ── Lesson hero — same inversion as section heads.
+   Kicker (with the colored number badge) is the PRIMARY heading.
+   The h1 below it acts as a smaller, mid-grey tagline. ──────── */
 .lesson-hero { padding: 56px 0 30px; }
 .lesson-hero .kicker {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-family: var(--mono); font-size: 13px;
-  color: var(--coral); font-weight: 600; letter-spacing: .03em;
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 .lesson-hero .kicker .num {
   background: var(--coral); color: white;
-  width: 24px; height: 24px; border-radius: 7px;
-  display: grid; place-items: center; font-size: 12px;
+  width: 44px; height: 44px; border-radius: 10px;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: 18px; font-weight: 700;
 }
 .lesson-hero h1 {
-  font-size: clamp(34px, 6vw, 60px); font-weight: 800;
-  margin: 16px 0 0; max-width: none; text-wrap: normal;
+  font-family: var(--display);
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 14px 0 0;
+  max-width: none; text-wrap: normal;
+  color: var(--ink-soft);
 }
 .lesson-hero .lede {
-  font-size: clamp(17px, 2vw, 21px);
+  font-size: clamp(15.5px, 1.6vw, 17px);
   color: var(--ink-soft);
-  max-width: 60ch; margin: 20px 0 0; font-weight: 500;
+  max-width: 60ch;
+  margin: 16px 0 0;
+  font-weight: 500;
+  line-height: 1.6;
 }
 .toc { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
 .toc a { text-decoration: none; }
@@ -54,17 +68,33 @@
 /* ── Section scaffolding ─────────────────────────────────── */
 .section { padding: 40px 0; }
 .section-head { max-width: 720px; margin-bottom: 26px; }
+/* Step chip is now the PRIMARY section heading. The h2 below it
+   is the secondary tagline / sub-headline. */
 .section-head .step-chip {
-  display: inline-block;
-  font-family: var(--mono); font-size: 17px; font-weight: 700;
-  letter-spacing: -0.005em;
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(28px, 3.8vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   color: var(--ink);
-  margin-bottom: 6px;
+  margin: 0;
 }
-.section-head h2 { font-size: clamp(28px, 4vw, 44px); margin: 8px 0 0; }
+.section-head h2 {
+  font-family: var(--display);
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  margin: 10px 0 0;
+}
 .section-head p {
-  font-size: 17.5px; color: var(--ink-soft);
-  margin: 14px 0 0; font-weight: 500;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin: 14px 0 0;
+  font-weight: 500;
+  line-height: 1.55;
 }
 .divider { height: 1.5px; background: var(--line); border: none; margin: 8px 0; }
 
