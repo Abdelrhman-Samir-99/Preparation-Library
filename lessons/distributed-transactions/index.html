@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Distributed Transactions · Personal Learning Repo</title>
+<link rel="stylesheet" href="../../assets/theme.css" />
+<link rel="stylesheet" href="../../assets/lesson.css" />
+</head>
+<body class="paper-grid">
+
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="../../">
+        <svg class="logo" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="29" height="29" rx="9" fill="var(--ink)" />
+          <path d="M16 12 L9 21 M16 12 L23 21" stroke="oklch(0.86 0.02 280 / .5)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="11" r="3.4" fill="var(--coral)" />
+          <circle cx="9"  cy="22" r="3.4" fill="var(--blue)" />
+          <circle cx="23" cy="22" r="3.4" fill="var(--amber)" />
+        </svg>
+        Personal Learning Repo
+      </a>
+      <a class="back" href="../../">← all branches</a>
+    </div>
+  </header>
+
+  <div id="app"></div>
+
+  <!-- React + Babel-standalone via CDN. Mirrors the handoff approach.
+       Babel JIT-compiles the JSX files below in-browser on load. -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="../../assets/scenario.jsx"></script>
+  <script type="text/babel" src="problem.jsx"></script>
+  <script type="text/babel" src="twophase.jsx"></script>
+  <script type="text/babel" src="saga.jsx"></script>
+  <script type="text/babel" src="page.jsx"></script>
+</body>
+</html>
