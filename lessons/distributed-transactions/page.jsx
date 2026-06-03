@@ -101,24 +101,33 @@ function Lesson() {
       <section className="section" id="problem">
         <div className="wrap">
           <SectionHead step="① The problem" title="A commit you can’t take back">
-            Watch a single "Place Order" fan out across three services. The failure at the end has no clean undo.
+            Two common ways to sequence the work across services. Both fail.
           </SectionHead>
+
           <div className="preamble">
             <p>
-              A customer clicks <b>Place Order</b>. Behind that one button the request needs to touch three independent services — <b>Orders</b>, <b>Payment</b>, <b>Inventory</b> — each owning its own database.
+              A customer clicks <b>Place Order</b>. The request needs to touch three independent services — <b>Orders</b>, <b>Payment</b>, <b>Inventory</b> — each owning its own database.
             </p>
             <p>
-              <em>There is no coordinator and no orchestrator here yet.</em> Some application code (a request handler, or one service calling the next) walks through the calls in order, committing each step's local transaction as soon as it gets a successful response. That ad-hoc sequencing is what falls apart the moment any step fails — and the failure can land on different sides depending on the call order, as the two tracks below show.
-            </p>
-            <p>
-              <b>Inventory fails</b> — Orders commits, Payment commits, Inventory refuses → the card is charged but nothing is reserved.
-              {' '}<b>Payment fails</b> — Orders commits, Inventory reserves, Payment is declined → stock is held for an order that was never paid.
-            </p>
-            <p>
-              Different services, different failure points, <b>same underlying mess</b>: no single transaction can undo work that already committed inside another service.
+              <em>There is no coordinator and no orchestrator here.</em> Some application code (a request handler, or one service calling the next) walks through the calls. The interesting question is: <b>when does each service actually commit its local transaction?</b> Two common patterns, two distinct ways to fail. Both leave the system inconsistent.
             </p>
           </div>
-          <ProblemScenario />
+
+          <Callout tag="Pattern A · Commit, then call" color="var(--coral)">
+            Each service writes to its DB and <b>commits its local transaction</b>, then calls the next service. No waiting — the commit happens first, the next call happens second.
+            {' '}<em>The failure mode:</em> if the LAST service fails, every step before it has already committed and there is no clean way to undo that work.
+          </Callout>
+          <ProblemCommitThenCall />
+
+          <Callout tag="Pattern B · Call, then commit" color="var(--warn)">
+            Each service does its work tentatively and <b>holds its commit until the next service returns success</b>. The intuition: only commit if downstream worked.
+            {' '}<em>The failure mode:</em> the DEEPEST service commits first (it has nothing downstream to wait on). If a MIDDLE service then fails before it can commit, the deepest service&rsquo;s work is stranded.
+          </Callout>
+          <ProblemCallThenCommit />
+
+          <Callout tag="The root cause" color="var(--ink)">
+            Two patterns, two failure shapes, <b>one root cause</b>: once a service has committed locally, no outside party can roll it back. Both 2PC and Saga exist to solve exactly this — in different ways.
+          </Callout>
         </div>
       </section>
 
