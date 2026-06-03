@@ -68,18 +68,34 @@
 /* ── Section scaffolding ─────────────────────────────────── */
 .section { padding: 40px 0; }
 .section-head { max-width: 720px; margin-bottom: 26px; }
-/* Step chip is now the PRIMARY section heading. The h2 below it
-   is the secondary tagline / sub-headline. */
+/* Step chip is the PRIMARY section heading: a colored number
+   badge + the section text. The h2 below it is the smaller
+   secondary tagline. */
 .section-head .step-chip {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-family: var(--display);
-  font-size: clamp(28px, 3.8vw, 40px);
+  font-size: clamp(26px, 3.6vw, 38px);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--ink);
   margin: 0;
 }
+.section-head .step-num {
+  flex: none;
+  background: var(--coral);  /* default; overridden inline per section */
+  color: white;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.section-head .step-text { min-width: 0; }
 .section-head h2 {
   font-family: var(--display);
   font-size: clamp(18px, 2.2vw, 22px);
@@ -87,7 +103,7 @@
   letter-spacing: -0.005em;
   color: var(--ink-soft);
   line-height: 1.35;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
 }
 .section-head p {
   font-size: 16px;
@@ -95,6 +111,10 @@
   margin: 14px 0 0;
   font-weight: 500;
   line-height: 1.55;
+}
+@media (max-width: 640px) {
+  .section-head .step-num { width: 36px; height: 36px; font-size: 16px; border-radius: 8px; }
+  .section-head .step-chip { gap: 11px; }
 }
 .divider { height: 1.5px; background: var(--line); border: none; margin: 8px 0; }
 

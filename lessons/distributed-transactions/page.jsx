@@ -4,11 +4,14 @@
    → takeaway → footer. Mounts into <div id="app">.
    =========================================================== */
 
-function SectionHead({ step, title, children }) {
+function SectionHead({ num, step, title, color, children }) {
   return (
     <div className="section-head">
-      <span className="step-chip">{step}</span>
-      <h2>{title}</h2>
+      <div className="step-chip">
+        <span className="step-num" style={color ? { background: color } : null}>{num}</span>
+        <span className="step-text">{step}</span>
+      </div>
+      {title && <h2>{title}</h2>}
       {children && <p>{children}</p>}
     </div>
   );
@@ -100,7 +103,7 @@ function Lesson() {
       {/* 1. problem */}
       <section className="section" id="problem">
         <div className="wrap">
-          <SectionHead step="① The problem" title="A commit you can’t take back">
+          <SectionHead num="1" step="The problem" color="var(--coral)" title="A commit you can’t take back">
             Two common ways to sequence the work across services. Both fail.
           </SectionHead>
 
@@ -134,7 +137,7 @@ function Lesson() {
       {/* 2. 2PC */}
       <section className="section" id="twophase">
         <div className="wrap">
-          <SectionHead step="② Approach A — Two-Phase Commit (2PC)" title="Ask everyone first, then commit together">
+          <SectionHead num="2" step="Approach A — Two-Phase Commit (2PC)" color="var(--blue)" title="Ask everyone first, then commit together">
             The textbook fix for strong consistency: run a vote before anyone commits for real.
           </SectionHead>
           <div className="preamble">
@@ -156,7 +159,7 @@ function Lesson() {
       {/* 3. saga */}
       <section className="section" id="saga">
         <div className="wrap">
-          <SectionHead step="③ Approach B — Sagas" title="Commit as you go, undo if you must">
+          <SectionHead num="3" step="Approach B — Sagas" color="var(--violet)" title="Commit as you go, undo if you must">
             Drop the global lock entirely. Each step commits locally; if a later step fails, you walk it back with compensations.
           </SectionHead>
           <div className="preamble">
@@ -178,7 +181,7 @@ function Lesson() {
       {/* 4. edge cases */}
       <section className="section" id="edges">
         <div className="wrap">
-          <SectionHead step="④ Edge cases & failures" title="When each one bites you">
+          <SectionHead num="4" step="Edge cases & failures" color="var(--warn)" title="When each one bites you">
             Both patterns work on the happy path. The differences show up at the edges — when something crashes, lags, or has to be undone. Below: five common failure modes and how each pattern handles (or fails to handle) them.
           </SectionHead>
 
@@ -273,7 +276,7 @@ function Lesson() {
       {/* 5. compare */}
       <section className="section" id="compare">
         <div className="wrap">
-          <SectionHead step="⑤ Which one?" title="Same goal, opposite bets">
+          <SectionHead num="5" step="Which one?" color="var(--ink)" title="Same goal, opposite bets">
             Both keep the system consistent. They just disagree about <i>when</i>.
           </SectionHead>
           <div className="compare">
