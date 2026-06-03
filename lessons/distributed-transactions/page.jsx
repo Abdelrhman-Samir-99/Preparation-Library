@@ -80,14 +80,14 @@ function Lesson() {
             Spread that same operation across many services and the guarantee evaporates. Here’s why, and the two classic ways to get it back.
           </p>
           <div className="toc">
-            <a href="#need"           className="chip">① Do you need it?</a>
-            <a href="#problem"        className="chip">② The problem</a>
-            <a href="#twophase"       className="chip">③ Two-Phase Commit</a>
-            <a href="#saga"           className="chip">④ Sagas</a>
-            <a href="#outbox"         className="chip">⑤ Outbox</a>
-            <a href="#edges"          className="chip">⑥ Edge cases</a>
-            <a href="#distributed-db" className="chip">⑦ Distributed DBs</a>
-            <a href="#compare"        className="chip">⑧ Which to use</a>
+            <a href="#need"           className="chip"><span className="chip-num" style={{ background: 'var(--green)'  }}>1</span> Do you need it?</a>
+            <a href="#problem"        className="chip"><span className="chip-num" style={{ background: 'var(--coral)'  }}>2</span> The problem</a>
+            <a href="#twophase"       className="chip"><span className="chip-num" style={{ background: 'var(--blue)'   }}>3</span> Two-Phase Commit</a>
+            <a href="#saga"           className="chip"><span className="chip-num" style={{ background: 'var(--violet)' }}>4</span> Sagas</a>
+            <a href="#outbox"         className="chip"><span className="chip-num" style={{ background: 'var(--coral)'  }}>5</span> Outbox</a>
+            <a href="#edges"          className="chip"><span className="chip-num" style={{ background: 'var(--warn)'   }}>6</span> Edge cases</a>
+            <a href="#distributed-db" className="chip"><span className="chip-num" style={{ background: 'var(--green)'  }}>7</span> Distributed DBs</a>
+            <a href="#compare"        className="chip"><span className="chip-num" style={{ background: 'var(--ink)'    }}>8</span> Which to use</a>
           </div>
         </div>
       </section>
