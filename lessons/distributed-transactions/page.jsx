@@ -84,7 +84,7 @@ function Lesson() {
             <a href="#problem"        className="chip">The problem</a>
             <a href="#twophase"       className="chip">Two-Phase Commit</a>
             <a href="#saga"           className="chip">Sagas</a>
-            <a href="#outbox"         className="chip">Outbox</a>
+            <a href="#outbox"         className="chip">Dual-write &amp; outbox</a>
             <a href="#edges"          className="chip">Edge cases</a>
             <a href="#distributed-db" className="chip">Distributed DBs</a>
             <a href="#compare"        className="chip">Which to use</a>
