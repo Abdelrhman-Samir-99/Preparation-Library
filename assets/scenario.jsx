@@ -112,6 +112,16 @@ function ScenarioPlayer({ title, badge, badgeColor = 'var(--blue)', legend, trac
         )}
       </div>
 
+      {/* Step caption — moved above the stage so the explanation is
+          visible while the animation plays. */}
+      <div className="caption">
+        <span className="cstep" style={step.tone ? { background: step.tone } : null}>{i + 1}</span>
+        <div className="cbody">
+          <h4>{step.title}</h4>
+          <p>{step.text} {step.why && <span className="why">{step.why}</span>}</p>
+        </div>
+      </div>
+
       <div className="stage">
         {renderStage(step, { trackId, index: i })}
       </div>
@@ -128,18 +138,8 @@ function ScenarioPlayer({ title, badge, badgeColor = 'var(--blue)', legend, trac
       )}
 
       <div className="scenario-foot">
-        <div className="caption">
-          <span className="cstep" style={step.tone ? { background: step.tone } : null}>{i + 1}</span>
-          <div className="cbody">
-            <h4>{step.title}</h4>
-            <p>{step.text} {step.why && <span className="why">{step.why}</span>}</p>
-          </div>
-        </div>
         <div className="controls">
           <button className="ctrl-btn" onClick={prev} disabled={i === 0}>← Prev</button>
-          <button className="ctrl-btn play" onClick={togglePlay}>
-            {playing ? '❚❚ Pause' : (i >= last ? '↺ Replay' : '▶ Play')}
-          </button>
           <div className="track">
             {steps.map((_, k) => (
               <span key={k}
@@ -149,6 +149,9 @@ function ScenarioPlayer({ title, badge, badgeColor = 'var(--blue)', legend, trac
           </div>
           <span className="cstepnum">{i + 1} / {steps.length}</span>
           <button className="ctrl-btn" onClick={next} disabled={i === last}>Next →</button>
+          <button className="ctrl-btn play" onClick={togglePlay}>
+            {playing ? '❚❚ Pause' : (i >= last ? '↺ Replay' : '▶ Play')}
+          </button>
         </div>
       </div>
     </div>

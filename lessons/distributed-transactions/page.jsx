@@ -101,8 +101,19 @@ function Lesson() {
       <section className="section" id="problem">
         <div className="wrap">
           <SectionHead step="① The problem" title="A commit you can’t take back">
-            Watch a single "Place Order" fan out across three services. Step through it — the failure at the end has no clean undo.
+            Watch a single "Place Order" fan out across three services. The failure at the end has no clean undo.
           </SectionHead>
+          <div className="preamble">
+            <p>
+              A customer clicks <b>Place Order</b>. Behind that one button the request fans out to three independent services — <b>Orders</b>, <b>Payment</b>, <b>Inventory</b> — each owning its own database. Orders saves the order and commits. Payment charges the card and commits. Then Inventory finds the item out of stock and refuses.
+            </p>
+            <p>
+              The card is already charged. The order is already saved. <b>No single transaction can undo work that already happened inside another service.</b> The system is left in a split-brain state — money taken, nothing to ship — and that is the exact failure both 2PC and the Saga pattern exist to prevent.
+            </p>
+            <p>
+              Step through the scenario below to see it play out.
+            </p>
+          </div>
           <ProblemScenario />
         </div>
       </section>
@@ -111,8 +122,16 @@ function Lesson() {
       <section className="section" id="twophase">
         <div className="wrap">
           <SectionHead step="② Approach A — Two-Phase Commit (2PC)" title="Ask everyone first, then commit together">
-            The textbook fix for strong consistency: a coordinator runs a vote before anyone commits for real. Try the happy path, then make a vote fail.
+            The textbook fix for strong consistency: run a vote before anyone commits for real.
           </SectionHead>
+          <div className="preamble">
+            <p>
+              A dedicated <b>coordinator</b> drives the whole transaction. <em>Phase 1 — Prepare:</em> it asks every participant to do the work tentatively, write a redo log, <b>lock the affected rows</b>, and vote yes or no. <em>Phase 2 — Commit:</em> if every vote is YES, the coordinator broadcasts COMMIT and everyone releases their locks. If any vote is NO, it broadcasts ABORT and everyone discards their tentative work.
+            </p>
+            <p>
+              The happy path gives you <b>strong, atomic consistency</b> across services — the same all-or-nothing guarantee a single database offers. The two failure tracks below show what happens when a participant votes NO (clean rollback) and when the coordinator crashes between phase 1 and phase 2 (participants stuck holding locks indefinitely).
+            </p>
+          </div>
           <TwoPhaseScenario />
           <Callout tag="When it fits" color="var(--blue)">
             2PC gives you <b>immediate, strong consistency</b> and is common inside databases (XA transactions).
@@ -125,8 +144,16 @@ function Lesson() {
       <section className="section" id="saga">
         <div className="wrap">
           <SectionHead step="③ Approach B — Sagas" title="Commit as you go, undo if you must">
-            Drop the global lock entirely. Each step commits locally; if a later step fails, you run <i>compensating</i> actions to walk it back. Try the happy path, then fail the inventory step.
+            Drop the global lock entirely. Each step commits locally; if a later step fails, you walk it back with compensations.
           </SectionHead>
+          <div className="preamble">
+            <p>
+              An <b>orchestrator</b> calls each service in order. Each service runs a local transaction and <b>commits immediately</b> — no waiting on votes, no locks held across services. If a later step fails, the orchestrator walks back through every committed step and runs a <em>compensating transaction</em> for each one. Compensations are business-level undos: a refund undoes a charge, a cancel undoes an order.
+            </p>
+            <p>
+              The happy path: each step commits locally and the chain finishes; the system reaches consistency by moving forward, not by locking. The failure track: Inventory fails after Orders and Payment have already committed, so the orchestrator triggers a <b>refund</b>, then <b>cancels the order</b> — undoing each committed step in reverse until the system is consistent again.
+            </p>
+          </div>
           <SagaScenario />
           <Callout tag="When it fits" color="var(--violet)">
             Sagas trade strict isolation for <b>availability and scale</b> — the standard choice for long-running, cross-service workflows
@@ -147,6 +174,17 @@ function Lesson() {
             {' '}<b>Saga</b> chooses <b>eventual consistency</b> — work commits as it goes, observers may see a brief in-between state, but the system never blocks.
             Most of the edges below are a direct consequence of that single choice.
           </Callout>
+
+          <div className="preamble">
+            <p>
+              Three failure tracks below, switchable from the tabs at the top of the player:
+            </p>
+            <p>
+              <b>Coordinator crash</b> — split-screen 2PC vs Saga. Both drivers die at the same moment, mid-flight. 2PC participants freeze holding locks; Saga services keep their committed work and the orchestrator restarts from durable state.
+              {' '}<b>Slow participant</b> — split-screen. One service drags. 2PC holds locks across every concurrent transaction; Saga only delays the slow step itself.
+              {' '}<b>Compensation retry</b> — Saga only. The refund API is down at the worst moment; idempotency keys let us safely retry until it succeeds.
+            </p>
+          </div>
 
           <EdgesScenario />
 
