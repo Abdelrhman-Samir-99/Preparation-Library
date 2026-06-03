@@ -62,7 +62,13 @@
   font-weight: 500;
   line-height: 1.6;
 }
-.toc { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+.toc {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 28px;
+}
 .toc a { text-decoration: none; }
 
 /* ── Section scaffolding ─────────────────────────────────── */
