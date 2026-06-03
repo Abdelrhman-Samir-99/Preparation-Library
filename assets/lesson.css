@@ -282,6 +282,65 @@
 }
 .legend .li .sw { width: 12px; height: 12px; border-radius: 4px; border: 2px solid; }
 
+/* ============================================================
+   EDGE CASES — paired-verdict cards (2PC vs Saga)
+   ============================================================ */
+.edge-list { display: flex; flex-direction: column; gap: 14px; }
+
+.edge {
+  background: var(--card);
+  border: 2px solid var(--line-bold);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.edge-head {
+  padding: 14px 22px;
+  border-bottom: 1.5px solid var(--line);
+  background: var(--paper-2);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.edge-head .ec-cat {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 6px;
+  color: white; background: var(--ink-faint);
+}
+.edge-head .ec-cat[data-cat="failure"]      { background: var(--fail); }
+.edge-head .ec-cat[data-cat="performance"]  { background: var(--warn); color: var(--ink); }
+.edge-head .ec-cat[data-cat="consistency"]  { background: var(--blue); }
+.edge-head .ec-cat[data-cat="saga-gotcha"]  { background: var(--violet); }
+.edge-head h4 {
+  font-family: var(--display); font-weight: 700; font-size: 17px;
+  margin: 0; flex: 1; min-width: 0;
+}
+
+.edge-body { display: grid; grid-template-columns: 1fr 1fr; }
+.edge-side { padding: 18px 22px; }
+.edge-side + .edge-side { border-left: 1.5px solid var(--line); }
+.edge-side .who {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-family: var(--display); font-weight: 700;
+  font-size: 14.5px; color: var(--ink);
+  margin-bottom: 10px;
+}
+.edge-side .verdict {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 6px;
+}
+.edge-side .verdict[data-v="bad"]  { background: var(--coral-t); color: var(--fail); }
+.edge-side .verdict[data-v="warn"] { background: var(--amber-t); color: oklch(0.55 0.13 70); }
+.edge-side .verdict[data-v="ok"]   { background: var(--green-t); color: var(--ok); }
+.edge-side .verdict[data-v="na"]   { background: var(--paper-2); color: var(--ink-faint); border: 1.5px solid var(--line-bold); }
+.edge-side p {
+  margin: 0; font-size: 14.5px; line-height: 1.55;
+  color: var(--ink-soft); font-weight: 500;
+}
+.edge-side b { color: var(--ink); font-weight: 700; }
+.edge-side em { font-style: normal; color: var(--ink); font-weight: 600; }
+
 /* ── Comparison cards ────────────────────────────────────── */
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .cmp-card {
@@ -295,8 +354,23 @@
 .cmp-card h3 { font-size: 23px; display: flex; align-items: center; gap: 10px; }
 .cmp-card .sub {
   font-family: var(--mono); font-size: 12.5px;
-  color: var(--ink-faint); margin: 4px 0 16px;
+  color: var(--ink-faint); margin: 4px 0 14px;
 }
+.cmp-card .consistency {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 9px 12px; border-radius: 8px;
+  font-family: var(--mono); font-size: 12px;
+}
+.cmp-card .consistency .lbl {
+  text-transform: uppercase; letter-spacing: .05em;
+  font-weight: 600; color: var(--ink-faint);
+}
+.cmp-card .consistency .val { font-weight: 700; }
+.cmp-card.tpc  .consistency { background: var(--blue-t); }
+.cmp-card.tpc  .consistency .val { color: var(--blue); }
+.cmp-card.saga .consistency { background: var(--violet-t); }
+.cmp-card.saga .consistency .val { color: var(--violet); }
 .cmp-card ul {
   list-style: none; padding: 0; margin: 0;
   display: flex; flex-direction: column; gap: 10px;
@@ -348,6 +422,10 @@
   .compare { grid-template-columns: 1fr; }
   .stage { height: 430px; }
   .scenario-top { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 720px) {
+  .edge-body { grid-template-columns: 1fr; }
+  .edge-side + .edge-side { border-left: none; border-top: 1.5px solid var(--line); }
 }
 
 /* Reduced motion — disable the entrance-y bits + tone down packet glide */
