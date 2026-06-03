@@ -27,6 +27,20 @@ function EdgesScenario() {
   ];
   const SPLIT_PACKET_IDS = ['p1', 'p2', 'p3', 'p4', 'q1', 'q2'];
 
+  /* ── Saga-only topology for the DIRECT retry track ──────── */
+  const SAGA = {
+    ox:  { x: 50, y: 18, name: 'Orchestrator', glyph: 'OX', coord: true },
+    ord: { x: 18, y: 60, name: 'Orders',       glyph: 'OD' },
+    pay: { x: 50, y: 60, name: 'Payment',      glyph: 'PY' },
+    inv: { x: 82, y: 60, name: 'Inventory',    glyph: 'IN' },
+  };
+  const SAGA_WIRES = [
+    { x1: 50, y1: 18, x2: 18, y2: 60 },
+    { x1: 50, y1: 18, x2: 50, y2: 60 },
+    { x1: 50, y1: 18, x2: 82, y2: 60 },
+  ];
+  const SAGA_PACKET_IDS = ['call', 'err'];
+
   /* ── Queue-driven retry topology (Saga compensation, the way
        it actually looks in production) ───────────────────────── */
   const QUEUE_RETRY_N = {
@@ -158,8 +172,72 @@ function EdgesScenario() {
     },
   ];
 
-  /* ── Track 3: compensation via queue + worker (production shape) ─ */
-  const retrySteps = [
+  /* ── Track 3a: compensation retry · DIRECT (no queue) ────
+       The simpler shape: orchestrator calls the Refund API itself
+       and retries on failure. Easier to reason about; rarely how
+       production systems actually build it. ─────────────────── */
+  const directRetrySteps = [
+    {
+      title: 'Inventory failed — orchestrator will call the Refund API directly',
+      text: 'Orders and Payment have committed locally. Inventory refused. The simplest way to compensate: the orchestrator itself calls the Refund API, and retries in-process if anything goes wrong.',
+      tone: 'var(--fail)',
+      states: { ox: 'active', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { ord: 'committed', pay: 'charged $129', inv: 'OUT OF STOCK' },
+      packets: {},
+    },
+    {
+      title: 'Orchestrator calls the Refund API',
+      text: 'Orchestrator asks Payment to issue a refund, with an idempotency key derived from the order (ord-1042). It blocks waiting on the response.',
+      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
+      labels: { ord: 'committed', pay: 'refunding…', inv: 'failed' },
+      packets: {
+        call: { x: 50, y: 38, label: 'refund $129 [key: ord-1042]', color: 'var(--violet)' },
+      },
+    },
+    {
+      title: 'Refund API is down — call fails',
+      text: 'The compensation call returns a 503. The customer\'s card is still charged. The orchestrator is still on the hook for this refund, and now has to manage the retry loop itself.',
+      tone: 'var(--fail)',
+      states: { ox: 'active', ord: 'ok', pay: 'fail', inv: 'fail' },
+      labels: { ord: 'committed', pay: '✗ refund failed', inv: 'failed' },
+      packets: {
+        err: { x: 50, y: 88, label: '⚠ Refund API 503', color: 'var(--fail)' },
+      },
+    },
+    {
+      title: 'Orchestrator retries with the same key',
+      text: 'Back off and try again. The key (ord-1042) tells the API "if you already saw this, don\'t process it twice." Safe to retry — but the orchestrator is the one looping, holding the whole flow open while the API recovers.',
+      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
+      labels: { ord: 'committed', pay: 'retrying…', inv: 'failed' },
+      packets: {
+        call: { x: 50, y: 38, label: 'refund $129 [key: ord-1042]', color: 'var(--violet)' },
+      },
+    },
+    {
+      title: 'Succeeds — exactly one refund issued',
+      text: 'The Refund API recognises the key, processes the refund once, and confirms. Idempotency ensures the customer is refunded exactly once even though we called twice.',
+      why: 'Works — but the orchestrator was tied up sitting on this for the whole retry window. Anything else it could be doing was waiting too.',
+      tone: 'var(--ok)',
+      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
+      labels: { ord: 'committed', pay: 'refunded ✓', inv: 'failed' },
+      packets: {},
+    },
+    {
+      title: 'Continue walking backwards → cancel order',
+      text: 'With Payment refunded, the orchestrator moves on to cancel the order. Same pattern: direct call, retry in-process if it fails.',
+      states: { ox: 'active', ord: 'undo', pay: 'undo', inv: 'fail' },
+      labels: { ord: 'cancelled', pay: 'refunded', inv: 'released' },
+      packets: {
+        call: { x: 18, y: 45, label: 'cancel order', color: 'var(--violet)' },
+      },
+    },
+  ];
+
+  /* ── Track 3b: compensation via queue + worker (production shape) ─
+       Same scenario as 3a, but the orchestrator hands the work off
+       to a queue. A worker handles the retry loop. The orchestrator
+       is free as soon as it publishes. ─────────────────────────── */
+  const queueRetrySteps = [
     {
       title: 'Inventory failed — time to walk back the committed steps',
       text: 'Orders and Payment have committed locally. Inventory refused. The orchestrator needs to compensate — but in production it does NOT call the Refund API directly. Instead it hands the work off to a compensation queue, so retries live outside the orchestrator and the orchestrator stays free.',
@@ -256,6 +334,29 @@ function EdgesScenario() {
     );
   };
 
+  const renderSagaStage = (step) => {
+    const wires = SAGA_WIRES.map(w => ({ ...w, active: true }));
+    const pkts = step.packets || {};
+    return (
+      <React.Fragment>
+        <FlowWires wires={wires} />
+        {Object.entries(SAGA).map(([id, n]) => (
+          <Node key={id} {...n}
+            state={step.states[id]}
+            label={(step.labels && step.labels[id]) || undefined} />
+        ))}
+        {SAGA_PACKET_IDS.map(id => {
+          const p = pkts[id];
+          return <Packet key={id}
+            x={p ? p.x : 50} y={p ? p.y : 50}
+            label={p ? p.label : ''}
+            color={p ? p.color : 'var(--ink)'}
+            visible={!!p} />;
+        })}
+      </React.Fragment>
+    );
+  };
+
   const renderQueueRetryStage = (step) => {
     const wires = QUEUE_RETRY_WIRES.map(w => ({ ...w, active: true }));
     const pkts = step.packets || {};
@@ -280,7 +381,8 @@ function EdgesScenario() {
   };
 
   const renderStage = (step, { trackId }) => {
-    if (trackId === 'retry') return renderQueueRetryStage(step);
+    if (trackId === 'retry-direct') return renderSagaStage(step);
+    if (trackId === 'retry-queue')  return renderQueueRetryStage(step);
     return renderSplitStage(step);
   };
 
@@ -295,9 +397,10 @@ function EdgesScenario() {
         { label: 'compensating',      color: 'var(--violet)', fill: 'var(--violet-t)' },
       ]}
       tracks={[
-        { id: 'crash', label: 'Coordinator crash',   steps: crashSteps },
-        { id: 'slow',  label: 'Slow participant',    steps: slowSteps  },
-        { id: 'retry', label: 'Compensation retry',  steps: retrySteps },
+        { id: 'crash',        label: 'Coordinator crash',          steps: crashSteps        },
+        { id: 'slow',         label: 'Slow participant',           steps: slowSteps         },
+        { id: 'retry-direct', label: 'Comp retry · direct',        steps: directRetrySteps  },
+        { id: 'retry-queue',  label: 'Comp retry · with queue',    steps: queueRetrySteps   },
       ]}
       renderStage={renderStage}
     />

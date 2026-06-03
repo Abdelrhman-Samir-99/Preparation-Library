@@ -202,7 +202,8 @@ function Lesson() {
             <p>
               <b>Coordinator crash</b> — split-screen 2PC vs Saga. Both drivers die at the same moment, mid-flight. 2PC participants freeze holding locks; Saga services keep their committed work and the orchestrator restarts from durable state.
               {' '}<b>Slow participant</b> — split-screen. One service drags. 2PC holds locks across every concurrent transaction; Saga only delays the slow step itself.
-              {' '}<b>Compensation retry (queue + worker)</b> — Saga only. Orchestrator hands the refund off to a <em>compensation queue</em>; a worker pulls it, calls the API, fails on a 503, the queue redelivers, and an idempotency key keeps the customer from being refunded twice. The production shape.
+              {' '}<b>Compensation retry · direct</b> — Saga only. The simpler shape: the orchestrator calls the Refund API itself and retries in-process when it fails. Easier to grasp; rarely how production builds it.
+              {' '}<b>Compensation retry · with queue</b> — Saga only. The orchestrator hands the refund off to a <em>compensation queue</em>; a worker pulls it, calls the API, fails on a 503, the queue redelivers, and an idempotency key keeps the customer from being refunded twice. <em>The production shape.</em>
             </p>
           </div>
 
