@@ -133,10 +133,10 @@ function Lesson() {
             </p>
           </div>
           <Callout tag="The order of preference" color="var(--green)">
-            <b>1.</b> Co-locate the data — single-DB ACID. Always try this first.
-            {' '}<b>2.</b> Distributed database (Spanner / CockroachDB / YugabyteDB) — if you genuinely need strong cross-store consistency.
-            {' '}<b>3.</b> Saga + transactional outbox — if eventual consistency is acceptable.
-            {' '}<b>4.</b> Hand-rolled 2PC across services — <em>never</em>.
+            <b>1.</b> Co-locate the data — single-DB ACID. Always try this first.<br/>
+            <b>2.</b> Distributed database (Spanner / CockroachDB / YugabyteDB) — if you genuinely need strong cross-store consistency.<br/>
+            <b>3.</b> Saga + transactional outbox — if eventual consistency is acceptable.<br/>
+            <b>4.</b> Hand-rolled 2PC across services — <em>never</em>.
           </Callout>
         </div>
       </section>
