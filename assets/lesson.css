@@ -508,15 +508,108 @@
   gap: 16px; flex-wrap: wrap;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
+/* ============================================================
+   Responsive — the scenario player needs the most work because
+   nodes are 158px-wide absolute boxes positioned by percent; on
+   narrow viewports they overflow the stage if not scaled down.
+   ============================================================ */
+
+/* ── Tablet (≤820px) ─────────────────────────────────────── */
 @media (max-width: 820px) {
   .compare { grid-template-columns: 1fr; }
   .stage { height: 430px; }
-  .scenario-top { flex-direction: column; align-items: flex-start; }
+  .scenario-top { flex-direction: column; align-items: flex-start; padding: 14px 18px; }
+  .scenario-top .tabs { flex-wrap: wrap; }
+  .node {
+    width: clamp(118px, 17vw, 158px);
+    padding: 10px 12px;
+  }
+  .node.coord { width: clamp(128px, 18vw, 170px); }
+  .node .nhead .nname { font-size: 13.5px; }
+  .node .nhead .glyph { width: 26px; height: 26px; font-size: 11.5px; }
+  .node .nstate { font-size: 10.5px; padding: 3px 7px; margin-top: 8px; }
+  .packet { font-size: 10.5px; padding: 5px 9px; }
+  .takeaway { padding: 28px 24px; }
 }
+
+/* ── Edge cases collapse + smaller caption ──────────────── */
 @media (max-width: 720px) {
   .edge-body { grid-template-columns: 1fr; }
   .edge-side + .edge-side { border-left: none; border-top: 1.5px solid var(--line); }
+  .caption { padding: 16px 18px; min-height: 0; gap: 12px; }
+  .caption .cstep { width: 32px; height: 32px; font-size: 12.5px; border-radius: 8px; }
+  .caption .cbody h4 { font-size: 15.5px; }
+  .caption .cbody p { font-size: 13.5px; line-height: 1.5; }
+  .legend { padding: 0 18px 14px; gap: 12px; }
+  .legend .li { font-size: 10.5px; }
+  .controls { padding: 12px 18px; gap: 10px; }
+  .ctrl-btn { font-size: 13px; padding: 8px 13px; }
+  .cstepnum { min-width: 36px; font-size: 11.5px; }
+}
+
+/* ── Phone (≤560px) — scenario player gets squeezed hard ── */
+@media (max-width: 560px) {
+  .lesson-hero { padding: 36px 0 20px; }
+  /* Convert to block-level flex so the text wraps instead of overflowing. */
+  .lesson-hero .kicker {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: clamp(20px, 5.5vw, 28px);
+    line-height: 1.2;
+  }
+  .lesson-hero .kicker .num { width: 36px; height: 36px; font-size: 15px; }
+  .lesson-hero h1 { font-size: clamp(18px, 4vw, 24px); }
+  .lesson-hero .lede { font-size: 14.5px; line-height: 1.55; }
+  .section { padding: 28px 0; }
+  .stage { height: 380px; }
+  .node {
+    width: clamp(98px, 26vw, 130px);
+    padding: 9px 10px;
+    border-width: 1.5px;
+  }
+  .node.coord { width: clamp(108px, 28vw, 140px); }
+  .node .nhead { gap: 7px; }
+  .node .nhead .nname { font-size: 12.5px; line-height: 1.1; }
+  .node .nhead .glyph { width: 22px; height: 22px; font-size: 10.5px; border-radius: 6px; }
+  .node .nstate { font-size: 10px; padding: 2.5px 6px; margin-top: 7px; }
+  .packet { font-size: 10px; padding: 4px 8px; }
+  /* Push the pips track to its own line below the buttons */
+  .controls { flex-wrap: wrap; }
+  .controls .track { order: 99; flex-basis: 100%; }
+  /* Tighter split-screen labels */
+  .split-label { font-size: 9.5px; padding: 2px 7px; top: 8px; }
+  /* Section-head badge a touch smaller */
+  .section-head .step-num { width: 34px; height: 34px; font-size: 15px; border-radius: 8px; }
+  .section-head .step-chip { gap: 10px; }
+  /* Edge case header text wraps cleanly */
+  .edge-head { padding: 12px 16px; gap: 8px; }
+  .edge-side { padding: 14px 16px; }
+  /* TOC chips and dctrl rows stay tidy */
+  .toc { gap: 8px; }
+  .dctrl { gap: 8px; padding: 12px 14px; }
+  /* Takeaway tighter */
+  .takeaway { padding: 24px 20px; }
+  .takeaway h3 { font-size: 22px; }
+  .takeaway p { font-size: 15px; }
+  /* Comparison card padding */
+  .cmp-card { padding: 18px; }
+  .cmp-card h3 { font-size: 20px; }
+}
+
+/* ── Narrow phone (≤400px) — extreme squeeze ─────────────── */
+@media (max-width: 400px) {
+  .stage { height: 360px; }
+  .node {
+    width: 92px;
+    padding: 7px 9px;
+  }
+  .node.coord { width: 100px; }
+  .node .nhead .nname { font-size: 11.5px; }
+  .node .nhead .glyph { width: 20px; height: 20px; font-size: 10px; }
+  .node .nstate { font-size: 9.5px; padding: 2px 5px; margin-top: 6px; }
+  .packet { font-size: 9.5px; padding: 3px 7px; }
 }
 
 /* Reduced motion — disable the entrance-y bits + tone down packet glide */
