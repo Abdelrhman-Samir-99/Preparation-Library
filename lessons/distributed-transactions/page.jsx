@@ -171,6 +171,10 @@ function Lesson() {
             </p>
           </div>
           <SagaScenario />
+          <Callout tag="In production · queue + worker" color="var(--coral)">
+            The compensations above are drawn as direct orchestrator-to-service arrows to keep the <em>pattern</em> clear. In real systems they almost always go through a <b>message queue</b> with a <b>worker</b> consumer: the orchestrator publishes the compensation as a message and moves on; a worker pulls it, calls the service with an idempotency key, and acks on success. That hand-off is what gives saga compensations their retry and idempotency story.
+            {' '}<b>See <a href="#edges">§ 4 Edge cases · Compensation retry</a></b> for the production shape with redelivery and a failing Refund API.
+          </Callout>
           <Callout tag="When it fits" color="var(--violet)">
             Sagas trade strict isolation for <b>availability and scale</b> — the standard choice for long-running, cross-service workflows
             (microservices, e-commerce checkout, travel booking). The price: <b>eventual consistency</b> and the work of designing a compensating action for every step.
@@ -198,7 +202,7 @@ function Lesson() {
             <p>
               <b>Coordinator crash</b> — split-screen 2PC vs Saga. Both drivers die at the same moment, mid-flight. 2PC participants freeze holding locks; Saga services keep their committed work and the orchestrator restarts from durable state.
               {' '}<b>Slow participant</b> — split-screen. One service drags. 2PC holds locks across every concurrent transaction; Saga only delays the slow step itself.
-              {' '}<b>Compensation retry</b> — Saga only. The refund API is down at the worst moment; idempotency keys let us safely retry until it succeeds.
+              {' '}<b>Compensation retry (queue + worker)</b> — Saga only. Orchestrator hands the refund off to a <em>compensation queue</em>; a worker pulls it, calls the API, fails on a 503, the queue redelivers, and an idempotency key keeps the customer from being refunded twice. The production shape.
             </p>
           </div>
 

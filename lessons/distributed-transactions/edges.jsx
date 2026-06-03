@@ -27,19 +27,24 @@ function EdgesScenario() {
   ];
   const SPLIT_PACKET_IDS = ['p1', 'p2', 'p3', 'p4', 'q1', 'q2'];
 
-  /* ── Saga-only topology for the retry track ──────────────── */
-  const SAGA = {
-    ox:  { x: 50, y: 18, name: 'Orchestrator', glyph: 'OX', coord: true },
-    ord: { x: 18, y: 60, name: 'Orders',       glyph: 'OD' },
-    pay: { x: 50, y: 60, name: 'Payment',      glyph: 'PY' },
-    inv: { x: 82, y: 60, name: 'Inventory',    glyph: 'IN' },
+  /* ── Queue-driven retry topology (Saga compensation, the way
+       it actually looks in production) ───────────────────────── */
+  const QUEUE_RETRY_N = {
+    orch:   { x: 50, y: 12, name: 'Orchestrator',  glyph: 'OX', coord: true },
+    queue:  { x: 22, y: 42, name: 'Comp queue',    glyph: 'MQ' },
+    worker: { x: 50, y: 42, name: 'Refund worker', glyph: 'RW' },
+    api:    { x: 80, y: 42, name: 'Refund API',    glyph: '$$' },
+    ord:    { x: 16, y: 75, name: 'Orders',        glyph: 'OD' },
+    pay:    { x: 50, y: 75, name: 'Payment',       glyph: 'PY' },
+    inv:    { x: 84, y: 75, name: 'Inventory',     glyph: 'IN' },
   };
-  const SAGA_WIRES = [
-    { x1: 50, y1: 18, x2: 18, y2: 60 },
-    { x1: 50, y1: 18, x2: 50, y2: 60 },
-    { x1: 50, y1: 18, x2: 82, y2: 60 },
+  const QUEUE_RETRY_WIRES = [
+    { x1: 50, y1: 12, x2: 22, y2: 42 },  // orch → queue (publish)
+    { x1: 22, y1: 42, x2: 50, y2: 42 },  // queue → worker (deliver / redeliver)
+    { x1: 50, y1: 42, x2: 80, y2: 42 },  // worker ↔ api
+    { x1: 50, y1: 42, x2: 50, y2: 75 },  // worker → pay (state update)
   ];
-  const SAGA_PACKET_IDS = ['call', 'err'];
+  const QUEUE_RETRY_PACKET_IDS = ['pub', 'msg', 'apicall', 'apiresp', 'state'];
 
   /* ── Track 1: coordinator crash (split-screen) ───────────── */
   const crashSteps = [
@@ -153,60 +158,73 @@ function EdgesScenario() {
     },
   ];
 
-  /* ── Track 3: compensation itself fails (Saga only) ──────── */
+  /* ── Track 3: compensation via queue + worker (production shape) ─ */
   const retrySteps = [
     {
-      title: 'Forward steps committed; Inventory fails',
-      text: 'Orders and Payment have committed locally. Inventory is out of stock — the forward path stops. Time to compensate backwards.',
-      tone: 'var(--fail)',
-      states: { ox: 'active', ord: 'ok', pay: 'ok', inv: 'fail' },
-      labels: { ord: 'committed', pay: 'charged $129', inv: 'OUT OF STOCK' },
+      title: 'Inventory failed — time to walk back the committed steps',
+      text: 'Orders and Payment have committed locally. Inventory refused. The orchestrator needs to compensate — but in production it does NOT call the Refund API directly. Instead it hands the work off to a compensation queue, so retries live outside the orchestrator and the orchestrator stays free.',
+      states: { orch: 'active', queue: 'idle', worker: 'idle', api: 'idle', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { queue: 'empty', worker: 'idle', api: 'idle', ord: 'committed', pay: 'charged $129', inv: 'OUT OF STOCK' },
       packets: {},
     },
     {
-      title: 'Compensate payment → call refund API',
-      text: 'The orchestrator asks Payment to issue a refund. Payment calls the external Refund API with an idempotency key derived from the order.',
-      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
-      labels: { ord: 'committed', pay: 'refunding…', inv: 'failed' },
+      title: 'Orchestrator publishes a refund job to the queue',
+      text: 'One durable write — { type: "refund", orderId: "ord-1042" }. The orchestrator hands off and moves on. It doesn\'t wait around for the actual API call.',
+      states: { orch: 'active', queue: 'active', worker: 'idle', api: 'idle', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { queue: '1 msg · pending', worker: 'idle', api: 'idle', pay: 'charged $129', inv: 'failed' },
       packets: {
-        call: { x: 50, y: 80, label: 'refund $129 [key: ord-1042]', color: 'var(--violet)' },
+        pub: { x: 36, y: 27, label: 'refund · ord-1042', color: 'var(--violet)' },
       },
     },
     {
-      title: 'Refund API is down',
-      text: 'The compensation call fails. The customer\'s card is still charged. Without retries, the system stays inconsistent — a Saga\'s worst failure mode.',
+      title: 'Worker consumes the message and calls the Refund API',
+      text: 'Refund Worker pulls the next message off the queue and calls the API with an idempotency key derived from the order. The queue holds the message as in-flight until the worker acks it.',
+      states: { orch: 'idle', queue: 'active', worker: 'active', api: 'active', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { queue: 'in-flight · 1', worker: 'calling API…', api: 'processing…', pay: 'charged $129', inv: 'failed' },
+      packets: {
+        msg:     { x: 36, y: 42, label: 'refund req', color: 'var(--blue)' },
+        apicall: { x: 65, y: 42, label: 'refund $129 [key: ord-1042]', color: 'var(--blue)' },
+      },
+    },
+    {
+      title: 'API returns 503 — Worker doesn\'t ack',
+      text: 'The Refund API is down. The worker doesn\'t send an ack to the queue, so the message stays as in-flight. After the visibility timeout the queue will redeliver it automatically — no manual retry logic in the orchestrator, no spinning loop in the worker.',
       tone: 'var(--fail)',
-      states: { ox: 'active', ord: 'ok', pay: 'fail', inv: 'fail' },
-      labels: { ord: 'committed', pay: '✗ refund failed', inv: 'failed' },
+      states: { orch: 'idle', queue: 'active', worker: 'fail', api: 'fail', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { queue: 'redelivery pending', worker: '✗ no ack', api: '✗ 503', pay: 'charged $129', inv: 'failed' },
       packets: {
-        err: { x: 50, y: 88, label: '⚠ Refund API 503', color: 'var(--fail)' },
+        apiresp: { x: 65, y: 36, label: '✗ 503 error', color: 'var(--fail)' },
       },
     },
     {
-      title: 'Retry with the same idempotency key',
-      text: 'Back off and try again. The key (ord-1042) tells the API "if you already saw this, don\'t process it twice." Safe to retry as many times as needed.',
-      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
-      labels: { ord: 'committed', pay: 'retrying…', inv: 'failed' },
+      title: 'Queue redelivers — Worker retries with the same key',
+      text: 'After backoff, the queue hands the same message to the worker again (still keyed by ord-1042). The worker calls the API a second time. The key is what makes this safe: if the API actually processed the first attempt and we just didn\'t hear the response, the second call dedupes instead of refunding twice.',
+      states: { orch: 'idle', queue: 'active', worker: 'active', api: 'active', ord: 'ok', pay: 'ok', inv: 'fail' },
+      labels: { queue: 'in-flight · 1', worker: 'retrying…', api: 'processing…', pay: 'charged $129', inv: 'failed' },
       packets: {
-        call: { x: 50, y: 80, label: 'refund $129 [key: ord-1042]', color: 'var(--violet)' },
+        msg:     { x: 36, y: 42, label: 'redeliver', color: 'var(--blue)' },
+        apicall: { x: 65, y: 42, label: 'refund $129 [key: ord-1042]', color: 'var(--blue)' },
       },
     },
     {
-      title: 'Succeeds — exactly one refund issued',
-      text: 'The Refund API recognises the key, processes the refund once, and confirms. Even if earlier attempts had partially succeeded, idempotency ensures the customer is refunded exactly once.',
-      why: 'Compensations must be idempotent — otherwise retries become bugs.',
+      title: 'API succeeds — Worker updates Payment and acks the queue',
+      text: 'The API processes the refund and returns 200. The worker writes the state update to Payment, then sends the ack to the queue. The message is removed from the queue.',
+      why: 'The orchestrator was free this entire time. Retries lived inside the queue + worker. Idempotency keys made them safe. This is the production shape of saga compensations.',
       tone: 'var(--ok)',
-      states: { ox: 'active', ord: 'ok', pay: 'undo', inv: 'fail' },
-      labels: { ord: 'committed', pay: 'refunded ✓', inv: 'failed' },
-      packets: {},
+      states: { orch: 'idle', queue: 'ok', worker: 'ok', api: 'ok', ord: 'ok', pay: 'undo', inv: 'fail' },
+      labels: { queue: 'empty', worker: 'done', api: 'OK ✓', pay: 'refunded ✓', inv: 'failed' },
+      packets: {
+        apiresp: { x: 65, y: 42, label: '✓ refunded', color: 'var(--ok)' },
+        state:   { x: 50, y: 58, label: 'state update', color: 'var(--ok)' },
+      },
     },
     {
-      title: 'Continue walking backwards → cancel order',
-      text: 'With payment refunded, the orchestrator moves on to cancel the order. The saga walks back step-by-step until the system is consistent again.',
-      states: { ox: 'active', ord: 'undo', pay: 'undo', inv: 'fail' },
-      labels: { ord: 'cancelled', pay: 'refunded', inv: 'released' },
+      title: 'Same machinery for the next compensation',
+      text: 'The orchestrator publishes the next compensation — { type: "cancel", orderId: "ord-1042" } — to the same queue. A worker (the same one or another consumer) processes it the same way. Step by step, the saga walks back until the system is consistent.',
+      states: { orch: 'active', queue: 'active', worker: 'active', api: 'idle', ord: 'undo', pay: 'undo', inv: 'fail' },
+      labels: { queue: '1 msg · cancel', worker: 'cancelling…', api: 'idle', ord: 'cancelling…', pay: 'refunded' },
       packets: {
-        call: { x: 18, y: 45, label: 'cancel order', color: 'var(--violet)' },
+        pub: { x: 36, y: 27, label: 'cancel · ord-1042', color: 'var(--violet)' },
       },
     },
   ];
@@ -238,18 +256,18 @@ function EdgesScenario() {
     );
   };
 
-  const renderSagaStage = (step) => {
-    const wires = SAGA_WIRES.map(w => ({ ...w, active: true }));
+  const renderQueueRetryStage = (step) => {
+    const wires = QUEUE_RETRY_WIRES.map(w => ({ ...w, active: true }));
     const pkts = step.packets || {};
     return (
       <React.Fragment>
         <FlowWires wires={wires} />
-        {Object.entries(SAGA).map(([id, n]) => (
+        {Object.entries(QUEUE_RETRY_N).map(([id, n]) => (
           <Node key={id} {...n}
             state={step.states[id]}
             label={(step.labels && step.labels[id]) || undefined} />
         ))}
-        {SAGA_PACKET_IDS.map(id => {
+        {QUEUE_RETRY_PACKET_IDS.map(id => {
           const p = pkts[id];
           return <Packet key={id}
             x={p ? p.x : 50} y={p ? p.y : 50}
@@ -262,7 +280,7 @@ function EdgesScenario() {
   };
 
   const renderStage = (step, { trackId }) => {
-    if (trackId === 'retry') return renderSagaStage(step);
+    if (trackId === 'retry') return renderQueueRetryStage(step);
     return renderSplitStage(step);
   };
 
