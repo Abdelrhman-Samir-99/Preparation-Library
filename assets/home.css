@@ -1,0 +1,158 @@
+/* ============================================================
+   home.css — home hub styles (header, hero, knowledge tree)
+   Pairs with theme.css.
+   ============================================================ */
+
+/* ── Sticky header ───────────────────────────────────────── */
+.site-head {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(10px);
+  background: oklch(0.985 0.008 90 / 0.82);
+  border-bottom: 1.5px solid var(--line);
+}
+.site-head .wrap { display: flex; align-items: center; justify-content: space-between; height: 66px; }
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--display); font-weight: 800; font-size: 19px;
+  letter-spacing: -0.02em;
+  text-decoration: none; color: var(--ink);
+}
+.brand .logo { flex: none; display: block; }
+.head-meta { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); }
+
+/* ── Hero ────────────────────────────────────────────────── */
+.hero { padding: 64px 0 26px; }
+.hero h1 { font-size: clamp(36px, 5.4vw, 60px); font-weight: 800; max-width: 17ch; text-wrap: normal; }
+.hero h1 .hl { position: relative; white-space: nowrap; }
+.hero h1 .hl::after {
+  content: ""; position: absolute; left: -2px; right: -2px; bottom: 6%; height: 38%;
+  background: var(--amber); opacity: .35; border-radius: 4px; z-index: -1;
+}
+.hero p {
+  font-size: clamp(17px, 2vw, 21px);
+  color: var(--ink-soft);
+  max-width: 56ch;
+  margin: 22px 0 0;
+  font-weight: 500;
+}
+.hero .meta-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; align-items: center; }
+
+/* ── The knowledge tree ──────────────────────────────────── */
+.map-section { padding: 22px 0 90px; }
+.map-head { margin-bottom: 30px; }
+.map-head h2 { font-size: clamp(24px, 3.4vw, 34px); }
+
+.repo { display: flex; flex-direction: column; gap: 38px; }
+
+/* A group = a "folder" with its topics. Accent set via --c on the group element. */
+.group { --c: var(--idle); }
+.group-head { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.group-head .folder {
+  width: 44px; height: 44px; flex: none; border-radius: 12px;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-weight: 700; font-size: 12px; letter-spacing: .02em;
+  color: white; background: var(--c);
+  box-shadow: 0 3px 0 color-mix(in oklab, var(--c) 60%, black 22%);
+}
+.group-head .gt { display: flex; flex-direction: column; gap: 1px; }
+.group-head h3 { font-size: 22px; }
+.group-head .path { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.group-head .count {
+  margin-left: auto;
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  color: var(--ink-soft);
+  border: 1.5px solid var(--line-bold); border-radius: 100px;
+  padding: 5px 11px; background: var(--card);
+}
+
+/* Topics branch off a vertical spine */
+.topics { position: relative; display: flex; flex-direction: column; gap: 12px; padding-left: 30px; }
+.topics::before {
+  content: ""; position: absolute;
+  left: 21px; top: -6px; bottom: 26px;
+  width: 2px; background: var(--line-bold); border-radius: 2px;
+}
+
+.topic {
+  position: relative;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-left: 6px solid var(--c);
+  border-radius: var(--r);
+  padding: 15px 18px;
+  display: flex; align-items: center; gap: 15px;
+  box-shadow: var(--shadow);
+  text-decoration: none; color: inherit;
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+}
+/* Connector from spine to each topic */
+.topic::before {
+  content: ""; position: absolute;
+  left: -17px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 2px; background: var(--line-bold); border-radius: 2px;
+}
+.topic::after {
+  content: ""; position: absolute;
+  left: -10px; top: 50%; transform: translate(-50%, -50%);
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--line-bold); border: 2px solid var(--paper);
+}
+.topic .ico {
+  width: 46px; height: 46px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--c) 15%, white);
+}
+.topic .body { flex: 1; min-width: 0; }
+.topic .body h4 { font-family: var(--display); font-weight: 700; font-size: 18.5px; }
+.topic .body p { margin: 3px 0 0; font-size: 14px; color: var(--ink-soft); font-weight: 500; }
+.topic .lesson-tag {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 9px;
+  font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--c);
+  background: color-mix(in oklab, var(--c) 13%, white);
+  padding: 5px 11px; border-radius: 100px;
+}
+.topic .status {
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  color: var(--ink-faint); white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.topic .status .soon-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-bold); }
+.topic .go { font-size: 20px; color: var(--c); font-weight: 700; }
+
+/* Active topic — clickable link */
+.topic.active { cursor: pointer; border-color: color-mix(in oklab, var(--c) 45%, var(--line)); }
+.topic.active::before, .topic.active::after { background: var(--c); }
+.topic.active:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--c); }
+.topic.active:active { transform: translateY(0); }
+
+/* Soon topic — not a link; nudges on click */
+.topic.soon { cursor: default; }
+.topic.soon .ico, .topic.soon .body { opacity: .7; }
+.topic.soon.nudge { animation: nudge .4s ease; }
+@keyframes nudge { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+
+/* Entrance — self-completing, base state visible so failure is safe */
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.enter { animation: rise .55s cubic-bezier(.2,.9,.3,1.2) both; }
+
+/* ── Footer ──────────────────────────────────────────────── */
+.foot {
+  border-top: 1.5px solid var(--line);
+  padding: 30px 0 50px;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+.foot .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.foot a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+.foot a:hover { color: var(--ink-soft); border-bottom-color: var(--ink-soft); }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .topics { padding-left: 22px; }
+  .topics::before { left: 13px; }
+  .topic { flex-wrap: wrap; }
+  .topic .status, .topic .go { margin-left: 61px; }
+}
+@media (prefers-reduced-motion: reduce) { .enter { animation: none; } }

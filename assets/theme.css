@@ -1,0 +1,138 @@
+/* ============================================================
+   Personal Learning Repo — shared theme
+   Warm paper, bold ink, multi-accent palette.
+   Used by the home hub and lesson pages.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Surfaces ──────────────────────────────────────────── */
+  --paper:      oklch(0.985 0.008 90);   /* warm off-white */
+  --paper-2:    oklch(0.965 0.011 88);   /* slightly deeper panel */
+  --card:       oklch(1 0 0);            /* white cards */
+  --ink:        oklch(0.24 0.025 280);   /* near-black slate */
+  --ink-soft:   oklch(0.42 0.02 280);
+  --ink-faint:  oklch(0.58 0.015 280);
+  --line:       oklch(0.90 0.012 280);
+  --line-bold:  oklch(0.82 0.015 280);
+
+  /* ── Accents (same L≈0.66, C≈0.17, hue varies) ─────────── */
+  --coral:   oklch(0.68 0.17 25);
+  --amber:   oklch(0.78 0.15 75);
+  --green:   oklch(0.72 0.15 158);
+  --blue:    oklch(0.66 0.16 248);
+  --violet:  oklch(0.62 0.17 300);
+  --pink:    oklch(0.70 0.16 350);
+
+  /* Soft tints for fills */
+  --coral-t:  oklch(0.95 0.04 25);
+  --amber-t:  oklch(0.96 0.05 80);
+  --green-t:  oklch(0.95 0.05 158);
+  --blue-t:   oklch(0.95 0.04 248);
+  --violet-t: oklch(0.95 0.04 300);
+
+  /* ── Scenario state colors ─────────────────────────────── */
+  --ok:    oklch(0.70 0.15 155);
+  --warn:  oklch(0.80 0.15 80);
+  --fail:  oklch(0.64 0.20 25);
+  --idle:  oklch(0.72 0.012 280);
+
+  /* ── Type ──────────────────────────────────────────────── */
+  --display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --sans:    'Hanken Grotesk', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Shape ─────────────────────────────────────────────── */
+  --r-sm: 8px;
+  --r:    14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+  --shadow:    0 2px 0 var(--line-bold), 0 8px 24px -12px oklch(0.4 0.05 280 / 0.25);
+  --shadow-lg: 0 4px 0 var(--line-bold), 0 22px 50px -20px oklch(0.4 0.05 280 / 0.35);
+
+  --maxw: 1180px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+a { color: inherit; }
+.mono { font-family: var(--mono); }
+
+/* dotted-grid paper texture */
+.paper-grid {
+  background-image: radial-gradient(oklch(0.7 0.02 280 / 0.16) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+}
+
+/* ── Chunky pill button ──────────────────────────────────── */
+.btn {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 15px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 11px 20px;
+  border-radius: 100px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  box-shadow: 0 3px 0 oklch(0.24 0.025 280 / 0.35);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 oklch(0.24 0.025 280 / 0.35); }
+.btn:active { transform: translateY(1px); box-shadow: 0 1px 0 oklch(0.24 0.025 280 / 0.35); }
+.btn.ghost {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--line-bold);
+}
+.btn.ghost:hover { box-shadow: 0 5px 0 var(--line-bold); }
+
+/* ── Small label chip ────────────────────────────────────── */
+.chip {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line-bold);
+  background: var(--card);
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 18px; }
+}

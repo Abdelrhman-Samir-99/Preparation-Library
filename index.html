@@ -1,103 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preparation Library</title>
-  <link rel="stylesheet" href="assets/design.css">
-  <script>
-    try {
-      const s = localStorage.getItem('site-theme');
-      if (s === 'dark' || (!s && matchMedia('(prefers-color-scheme: dark)').matches))
-        document.documentElement.setAttribute('data-theme', 'dark');
-      else if (s === 'light')
-        document.documentElement.setAttribute('data-theme', 'light');
-    } catch (e) {}
-  </script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Personal Learning Repo</title>
+<link rel="stylesheet" href="assets/theme.css" />
+<link rel="stylesheet" href="assets/home.css" />
 </head>
-<body>
+<body class="paper-grid">
 
-  <header class="site-header wrap">
-    <span class="eyebrow">Preparation library</span>
-    <h1>Interview-prep notes &amp; interactive demos</h1>
-    <p class="lede">A personal notebook of flashcards, operable SVG diagrams, and study notes I keep while preparing for senior engineering interviews.</p>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+  <header class="site-head">
+    <div class="wrap">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="29" height="29" rx="9" fill="var(--ink)" />
+          <path d="M16 12 L9 21 M16 12 L23 21" stroke="oklch(0.86 0.02 280 / .5)" stroke-width="2" stroke-linecap="round" />
+          <circle cx="16" cy="11" r="3.4" fill="var(--coral)" />
+          <circle cx="9"  cy="22" r="3.4" fill="var(--blue)" />
+          <circle cx="23" cy="22" r="3.4" fill="var(--amber)" />
+        </svg>
+        Personal Learning Repo
+      </div>
+      <div class="head-meta">software engineering · by example</div>
+    </div>
   </header>
 
-  <main class="wrap">
-
-    <section>
-      <h2 class="eyebrow" style="display:block; margin-top: var(--space-8); margin-bottom: var(--space-5);">Try it</h2>
-      <a class="link-card" href="AWS/">
-        <span class="lc-num">01</span>
-        <div>
-          <span class="lc-tag">Flashcards</span>
-          <h3 class="lc-title">AWS</h3>
-          <p class="lc-desc">IAM and SQS flashcards, with sequential/shuffle/missed-only modes</p>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <span class="chip">notes I'm taking as I learn</span>
+        <h1>Software engineering concepts, drawn until they <span class="hl">click</span>.</h1>
+        <p>This is my notebook. Each topic opens into animated, step-through scenarios that show how things actually behave — written to understand them, and shared in case they help you too.</p>
+        <div class="meta-row">
+          <span class="chip mono" id="lessonCountChip">— lessons so far</span>
         </div>
-      </a>
-      <a class="link-card" href="System%20Design/High%20Level%20Design/Distributed%20Transactions/">
-        <span class="lc-num">02</span>
-        <div>
-          <span class="lc-tag">Diagrams</span>
-          <h3 class="lc-title">Distributed transactions</h3>
-          <p class="lc-desc">Notes + 5 interactive SVG diagrams you can operate</p>
-        </div>
-      </a>
+      </div>
     </section>
 
-    <section style="margin-top: var(--space-9); padding-top: var(--space-9); border-top: 1px solid var(--border);">
-      <h2 class="eyebrow" style="display:block; margin-bottom: var(--space-5);">Topic notes</h2>
-      <a class="link-card" href="System%20Design/High%20Level%20Design/">
-        <span class="lc-num">03</span>
-        <div>
-          <span class="lc-tag">System design</span>
-          <h3 class="lc-title">High-level design</h3>
-          <p class="lc-desc">Scaling, caches, databases, message queues, distributed transactions</p>
+    <section class="map-section">
+      <div class="wrap">
+        <div class="map-head">
+          <h2>The knowledge tree</h2>
         </div>
-      </a>
-      <a class="link-card" href="System%20Design/Low%20Level%20Design/">
-        <span class="lc-num">04</span>
-        <div>
-          <span class="lc-tag">System design</span>
-          <h3 class="lc-title">Low-level design</h3>
-          <p class="lc-desc">Patterns, principles, OOD</p>
-        </div>
-      </a>
-      <a class="link-card" href="Problem%20Solving/">
-        <span class="lc-num">05</span>
-        <div>
-          <span class="lc-tag">Algorithms</span>
-          <h3 class="lc-title">Problem solving</h3>
-          <p class="lc-desc">Data structures &amp; algorithms</p>
-        </div>
-      </a>
-      <a class="link-card" href="Programming%20Languages/">
-        <span class="lc-num">06</span>
-        <div>
-          <span class="lc-tag">Languages</span>
-          <h3 class="lc-title">Programming languages</h3>
-          <p class="lc-desc">Language notes (C++, C#, Java, Ruby, Rails, Spring)</p>
-        </div>
-      </a>
-      <a class="link-card" href="Behavioral/">
-        <span class="lc-num">07</span>
-        <div>
-          <span class="lc-tag">Interviews</span>
-          <h3 class="lc-title">Behavioral</h3>
-          <p class="lc-desc">Company-specific prep</p>
-        </div>
-      </a>
+        <div class="repo" id="repo"></div>
+      </div>
     </section>
-
   </main>
 
-  <footer class="site-footer wrap">
-    <span>Last updated <code>2026-06-02</code> &middot; Design system: <a href="assets/DESIGN.md">assets/DESIGN.md</a></span>
-    <a href="https://github.com/Abdelrhman-Samir-99/Preparation-Library">GitHub</a>
+  <footer class="foot">
+    <div class="wrap">
+      <span>Personal Learning Repo · notes shared in the open</span>
+      <span>a growing collection — one branch at a time</span>
+    </div>
   </footer>
 
-  <script src="assets/theme.js"></script>
+  <script src="assets/data/catalog.js"></script>
+  <script>
+  (function () {
+    // ──────────────────────────────────────────────────────
+    // Icon registry. Each entry returns inline SVG markup.
+    // Stroke uses currentColor so the topic's --c flows through
+    // (we set the SVG's color to var(--c) on the .ico parent).
+    // ──────────────────────────────────────────────────────
+    const ICONS = {
+      'graph-3': /* Distributed Systems: three connected nodes */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<circle cx="13" cy="5" r="3" /><circle cx="5" cy="20" r="3" /><circle cx="21" cy="20" r="3" />' +
+          '<line x1="11" y1="7.5" x2="6.5" y2="17.5" />' +
+          '<line x1="15" y1="7.5" x2="19.5" y2="17.5" />' +
+          '<line x1="8" y1="20" x2="18" y2="20" />' +
+        '</svg>',
+      'bars': /* Scalability: three vertical bars increasing */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+          '<line x1="6" y1="20" x2="6" y2="14" />' +
+          '<line x1="13" y1="20" x2="13" y2="9" />' +
+          '<line x1="20" y1="20" x2="20" y2="5" />' +
+        '</svg>',
+      'queue': /* Messaging & Queues: rectangles in a row */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<rect x="4" y="9" width="6" height="6" rx="1.5" />' +
+          '<rect x="11" y="9" width="6" height="6" rx="1.5" />' +
+          '<rect x="18" y="9" width="4" height="6" rx="1.5" />' +
+        '</svg>',
+      'nested-square': /* OOP & SOLID: square inside square */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<rect x="4" y="4" width="18" height="18" rx="3" />' +
+          '<rect x="9" y="9" width="8" height="8" rx="2" />' +
+        '</svg>',
+      'nodes-4': /* Design Patterns: four nodes with two connecting edges */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<circle cx="7" cy="7" r="2.4" /><circle cx="19" cy="7" r="2.4" />' +
+          '<circle cx="7" cy="19" r="2.4" /><circle cx="19" cy="19" r="2.4" />' +
+          '<line x1="9.4" y1="7" x2="16.6" y2="7" />' +
+          '<line x1="7" y1="9.4" x2="7" y2="16.6" />' +
+        '</svg>',
+      'chevrons': /* API Design: two arrows pointing inward */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="9,8 4,13 9,18" />' +
+          '<polyline points="17,8 22,13 17,18" />' +
+        '</svg>',
+      'stacked-rows': /* Databases: three stacked horizontal bars */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<rect x="5" y="4"    width="16" height="5" rx="2.5" />' +
+          '<rect x="5" y="10.5" width="16" height="5" rx="2.5" />' +
+          '<rect x="5" y="17"   width="16" height="5" rx="2.5" />' +
+        '</svg>',
+      'target': /* Networking: circle with dashed ring + marks */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<circle cx="13" cy="13" r="3" />' +
+          '<circle cx="13" cy="13" r="8.5" stroke-dasharray="3 3" />' +
+          '<line x1="13" y1="4.5" x2="13" y2="1.5" />' +
+          '<line x1="13" y1="24.5" x2="13" y2="21.5" />' +
+        '</svg>',
+      'bars-3': /* Concurrency: three vertical lines + center dot */
+        '<svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+          '<line x1="7" y1="5" x2="7" y2="21" />' +
+          '<line x1="13" y1="5" x2="13" y2="21" />' +
+          '<line x1="19" y1="5" x2="19" y2="21" />' +
+          '<circle cx="13" cy="13" r="2.2" fill="currentColor" stroke="none" />' +
+        '</svg>',
+    };
 
+    const escape = (s) => String(s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const folderLabel = (g) =>
+      (window.GROUP_LABEL && window.GROUP_LABEL[g.id]) || g.id.toUpperCase();
+
+    function renderTopic(topic, accentVar) {
+      const lesson = topic.lessons && topic.lessons[0];
+      const icon = ICONS[topic.iconKey] || ICONS['nodes-4'];
+
+      if (lesson) {
+        // Active topic — clickable card, whole thing is the <a>.
+        return (
+          '<a class="topic active" href="' + escape(lesson.href) + '">' +
+            '<div class="ico" style="color: var(--c)">' + icon + '</div>' +
+            '<div class="body">' +
+              '<h4>' + escape(topic.name) + '</h4>' +
+              '<p>' + escape(topic.tagline) + '</p>' +
+              '<span class="lesson-tag">📄 ' + escape(lesson.number) + ' · ' + escape(lesson.title) + '</span>' +
+            '</div>' +
+            '<span class="go">→</span>' +
+          '</a>'
+        );
+      }
+
+      // Soon topic — not a link; nudges on click.
+      return (
+        '<div class="topic soon">' +
+          '<div class="ico" style="color: var(--c)">' + icon + '</div>' +
+          '<div class="body">' +
+            '<h4>' + escape(topic.name) + '</h4>' +
+            '<p>' + escape(topic.tagline) + '</p>' +
+          '</div>' +
+          '<div class="status"><span class="soon-dot"></span> soon</div>' +
+        '</div>'
+      );
+    }
+
+    function renderGroup(group) {
+      const accentVar = 'var(--' + group.accent + ')';
+      const topics = group.topics.map(t => renderTopic(t, accentVar)).join('');
+      return (
+        '<div class="group" data-enter style="--c: ' + accentVar + '">' +
+          '<div class="group-head">' +
+            '<div class="folder">' + escape(folderLabel(group)) + '</div>' +
+            '<div class="gt">' +
+              '<h3>' + escape(group.name) + '</h3>' +
+              '<span class="path">' + escape(group.path) + ' · ' + escape(group.tagline) + '</span>' +
+            '</div>' +
+            '<span class="count">' + group.topics.length + ' topic' + (group.topics.length === 1 ? '' : 's') + '</span>' +
+          '</div>' +
+          '<div class="topics">' + topics + '</div>' +
+        '</div>'
+      );
+    }
+
+    // Mount the tree
+    const repo = document.getElementById('repo');
+    repo.innerHTML = window.CATALOG.groups.map(renderGroup).join('');
+
+    // Lesson-count chip — derives from catalog so it stays honest
+    const totalLessons = window.CATALOG.groups.reduce(
+      (n, g) => n + g.topics.reduce((m, t) => m + (t.lessons ? t.lessons.length : 0), 0), 0);
+    const chip = document.getElementById('lessonCountChip');
+    if (totalLessons === 1) chip.textContent = '1 lesson so far, more on the way';
+    else chip.textContent = totalLessons + ' lessons so far, more on the way';
+
+    // Entrance animation — self-completing + safety net
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = [...document.querySelectorAll('[data-enter]')];
+    if (!reduce) {
+      items.forEach((el, i) => {
+        el.style.animationDelay = (i * 0.09) + 's';
+        el.classList.add('enter');
+      });
+      setTimeout(() => items.forEach(el => el.classList.remove('enter')), 1600);
+    }
+
+    // Gentle nudge when an unwritten topic is clicked
+    document.querySelectorAll('.topic.soon').forEach(t => {
+      t.addEventListener('click', () => {
+        t.classList.remove('nudge');
+        void t.offsetWidth; // force reflow so the class re-add restarts the animation
+        t.classList.add('nudge');
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
