@@ -148,6 +148,8 @@ function Lesson() {
             Most of the edges below are a direct consequence of that single choice.
           </Callout>
 
+          <EdgesScenario />
+
           <div className="edge-list">
             <EdgeCase
               category="failure"
